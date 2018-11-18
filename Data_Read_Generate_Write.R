@@ -1,6 +1,4 @@
 # Packages that will be used
-# library(ez)
-# library(lsr)
 library(lme4)
 library(lmerTest)
 library(car)
@@ -9,13 +7,11 @@ library(ggplot2)
 library("simr")
 library(svMisc)
 library(MuMIn)
-# library("yhat")
 
 # File output names
 file_name_output <- "team_player_aggragate_stats.csv"
 
 # Read in data ----
-
 
 folder_location <- "Database"
 folder_location_database <- paste(main_work_directory_name, folder_location, sep = "")
