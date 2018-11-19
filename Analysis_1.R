@@ -11,9 +11,11 @@ my_errors_uniqe_team <- "Errors_Unique"
 
 my_individualScore <- "IndividualScore"
 my_CI_ind <- "CI_ind"
+my_II_ind <- "II_ind"
+my_time_remaining_ind <- "Time_remaining_ind"
 
 # Dependant variable
-dependet_variable <- my_CI_ind
+dependet_variable <- my_time_remaining_ind
 
 # Data ----
 # Team
@@ -72,6 +74,18 @@ if(dependet_variable == my_teamScore){
   fitted_plot_file_name <- "Residuals_Fitted_Plot_CI_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_CI_ind.png"
   QQ_plot_file_name <- "Residual_QQ_CI_ind.png"
+} else if(dependet_variable == my_II_ind){
+  fit_rand_dependent <- lmer(II_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_II_ind.png"
+  historgram_plot_file_name <- "Residuals_Histogram_II_ind.png"
+  QQ_plot_file_name <- "Residual_QQ_II_ind.png"
+} else if(dependet_variable == my_time_remaining_ind){
+  fit_rand_dependent <- lmer(timeRemaining_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_time_remaining_ind.png"
+  historgram_plot_file_name <- "Residuals_Histogram_time_remaining_ind.png"
+  QQ_plot_file_name <- "Residual_QQ_time_remaining_ind.png"
 } else {
   stop("The dependent variable is not recognized")
 }
@@ -125,7 +139,7 @@ N_ind_full_text <- paste("(N = ", N_ind, ")", sep = "")
 
 myfigure_titles <- c("Individual Scores", "Correct Items Collected", "Incorrect Items Collected", "Distance (Total)", "Time remaining (Ind)", "Errors (Unique)")
 myy_values_ind <- c("IndividualScore", "CI_ind", "II_ind", "Dis_total_ind", "timeRemaining_team", "ERROR_ind_unique")
-myy_labels_ind <- c("Individual Score", "Correct Items (Individual)", "Incorrect Items (Individual)", "Distance (Total)", "Time (s)")
+myy_labels_ind <- c("Individual Score", "Correct Items (Individual)", "Incorrect Items (Individual)", "Distance (Total)", "Time (s)", "Errors(Unique)")
 myx_values <- c("SessionOrder", "Target")
 myx_labels_ind <- c("Session", "Target")
 myplot_types <- c("Group_Bar", "Boxplot", "Point_plot")
