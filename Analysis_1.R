@@ -5,9 +5,12 @@ setwd(figure_directory)
 # Posible Dependent variables
 my_teamScore <- "TeamScore"
 my_CI_team <- "CI_team"
+my_II_team <- "II_team"
+my_time_remaining_team <- "Time_remaining"
+my_errors_uniqe <- "Errors_Unique"
 
 # Dependant variable
-dependet_variable <- my_CI_team
+dependet_variable <- my_errors_uniqe
 
 # Data ----
 # Team
@@ -33,9 +36,27 @@ if(dependet_variable == my_teamScore){
 } else if(dependet_variable == my_CI_team){
   fit_rand_dependent <- lmer(CI_team~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
   #Files names for assumptions
-  fitted_plot_file_name <- "Residuals_Fitted_Plot_CI.png"
-  historgram_plot_file_name <- "Residuals_Histogram_CI.png"
-  QQ_plot_file_name <- "Residual_QQ_CI.png"
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_CI_team.png"
+  historgram_plot_file_name <- "Residuals_Histogram_CI_team.png"
+  QQ_plot_file_name <- "Residual_QQ_CI_team.png"
+} else if (dependet_variable == my_II_team){
+  fit_rand_dependent <- lmer(II_team~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_II_team.png"
+  historgram_plot_file_name <- "Residuals_Histogram_II_team.png"
+  QQ_plot_file_name <- "Residual_QQ_II.png"
+} else if(dependet_variable == my_time_remaining_team){
+  fit_rand_dependent <- lmer(timeRemaining_team~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_time_remaining_team.png"
+  historgram_plot_file_name <- "Residuals_Histogram_time_remaining_team.png"
+  QQ_plot_file_name <- "Residual_QQ_time_remaining_team.png"
+} else if(dependet_variable == my_errors_uniqe) {
+  fit_rand_dependent <- lmer(ERROR_team_unique~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_time_ERROR_unique.png"
+  historgram_plot_file_name <- "Residuals_Histogram_ERROR_unique_team.png"
+  QQ_plot_file_name <- "Residual_QQ_ERROR_unique_team.png"
 } else {
   stop("The dependent variable is not recognized")
 }
