@@ -103,7 +103,7 @@ r.squaredGLMM(fit_rand_dependent)
 
 myfigure_titles <- c("Team Scores", "Correct Items Collected", "Incorrect Items Collected", "Distance (Total)", "Time Remaining (Team)", "Errors (Unique)")
 myy_values_team <- c("TeamScore", "CI_team", "II_team", "Dis_total_team", "timeRemaining_team", "ERROR_team_unique")
-myy_labels_team <- c("Team Score", "Correct Items (Team)", "Incorrect Items (Team)", "Distance (Total)", "Time(s)", "Count")
+myy_labels_team <- c("Team Score", "Correct Items (Team)", "Incorrect Items (Team)", "Distance (Total)", "Time(s)", "Errors (Unique)")
 myx_values <- c("SessionOrder", "Target")
 myx_labels_team <- c("Session", "Target")
 myplot_types <- c("Group_Bar", "Boxplot", "Point_plot")
