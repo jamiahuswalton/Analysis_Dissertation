@@ -12,7 +12,7 @@ columns_to_refactor <- c("SessionOrder", "Team", "Player_ID", "Condition", "Domi
 team_aggregate_data_stats <- re_factor_columns(team_aggregate_data_stats, columns_to_refactor)
 
 
-#------#
+# Team ------
 fit_rand_teamscore <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
 
 # Currnt power
@@ -28,6 +28,24 @@ powerCurve(test_100, seed = 300, along = "Team")
 # powerCurve(model2)
 model2 <- extend(fit_rand_teamscore_pilot, along = "Team", n = 33)
 powerSim(model2, nsim=50)
+
+# Individual ----
+fit_rand_indScore <- lmer(IndividualScore~Target+SessionOrder+(1|Team)+(1|Player_ID), data = team_aggregate_data_stats)
+
+# Currnt power
+powerSim(fit_rand_indScore, nsim = 1000, seed = 300)
+
+# test <- extend(fit_rand_indScore, along = "Team")
+test_100 <- extend(fit_rand_indScore, along = "Team", n = 100)
+powerSim(test_100, nsim = 100, seed = 300)
+powerCurve(test_100, seed = 300, along = "Team")
+
+
+# powerSim(fit_rand_teamscore_pilot)
+# powerCurve(model2)
+model2 <- extend(fit_rand_indScore, along = "Team", n = 33)
+powerSim(model2, nsim=50)
+
 
 #-----
 u_my <- 2 # Number of coeffecicents

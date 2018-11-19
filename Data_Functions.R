@@ -8,7 +8,7 @@ remove_a_team_from_raw_data <- function(data, teams_to_be_removed, name_of_team_
   return(clean_data)
 }
 
-# Remove measures with a give value
+# Remove measures with a give value ----
 remove_measures_with_given_value <- function(data_set, col_name, value){
   rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
   
@@ -22,7 +22,7 @@ clean_inventory_data_by_removing_game_enteries <- function(inventory_data, colum
   return(inventory_data[-inventory_entries_to_remove,])
 }
 
-#Function to count the total number of errors commited by a team (regarless of if this rule was broken before) ----
+# Function to count the total number of errors commited by a team (regarless of if this rule was broken before) ----
 total_number_of_errors_team <- function(date_errors, teamNum, condition){
   total_errors_team <- 0
   total_errors_team <- sum(date_errors$teamnumber == teamNum & 
@@ -30,7 +30,7 @@ total_number_of_errors_team <- function(date_errors, teamNum, condition){
 }
 
 
-#Function to count the total number of errors commited by a player (regarless of if this rule was broken before) ----
+# Function to count the total number of errors commited by a player (regarless of if this rule was broken before) ----
 total_number_of_errors_individual <- function(data_errors, teamNum, playernum, condition){
   total_errors_individual <- 0
   total_errors_individual <- sum(data_errors$playernum == playernum & 
@@ -56,7 +56,7 @@ list_of_team_numbers <- function(data, team_number_col_name){
   return(as.numeric(levels(factor(as.vector(data[,team_number_col_name])))))
 }
 
-#Function to count the number of times a game strategy was used ----
+# Function to count the number of times a game strategy was used ----
 strategy_count_vector<- function(position_data, experimentalcondition, teamnumber_current, playernumber_one, playernumber_two, playernumber_three, strategy_barrier_distance){
   
   #Need to get the position Data for all players (3 players)
@@ -127,8 +127,7 @@ strategy_count_vector<- function(position_data, experimentalcondition, teamnumbe
   return(c(count_go_together, count_go_alone, count_mix))
 }
 
-
-#Function that counts the number of utterences for a player in a given condition ----
+# Function that counts the number of utterences for a player in a given condition ----
 utterance_count_for_a_player<- function(positionData, condition, team_number, player_num){
   #Get players table data
   is_player_1 <- as.vector(positionData$expcondition == condition & positionData$teamnumber == team_number & 
@@ -592,13 +591,8 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
   return(data_output_final)
 }
 
-
-
-
-
-# Generate figures for dependent variables with specified x variables
-
-generate_figures <- function(Data, num_of_teams, figure_titles, y_values_team, y_labels_team, x_values, x_labels_team, plot_types, filelocation){ # Need to change the variables
+# Generate figures for dependent variables with specified x variables ----
+generate_figures_team <- function(Data, num_of_teams, figure_titles, y_values_team, y_labels_team, x_values, x_labels_team, plot_types, filelocation){ # Need to change the variables
   previous_wd_location <- getwd()
   
   setwd(filelocation)
@@ -647,6 +641,61 @@ generate_figures <- function(Data, num_of_teams, figure_titles, y_values_team, y
   setwd(previous_wd_location)
 }
 
+# Generate figures for dependent variables with specified x variables (Individual) ----
+generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_ind, y_labels_ind, x_values_ind, x_labels_ind, plot_types_ind, filelocation){
+  previous_wd_location <- getwd()
+  
+  # What is the N for Inds
+  N_ind <- num_of_players
+  
+  # The N text to add to title for Inds 
+  N_ind_full_text <- paste("(N = ", N_ind, ")", sep = "")
+  
+  # # Test
+  # 
+  # figure_titles <- c("Individual Scores", "Correct Items Collected")
+  # y_values_ind <- c("IndividualScore", "CI_ind")
+  # y_labels_ind <- c("Individual Score", "Correct Items (Individual)")
+  # x_values_ind <- c("SessionOrder", "Target")
+  # x_labels_ind <- c("Session", "Target")
+  # plot_types_ind <- c("Group_Bar", "Boxplot", "Point_plot")
+  
+  for(y_current in y_values_ind){
+    for (x_current in x_values_ind){
+      index_for_y <- which(y_current == y_values_ind)
+      index_for_x <- which(x_current == x_values_ind)
+      
+      for(plot in plot_types_ind){
+        x_label <- x_labels_ind[index_for_x]
+        y_label <- y_labels_ind[index_for_y]
+        figure_title <- figure_titles[index_for_y]
+        filename_graph <- paste("ind_",y_label,"_by_",x_label,"_",plot,".png", sep = "")
+        
+        if(plot == "Group_Bar"){
+          # print(paste("team_",y_label,"_by_",x_label,"_",plot, sep = ""))
+          ggplot(data = Data, aes_string(x = x_current, y = y_current, fill = "Player_ID")) +
+            geom_bar(stat = "identity", position = "dodge") +
+            labs(title = paste(figure_title, N_ind_full_text) , x = x_label, y = y_label) +
+            guides(fill=FALSE)
+          ggsave(filename = filename_graph)
+          
+        } else if(plot == "Boxplot"){
+          ggplot(data = Data, aes_string(x = x_current, y = y_current)) +
+            geom_boxplot() +
+            labs(title = paste(figure_title, N_ind_full_text), x = x_label, y = y_label)
+          ggsave(filename = filename_graph)
+        } else if(plot == "Point_plot"){
+          ggplot(data = Data, aes_string(x = x_current, y = y_current)) +
+            geom_point() +
+            labs(title = paste(figure_title, N_ind_full_text), x = x_label, y = y_label)
+          ggsave(filename = filename_graph)
+        }
+      }
+    }
+  }
+  
+  setwd(previous_wd_location)
+}
 #Test ----
 
 # # What is the N for Teams

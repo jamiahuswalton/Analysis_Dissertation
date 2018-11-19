@@ -51,4 +51,3 @@ for(y_current in y_values_team){
     }
   }
 }
-
