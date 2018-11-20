@@ -16,7 +16,7 @@ my_time_remaining_ind <- "Time_remaining_ind"
 my_errors_uniqe_ind <- "ERROR_ind_unique"
 
 # Dependant variable
-dependet_variable <- my_errors_uniqe_ind
+dependet_variable <- my_teamScore
 
 # Data ----
 # Team
