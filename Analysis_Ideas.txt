@@ -1,0 +1,7 @@
+Analysis
+- Does distance travel change based on condition?
+- DOes communication change based on condition
+- Does communication duration change based on the condition?
+- Does the influence of the feedback  strategy change depending on the strategy used?
+- Does the perception of how they did change based on the condition?
+- When do teams change strategies?
