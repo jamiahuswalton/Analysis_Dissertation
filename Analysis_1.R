@@ -13,9 +13,10 @@ my_individualScore <- "IndividualScore"
 my_CI_ind <- "CI_ind"
 my_II_ind <- "II_ind"
 my_time_remaining_ind <- "Time_remaining_ind"
+my_errors_uniqe_ind <- "ERROR_ind_unique"
 
 # Dependant variable
-dependet_variable <- my_time_remaining_ind
+dependet_variable <- my_errors_uniqe_ind
 
 # Data ----
 # Team
@@ -86,6 +87,12 @@ if(dependet_variable == my_teamScore){
   fitted_plot_file_name <- "Residuals_Fitted_Plot_time_remaining_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_time_remaining_ind.png"
   QQ_plot_file_name <- "Residual_QQ_time_remaining_ind.png"
+} else if(dependet_variable == my_errors_uniqe_ind){
+  fit_rand_dependent <- lmer(ERROR_ind_unique~Target+SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_ERROR_unique_ind.png"
+  historgram_plot_file_name <- "Residuals_Histogram_ERROR_unique_ind.png"
+  QQ_plot_file_name <- "Residual_QQ_ERROR_unique_ind.png"
 } else {
   stop("The dependent variable is not recognized")
 }
