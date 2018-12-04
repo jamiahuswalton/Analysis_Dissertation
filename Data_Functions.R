@@ -333,7 +333,6 @@ is_demographic_rand_num_in_post_survey <- function(post_session_table, demo_surv
   return(is_in_post_survey)
 }
 
-
 # Function to Check to make sure each rand number in the post survey responses are the same for each player in each team ( for all of the conditions) ----
 is_post_session_data_correct <- function(post_session_data, team_number_column_name, player_num_col_name, rand_num_col_name){
   is_correct <- T
@@ -391,8 +390,6 @@ is_post_session_data_correct <- function(post_session_data, team_number_column_n
   return(is_correct)
 }
 
-
-
 # Generate aggragate data (final team score, final individual score, ) ----
 generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, 
                                     player_num_list, strategy_barrier_dis, counter_balance_set, col.names){
@@ -404,10 +401,6 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
   colnames(data_output_final)<- col.names
   
   for(team in team_numbers){
-    # Progress Bar
-    team_index <- which(team == team_numbers)
-    progress(team_index / length(team_numbers) * 100)
-    
     for(condition in condition_list){
       
       #Count the number of times strategies were used
@@ -586,6 +579,10 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     dominate_strategy_used))
       }
     }
+    
+    # Progress Bar
+    team_index <- which(team == team_numbers)
+    progress(team_index / length(team_numbers) * 100)
   }
   
   return(data_output_final)
@@ -636,6 +633,10 @@ generate_figures_team <- function(Data, num_of_teams, figure_titles, y_values_te
         }
       }
     }
+    
+    # Progress Bar
+    y_index <- which(y_current == y_values_team)
+    progress(y_index / length(y_values_team) * 100)
   }
   
   setwd(previous_wd_location)
@@ -692,32 +693,13 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
         }
       }
     }
+    
+    # Progress Bar
+    y_index <- which(y_current == y_values_ind)
+    progress(y_index / length(y_values_ind) * 100)
   }
   
   setwd(previous_wd_location)
 }
 #Test ----
 
-# # What is the N for Teams
-# N_teams <- length(levels(factor(team_aggregate_data_stats$Team) ))
-# 
-# # The N text to add to title for teams 
-# N_teams_full_text <- paste("(N = ", N_teams, ")", sep = "")
-# 
-# myfigure_titles <- c("Team Scores", "Correct Items Collected", "Incorrect Items Collected", "Distance (Total)")
-# myy_values_team <- c("TeamScore", "CI_team", "II_team", "Dis_total_team")
-# myy_labels_team <- c("Team Score", "Correct Items (Team)", "Incorrect Items (Team)", "Distance (Total)")
-# myx_values <- c("SessionOrder", "Target")
-# myx_labels_team <- c("Session", "Target")
-# myplot_types <- c("Group_Bar", "Boxplot", "Point_plot")
-# myFileLocation <- "C:/Users/jamia/Box/TMET2/DATA TMET2/Data_And_Calcuations/Figures"
-# 
-# generate_figures(Data = team_aggregate_data_stats,
-#                  num_of_teams = N_teams,
-#                  figure_titles = myfigure_titles,
-#                  y_values_team = myy_values_team,
-#                  y_labels_team = myy_labels_team,
-#                  x_values = myx_values,
-#                  x_labels_team = myx_labels_team,
-#                  plot_types = myplot_types, 
-#                  filelocation = myFileLocation)

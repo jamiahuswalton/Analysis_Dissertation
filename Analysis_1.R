@@ -144,12 +144,34 @@ N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
 # The N text to add to title for Inds 
 N_ind_full_text <- paste("(N = ", N_ind, ")", sep = "")
 
-myfigure_titles <- c("Individual Scores", "Correct Items Collected", "Incorrect Items Collected", "Distance (Total)", "Time remaining (Ind)", "Errors (Unique)")
-myy_values_ind <- c("IndividualScore", "CI_ind", "II_ind", "Dis_total_ind", "timeRemaining_team", "ERROR_ind_unique")
-myy_labels_ind <- c("Individual Score", "Correct Items (Individual)", "Incorrect Items (Individual)", "Distance (Total)", "Time (s)", "Errors(Unique)")
-myx_values <- c("SessionOrder", "Target")
-myx_labels_ind <- c("Session", "Target")
-myplot_types <- c("Group_Bar", "Boxplot", "Point_plot")
+myfigure_titles <- c("Individual Scores", 
+                     "Correct Items Collected", 
+                     "Incorrect Items Collected", 
+                     "Distance (Total)", 
+                     "Time remaining (Ind)", 
+                     "Errors (Unique)")
+
+myy_values_ind <- c("IndividualScore", 
+                    "CI_ind", "II_ind", 
+                    "Dis_total_ind", 
+                    "timeRemaining_team", 
+                    "ERROR_ind_unique")
+
+myy_labels_ind <- c("Individual Score", 
+                    "Correct Items (Individual)", 
+                    "Incorrect Items (Individual)", 
+                    "Distance (Total)", "Time (s)", 
+                    "Errors(Unique)")
+
+myx_values <- c("SessionOrder", 
+                "Target")
+
+myx_labels_ind <- c("Session", 
+                    "Target")
+
+myplot_types <- c("Group_Bar", 
+                  "Boxplot", 
+                  "Point_plot")
 
 generate_figures_ind(Data = clean_aggregate_data_stats,
                      num_of_players = N_ind,
@@ -164,12 +186,31 @@ generate_figures_ind(Data = clean_aggregate_data_stats,
 #Generate Plots for Team performance
 
 # What is the N for Teams
-myfigure_titles <- c("Team Scores", "Correct Items Collected", "Incorrect Items Collected", "Distance (Total)", "Time Remaining (Team)", "Errors (Unique)")
-myy_values_team <- c("TeamScore", "CI_team", "II_team", "Dis_total_team", "timeRemaining_team", "ERROR_team_unique")
-myy_labels_team <- c("Team Score", "Correct Items (Team)", "Incorrect Items (Team)", "Distance (Total)", "Time (s)", "Errors (Unique)")
-myx_values <- c("SessionOrder", "Target")
-myx_labels_team <- c("Session", "Target")
-myplot_types <- c("Group_Bar", "Boxplot", "Point_plot")
+myfigure_titles <- c("Team Scores", 
+                     "Correct Items Collected", 
+                     "Incorrect Items Collected", 
+                     "Distance (Total)", 
+                     "Time Remaining (Team)", 
+                     "Errors (Unique)")
+myy_values_team <- c("TeamScore", 
+                     "CI_team", 
+                     "II_team", 
+                     "Dis_total_team", 
+                     "timeRemaining_team", 
+                     "ERROR_team_unique")
+myy_labels_team <- c("Team Score", 
+                     "Correct Items (Team)", 
+                     "Incorrect Items (Team)", 
+                     "Distance (Total)", 
+                     "Time (s)", 
+                     "Errors (Unique)")
+myx_values <- c("SessionOrder", 
+                "Target")
+myx_labels_team <- c("Session", 
+                     "Target")
+myplot_types <- c("Group_Bar", 
+                  "Boxplot", 
+                  "Point_plot")
 
 generate_figures_team(Data = clean_aggregate_data_stats,
                       num_of_teams = N_teams,
