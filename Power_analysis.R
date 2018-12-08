@@ -16,7 +16,7 @@ team_aggregate_data_stats <- re_factor_columns(team_aggregate_data_stats, column
 fit_rand_teamscore <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
 
 # Currnt power
-powerSim(fit_rand_teamscore, nsim = 1000, seed = 300)
+powerSim(fit_rand_teamscore, nsim = 200, seed = 300)
 
 # test <- extend(fit_rand_teamscore, along = "Team")
 test_100 <- extend(fit_rand_teamscore, along = "Team", n = 100)
