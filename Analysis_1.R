@@ -16,7 +16,7 @@ my_time_remaining_ind <- "Time_remaining_ind"
 my_errors_uniqe_ind <- "ERROR_ind_unique"
 
 # Dependant variable
-dependet_variable <- my_individualScore
+dependet_variable <- my_time_remaining_team
 
 # Data ----
 # Team
@@ -109,6 +109,7 @@ if(dependet_variable == my_teamScore){
 
 summary(fit_rand_dependent)
 summary(fit_rand_dependent_robust)
+compare(fit_rand_dependent, fit_rand_dependent_robust)
 
 # Assumption: Your data needs to show homoscedasticity, which is where the variances along the line of best fit remain similar as you move along the line ----
 # Fitted values
