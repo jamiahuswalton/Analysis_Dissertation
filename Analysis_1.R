@@ -2,7 +2,7 @@
 
 setwd(figure_directory)
 
-# Posible Dependent variables
+# Posible Dependent variables ----
 my_teamScore <- "TeamScore"
 my_CI_team <- "CI_team"
 my_II_team <- "II_team"
@@ -15,11 +15,11 @@ my_II_ind <- "II_ind"
 my_time_remaining_ind <- "Time_remaining_ind"
 my_errors_uniqe_ind <- "ERROR_ind_unique"
 
-# Dependant variable
-dependet_variable <- my_individualScore
+# Dependant variable ----
+dependet_variable <- my_teamScore
 
 # Data ----
-# Team
+
 # clean_aggregate_data_stats <- my_aggregate_data
 clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data,col_name = "Condition", value = "A") # without none condition
 
