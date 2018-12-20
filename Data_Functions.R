@@ -482,14 +482,9 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         
         # Get the time remaining team and individual
         time_remaining_ind <- as.vector(player_data[last_line,"gametimer_ind"])
-        # time_remaining_team <- as.vector(player_data[last_line,"gametimer"])
         
         #Get the Individual Score
         individual_final_score<- as.vector(player_data[last_line,"individualscore"])
-        
-        #Get the team score
-        #team_final_score<- as.vector(player_data[last_line,"teamscore"]) 
-        
         
         #Correct Individual Items Collected
         correct_individual_items_collected<- as.vector(player_data[last_line, "ci_ind"])
@@ -709,14 +704,3 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-total_items_collected_in_session(inventory_table, 10, 1, "B")
-
-team_num <- 10
-player_num <- 1
-condition_letter <- "B"
-
-# The items (individual or team) collected by the individual
-individual_data_inventory_activity <- inventory_table %>%
-  filter(teamnumber == team_num & expcondition == condition_letter & playernum == player_num & itemid != -1)
-
-length(individual_data_inventory_activity[,1])
