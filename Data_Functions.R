@@ -29,7 +29,6 @@ total_number_of_errors_team <- function(date_errors, teamNum, condition){
                              date_errors$expcondition == condition)
 }
 
-
 # Function to count the total number of errors commited by a player (regarless of if this rule was broken before) ----
 total_number_of_errors_individual <- function(data_errors, teamNum, playernum, condition){
   total_errors_individual <- 0
@@ -48,8 +47,6 @@ re_factor_columns <- function(userData, columnNames){
   }
   return(factorData)
 }
-
-
 
 # Generate team number list in a given data set ----
 list_of_team_numbers <- function(data, team_number_col_name){
@@ -300,6 +297,14 @@ total_distance_traveled_by_team <- function(position_data, experimentalcondition
   return(sum(distance_traveled_by_each_player))
 }
 
+# Total items (correct and incorrect) collected by a player in a given session
+total_items_collected_in_session <- function(inventory_data, team_num, player_num, condition_name){
+  inventory_data_filtered <- inventory_data %>%
+    filter(teamnumber == team_num & expcondition == condition_name & playernum == player_num & itemid != -1)
+  
+  return(length(inventory_data_filtered[,1]))
+}
+
 # Check to see if the random numbers in demographics surveys match the random numbers in the post surveys ----
 is_demographic_rand_num_in_post_survey <- function(post_session_table, demo_survey, team_col_name, player_col_name, rand_num_col_name){
   #team_col_name : for the post_session_table
@@ -477,14 +482,9 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         
         # Get the time remaining team and individual
         time_remaining_ind <- as.vector(player_data[last_line,"gametimer_ind"])
-        # time_remaining_team <- as.vector(player_data[last_line,"gametimer"])
         
         #Get the Individual Score
         individual_final_score<- as.vector(player_data[last_line,"individualscore"])
-        
-        #Get the team score
-        #team_final_score<- as.vector(player_data[last_line,"teamscore"]) 
-        
         
         #Correct Individual Items Collected
         correct_individual_items_collected<- as.vector(player_data[last_line, "ci_ind"])
@@ -701,5 +701,6 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
   
   setwd(previous_wd_location)
 }
+
 #Test ----
 
