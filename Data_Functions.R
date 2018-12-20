@@ -298,7 +298,7 @@ total_distance_traveled_by_team <- function(position_data, experimentalcondition
 }
 
 # Total items (correct and incorrect) collected by a player in a given session
-total_items_collected_in_session <- function(inventory_data, team_num, player_num, condition_name){
+total_items_collected_in_session_by_individual <- function(inventory_data, team_num, player_num, condition_name){
   inventory_data_filtered <- inventory_data %>%
     filter(teamnumber == team_num & expcondition == condition_name & playernum == player_num & itemid != -1)
   
@@ -703,4 +703,15 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
+team_num <- 10
+player_num <- 1
+condition_letter <- "B"
 
+individual_data <-  positionTable %>%
+  filter(teamnumber == team_num & playernum == player_num & expcondition == condition_letter)
+
+individual_data_last_row <- tail(individual_data,1)
+duration_ind <- individual_data_last_row[1,"duration_ind"]
+num_items_collected <- total_items_collected_in_session_by_individual(inventory_table, team_num, 1, "B")
+
+sec_per_items <- duration_ind / num_items_collected
