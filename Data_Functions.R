@@ -305,6 +305,42 @@ total_items_collected_in_session_by_individual <- function(inventory_data, team_
   return(length(inventory_data_filtered[,1]))
 }
 
+# Collection Rate - Individual - Total time (sec) per item
+collection_rate_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
+  # This is the item collection rate for an individual
+  # The units for this value is Sec / item. 
+  # This takes into account the total items (incorrect or correct) collected by the individual
+  
+  total_items_collected <- total_items_collected_in_session_by_individual(data_inventory, teamnum, playernumber, condition)
+  player_data <- data_position %>% filter(teamnumber == teamnum & playernum == playernumber & expcondition == condition)
+  player_data_last_line <- tail(player_data, 1)
+  duration_ind <- player_data_last_line[1,"duration_ind"]
+  
+  return (duration_ind / total_items_collected)
+}
+
+# Total items (correct and incorrect) collected by a team in a given session
+total_items_collected_in_session_by_team <- function(data_inventory, team_num, condition_name){
+  inventory_data_filtered <- data_inventory %>%
+    filter(teamnumber == team_num & expcondition == condition_name & itemid != -1)
+  
+  return(length(inventory_data_filtered[,"itemid"]))
+}
+
+# Collection Rate - Team - Total time (sec) per item
+collection_rate_team <-  function(data_position, data_inventory, teamnum, condition){
+  # This is the item collection rate for a team
+  # The units for this value is Sec / item. 
+  # This takes into account the total items (incorrect or correct) collected by the team
+  
+  total_items_collected <- total_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+  team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
+  team_data_last_line <- tail(team_data, 1)
+  duration_team <- team_data_last_line[1,"duration"]
+  
+  return(duration_team / total_items_collected)
+}
+
 # Check to see if the random numbers in demographics surveys match the random numbers in the post surveys ----
 is_demographic_rand_num_in_post_survey <- function(post_session_table, demo_survey, team_col_name, player_col_name, rand_num_col_name){
   #team_col_name : for the post_session_table
@@ -703,15 +739,19 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
-team_num <- 10
-player_num <- 1
-condition_letter <- "B"
 
-individual_data <-  positionTable %>%
-  filter(teamnumber == team_num & playernum == player_num & expcondition == condition_letter)
+data_position <- clean_positionTable
+data_inventory <- clean_inventory_data
+teamnum <- 7
+condition <- "B"
 
-individual_data_last_row <- tail(individual_data,1)
-duration_ind <- individual_data_last_row[1,"duration_ind"]
-num_items_collected <- total_items_collected_in_session_by_individual(inventory_table, team_num, 1, "B")
+total_items_collected <- total_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
+team_data_last_line <- tail(team_data, 1)
+duration_team <- team_data_last_line[1,"duration"]
+duration_team / total_items_collected
 
-sec_per_items <- duration_ind / num_items_collected
+
+collection_rate_team(clean_positionTable, clean_inventory_data, 7, "B")
+
+ 
