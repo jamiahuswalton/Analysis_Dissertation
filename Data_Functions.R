@@ -297,7 +297,7 @@ total_distance_traveled_by_team <- function(position_data, experimentalcondition
   return(sum(distance_traveled_by_each_player))
 }
 
-# Total items (correct and incorrect) collected by a player in a given session
+# Total items (correct and incorrect)(team and individual) collected by a player in a given session
 total_items_collected_in_session_by_individual <- function(inventory_data, team_num, player_num, condition_name){
   inventory_data_filtered <- inventory_data %>%
     filter(teamnumber == team_num & expcondition == condition_name & playernum == player_num & itemid != -1)
@@ -305,7 +305,7 @@ total_items_collected_in_session_by_individual <- function(inventory_data, team_
   return(length(inventory_data_filtered[,1]))
 }
 
-# Collection Rate - Individual - Total time (sec) per item
+# Collection Rate - Individual - Total time (sec) per item (team and individual items)
 collection_rate_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
   # The units for this value is Sec / item. 
@@ -319,7 +319,28 @@ collection_rate_ind <- function(data_position, data_inventory, teamnum, playernu
   return (duration_ind / total_items_collected)
 }
 
-# Total items (correct and incorrect) collected by a team in a given session
+# Total correct items (team and individual items) collected by a player in a given session
+total_correct_items_collected_in_session_by_individual <- function(inventory_data, team_num, player_num, condition_name){
+  inventory_data_filtered <- inventory_data %>%
+    filter(playernum == player_num & teamnumber == team_num & expcondition == condition_name & itemid != -1 & boughtcorrectly == 1)
+  return(length(inventory_data_filtered[,"itemid"]))
+}
+
+# Collection Rate for correct item - Individual - Total time (sec) per item (team and individual items)
+collection_rate_correct_items_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
+  # This is the item collection rate for an individual
+  # The units for this value is Sec / item. 
+  # This takes into account the total correct items (team and individual) collected by the individual
+  
+  total_items_collected <- total_correct_items_collected_in_session_by_individual(data_inventory, teamnum, playernumber, condition)
+  player_data <- data_position %>% filter(teamnumber == teamnum & playernum == playernumber & expcondition == condition)
+  player_data_last_line <- tail(player_data, 1)
+  duration_ind <- player_data_last_line[1,"duration_ind"]
+  
+  return(duration_ind / total_items_collected)
+}
+
+# Total items (correct and incorrect)(team and individual) collected by a team in a given session
 total_items_collected_in_session_by_team <- function(data_inventory, team_num, condition_name){
   inventory_data_filtered <- data_inventory %>%
     filter(teamnumber == team_num & expcondition == condition_name & itemid != -1)
@@ -327,7 +348,7 @@ total_items_collected_in_session_by_team <- function(data_inventory, team_num, c
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Collection Rate - Team - Total time (sec) per item
+# Collection Rate - Team - Total time (sec) per item (team and individual items)
 collection_rate_team <-  function(data_position, data_inventory, teamnum, condition){
   # This is the item collection rate for a team
   # The units for this value is Sec / item. 
@@ -339,6 +360,28 @@ collection_rate_team <-  function(data_position, data_inventory, teamnum, condit
   duration_team <- team_data_last_line[1,"duration"]
   
   return(duration_team / total_items_collected)
+}
+
+# Total correct items (team and individual items) collected by a team in a given session
+total_correct_items_collected_in_session_by_team <- function(data_inventory, team_num, condition_name){
+  inventory_data_filtered <- data_inventory %>%
+    filter(teamnumber == team_num & expcondition == condition_name & itemid != -1 & boughtcorrectly == 1)
+  
+  return(length(inventory_data_filtered[,"itemid"]))
+}
+
+# Collection Rate for correct item - Team - Total time (sec) per item (team and individual items)
+collection_rate_correct_items_team <- function(data_position, data_inventory, teamnum, condition){
+  # This is the item collection rate for a team
+  # The units for this value is Sec / item. 
+  # This takes into account the total correct items (team and individual) collected by a team
+  
+  total_items_collected <- total_correct_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+  team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
+  team_data_last_line <- tail(team_data, 1)
+  duration_team <- team_data_last_line[1,"duration"]
+  
+  return(duration_team/total_items_collected)
 }
 
 # Check to see if the random numbers in demographics surveys match the random numbers in the post surveys ----
@@ -489,8 +532,11 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
       #Team time remaining
       time_remaining_team <- as.vector(player_data_1[last_line_1,"gametimer"])
       
-      # Team collection rate for condition
+      # Collection rate for team in a condition (correct and incorrect items)(team and individual)
       team_collection_rate <- collection_rate_team(clean_position_data, clean_invent_data, team, condition)
+      
+      # Collection rate for team in a condition (correct items) (team and individual items)
+      team_collection_rate_correct_items <- collection_rate_correct_items_team(clean_position_data, clean_invent_data, team, condition)
       
       for(player in player_num_list){
         # The next step is to add all of the values for each cloumn
@@ -585,8 +631,11 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         
         #---------------------------------------------------------------
         
-        # Collection rate for individual
+        # Collection rate for individual (correct and incorrect)(team and individual items)
         individual_collection_rate <- collection_rate_ind(clean_position_data, clean_invent_data, team, player, condition)
+        
+        # Collection rate for individual (correct items)(team and individual items)
+        individual_collection_rate_correct_items <- collection_rate_correct_items_ind(clean_position_data, clean_invent_data, team, player, condition)
         
         #This should be the same as the col_names variable above.
         data_output_final<- rbind(data_output_final, 
@@ -603,12 +652,14 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     correct_individual_items_collected, 
                                     incorrect_individual_item_collected, 
                                     individual_collection_rate,
+                                    individual_collection_rate_correct_items,
                                     errors_individual_unique,
                                     total_errors_ind,
                                     total_dis_ind,
                                     correct_team_items_collected,
                                     incorrect_team_item_collected,
                                     team_collection_rate,
+                                    team_collection_rate_correct_items,
                                     errors_team_unique,
                                     total_errors_team,
                                     total_dis_team,
@@ -747,14 +798,3 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
-test <- clean_aggregate_data_stats %>%
-  mutate(position = rank(-clean_aggregate_data_stats[,"CI_team"], ties.method="first")) 
-
-# Try using the regular aes and not the aes_string. I am thinking that this is causing the issues
-ggplot(data = test, aes_string(x = "SessionOrder", y = "CI_team", fill = "Team", group = "position")) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = paste("Test", "39") , x = "Session", y = "CI_team") +
-  guides(fill=guide_legend(title="Team"))
-ggsave(filename = filename_graph)
-
-
