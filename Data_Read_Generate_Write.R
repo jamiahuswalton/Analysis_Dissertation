@@ -96,11 +96,13 @@ col_names<- c("Team",
               "TeamScore", 
               "CI_ind", 
               "II_ind", 
+              "Collection_rate_ind",
               "ERROR_ind_unique",
               "ERROR_ind_total",
               "Dis_total_ind",
               "CI_team", 
-              "II_team", 
+              "II_team",
+              "Collection_rate_team",
               "ERROR_team_unique",
               "ERROR_team_total",
               "Dis_total_team",
@@ -115,7 +117,7 @@ col_names<- c("Team",
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
-my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, 
+my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, 
                                              player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names)
 
 #Save aggregate data to csv file
