@@ -532,8 +532,11 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
       #Team time remaining
       time_remaining_team <- as.vector(player_data_1[last_line_1,"gametimer"])
       
-      # Team collection rate for condition
+      # Collection rate for team in a condition (correct and incorrect items)(team and individual)
       team_collection_rate <- collection_rate_team(clean_position_data, clean_invent_data, team, condition)
+      
+      # Collection rate for team in a condition (correct items) (team and individual items)
+      team_collection_rate_correct_items <- collection_rate_correct_items_team(clean_position_data, clean_invent_data, team, condition)
       
       for(player in player_num_list){
         # The next step is to add all of the values for each cloumn
@@ -628,8 +631,11 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         
         #---------------------------------------------------------------
         
-        # Collection rate for individual
+        # Collection rate for individual (correct and incorrect)(team and individual items)
         individual_collection_rate <- collection_rate_ind(clean_position_data, clean_invent_data, team, player, condition)
+        
+        # Collection rate for individual (correct items)(team and individual items)
+        individual_collection_rate_correct_items <- collection_rate_correct_items_ind(clean_position_data, clean_invent_data, team, player, condition)
         
         #This should be the same as the col_names variable above.
         data_output_final<- rbind(data_output_final, 
@@ -646,12 +652,14 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     correct_individual_items_collected, 
                                     incorrect_individual_item_collected, 
                                     individual_collection_rate,
+                                    individual_collection_rate_correct_items,
                                     errors_individual_unique,
                                     total_errors_ind,
                                     total_dis_ind,
                                     correct_team_items_collected,
                                     incorrect_team_item_collected,
                                     team_collection_rate,
+                                    team_collection_rate_correct_items,
                                     errors_team_unique,
                                     total_errors_team,
                                     total_dis_team,
@@ -790,17 +798,3 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
-teamnum<- 7
-player <- 3
-condition <- "A"
-data_position <- clean_positionTable
-data_inventory <- clean_inventory_data
-
-total_items_collected <- total_correct_items_collected_in_session_by_team(data_inventory, teamnum, condition)
-team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
-team_data_last_line <- tail(team_data, 1)
-duration_team <- team_data_last_line[1,"duration"]
-
-duration_team / total_items_collected 
-
-collection_rate_correct_items_team(data_position, data_inventory, teamnum, condition)
