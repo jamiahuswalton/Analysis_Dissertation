@@ -8,6 +8,7 @@ my_CI_team <- "CI_team"
 my_II_team <- "II_team"
 my_time_remaining_team <- "Time_remaining"
 my_errors_uniqe_team <- "Errors_Unique"
+my_collection_rate_team <- "team_collection_rate"
 
 my_individualScore <- "IndividualScore"
 my_CI_ind <- "CI_ind"
@@ -16,7 +17,7 @@ my_time_remaining_ind <- "Time_remaining_ind"
 my_errors_uniqe_ind <- "ERROR_ind_unique"
 
 # Dependant variable ----
-dependet_variable <- my_teamScore
+dependet_variable <- my_collection_rate_team
 
 # Data ----
 
@@ -30,6 +31,9 @@ clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, colu
 # Number of teams and players ----
 # What is the N for Teams
 N_teams <- length(levels(factor(clean_aggregate_data_stats$Team) ))
+
+#Anova
+summary(aov(Collection_rate_team ~ Target + Error(Team/ Target), data = clean_aggregate_data_stats))
 
 # Fit Model ----
 
@@ -63,6 +67,12 @@ if(dependet_variable == my_teamScore){
   fitted_plot_file_name <- "Residuals_Fitted_Plot_time_ERROR_unique_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_ERROR_unique_team.png"
   QQ_plot_file_name <- "Residual_QQ_ERROR_unique_team.png"
+} else if(dependet_variable == my_collection_rate_team){
+  fit_rand_dependent <- lmer(Collection_rate_team~Target+SessionOrder+(1|Team), data = clean_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_team.png"
+  historgram_plot_file_name <- "Residuals_Histogram_collection_rate_team.png"
+  QQ_plot_file_name <- "Residual_QQ_collection_rate_team.png"
 } else if(dependet_variable == my_individualScore){
   fit_rand_dependent <- lmer(IndividualScore~Target+SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
   #Files names for assumptions
@@ -191,19 +201,22 @@ myfigure_titles <- c("Team Scores",
                      "Incorrect Items Collected", 
                      "Distance (Total)", 
                      "Time Remaining (Team)", 
-                     "Errors (Unique)")
+                     "Errors (Unique)",
+                     "Collection Rate (Team)")
 myy_values_team <- c("TeamScore", 
                      "CI_team", 
                      "II_team", 
                      "Dis_total_team", 
                      "timeRemaining_team", 
-                     "ERROR_team_unique")
+                     "ERROR_team_unique",
+                     "Collection_rate_team")
 myy_labels_team <- c("Team Score", 
                      "Correct Items (Team)", 
                      "Incorrect Items (Team)", 
                      "Distance (Total)", 
                      "Time (s)", 
-                     "Errors (Unique)")
+                     "Errors (Unique)",
+                     "Rate (sec per item)")
 myx_values <- c("SessionOrder", 
                 "Target")
 myx_labels_team <- c("Session", 

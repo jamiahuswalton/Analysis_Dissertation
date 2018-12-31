@@ -432,7 +432,7 @@ is_post_session_data_correct <- function(post_session_data, team_number_column_n
 }
 
 # Generate aggragate data (final team score, final individual score, ) ----
-generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, 
+generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, 
                                     player_num_list, strategy_barrier_dis, counter_balance_set, col.names){
   # Final data output
   number_of_columns<- length(col.names)
@@ -488,6 +488,9 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
       
       #Team time remaining
       time_remaining_team <- as.vector(player_data_1[last_line_1,"gametimer"])
+      
+      # Team collection rate for condition
+      team_collection_rate <- collection_rate_team(clean_position_data, clean_invent_data, team, condition)
       
       for(player in player_num_list){
         # The next step is to add all of the values for each cloumn
@@ -582,6 +585,8 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         
         #---------------------------------------------------------------
         
+        # Collection rate for individual
+        individual_collection_rate <- collection_rate_ind(clean_position_data, clean_invent_data, team, player, condition)
         
         #This should be the same as the col_names variable above.
         data_output_final<- rbind(data_output_final, 
@@ -597,11 +602,13 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     team_final_score, 
                                     correct_individual_items_collected, 
                                     incorrect_individual_item_collected, 
+                                    individual_collection_rate,
                                     errors_individual_unique,
                                     total_errors_ind,
                                     total_dis_ind,
                                     correct_team_items_collected,
-                                    incorrect_team_item_collected, 
+                                    incorrect_team_item_collected,
+                                    team_collection_rate,
                                     errors_team_unique,
                                     total_errors_team,
                                     total_dis_team,
@@ -649,8 +656,9 @@ generate_figures_team <- function(Data, num_of_teams, figure_titles, y_values_te
         filename_graph <- paste("team_",y_label,"_by_",x_label,"_",plot,".png", sep = "")
         
         if(plot == "Group_Bar"){
-          # print(paste("team_",y_label,"_by_",x_label,"_",plot, sep = ""))
-          ggplot(data = Data, aes_string(x = x_current, y = y_current, fill = "Team")) +
+          Data_ordered <- Data %>%
+            mutate(position = rank(-Data[,y_current], ties.method="first"))
+          ggplot(data = Data_ordered, aes_string(x = x_current, y = y_current, fill = "Team", group = "position")) +
             geom_bar(stat = "identity", position = "dodge") +
             labs(title = paste(figure_title, N_teams_full_text) , x = x_label, y = y_label) +
             guides(fill=guide_legend(title="Team"))
@@ -739,19 +747,14 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
+test <- clean_aggregate_data_stats %>%
+  mutate(position = rank(-clean_aggregate_data_stats[,"CI_team"], ties.method="first")) 
 
-data_position <- clean_positionTable
-data_inventory <- clean_inventory_data
-teamnum <- 7
-condition <- "B"
-
-total_items_collected <- total_items_collected_in_session_by_team(data_inventory, teamnum, condition)
-team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
-team_data_last_line <- tail(team_data, 1)
-duration_team <- team_data_last_line[1,"duration"]
-duration_team / total_items_collected
+# Try using the regular aes and not the aes_string. I am thinking that this is causing the issues
+ggplot(data = test, aes_string(x = "SessionOrder", y = "CI_team", fill = "Team", group = "position")) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = paste("Test", "39") , x = "Session", y = "CI_team") +
+  guides(fill=guide_legend(title="Team"))
+ggsave(filename = filename_graph)
 
 
-collection_rate_team(clean_positionTable, clean_inventory_data, 7, "B")
-
- 
