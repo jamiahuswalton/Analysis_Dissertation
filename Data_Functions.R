@@ -326,7 +326,7 @@ total_correct_items_collected_in_session_by_individual <- function(inventory_dat
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Collection Rate for correct item - Individual - Teal time (sec) per item (team and individual items)
+# Collection Rate for correct item - Individual - Total time (sec) per item (team and individual items)
 collection_rate_correct_items_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
   # The units for this value is Sec / item. 
@@ -360,6 +360,28 @@ collection_rate_team <-  function(data_position, data_inventory, teamnum, condit
   duration_team <- team_data_last_line[1,"duration"]
   
   return(duration_team / total_items_collected)
+}
+
+# Total correct items (team and individual items) collected by a team in a given session
+total_correct_items_collected_in_session_by_team <- function(data_inventory, team_num, condition_name){
+  inventory_data_filtered <- data_inventory %>%
+    filter(teamnumber == team_num & expcondition == condition_name & itemid != -1 & boughtcorrectly == 1)
+  
+  return(length(inventory_data_filtered[,"itemid"]))
+}
+
+# Collection Rate for correct item - Team - Total time (sec) per item (team and individual items)
+collection_rate_correct_items_team <- function(data_position, data_inventory, teamnum, condition){
+  # This is the item collection rate for a team
+  # The units for this value is Sec / item. 
+  # This takes into account the total correct items (team and individual) collected by a team
+  
+  total_items_collected <- total_correct_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+  team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
+  team_data_last_line <- tail(team_data, 1)
+  duration_team <- team_data_last_line[1,"duration"]
+  
+  return(duration_team/total_items_collected)
 }
 
 # Check to see if the random numbers in demographics surveys match the random numbers in the post surveys ----
@@ -768,21 +790,17 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
-team<- 7
+teamnum<- 7
 player <- 3
-condition <- "C"
+condition <- "A"
 data_position <- clean_positionTable
+data_inventory <- clean_inventory_data
 
-# This is the item collection rate for an individual
-# The units for this value is Sec / item. 
-# This takes into account the total correct items (team and individual) collected by the individual
+total_items_collected <- total_correct_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
+team_data_last_line <- tail(team_data, 1)
+duration_team <- team_data_last_line[1,"duration"]
 
-total_items_collected <- total_correct_items_collected_in_session_by_individual(clean_inventory_data, team, player, condition)
-player_data <- data_position %>% filter(teamnumber == team & playernum == player & expcondition == condition)
-player_data_last_line <- tail(player_data, 1)
-duration_ind <- player_data_last_line[1,"duration_ind"]
+duration_team / total_items_collected 
 
-duration_ind / total_items_collected
-
-
-collection_rate_correct_items_ind(clean_positionTable, clean_inventory_data, team, player, condition)
+collection_rate_correct_items_team(data_position, data_inventory, teamnum, condition)
