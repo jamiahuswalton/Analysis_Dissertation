@@ -17,7 +17,7 @@ my_time_remaining_ind <- "Time_remaining_ind"
 my_errors_uniqe_ind <- "ERROR_ind_unique"
 
 # Dependant variable ----
-dependet_variable <- my_collection_rate_team
+dependet_variable <- my_teamScore
 
 # Data ----
 
@@ -32,13 +32,11 @@ clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, colu
 # What is the N for Teams
 N_teams <- length(levels(factor(clean_aggregate_data_stats$Team) ))
 
-#Anova
-summary(aov(Collection_rate_team ~ Target + Error(Team/ Target), data = clean_aggregate_data_stats))
 
 # Fit Model ----
 
 if(dependet_variable == my_teamScore){
-  fit_rand_dependent <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = clean_aggregate_data_stats)
+  fit_rand_dependent <- lmer(TeamScore~Target*SessionOrder+(1|Team), data = clean_aggregate_data_stats)
   # File names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_TeamScoreMode.png"
   historgram_plot_file_name <- "Residuals_Histogram_TeamScoreModel.png"
@@ -241,27 +239,30 @@ generate_figures_team(Data = clean_aggregate_data_stats,
 
 # Target, Session
 emmeans(fit_rand_dependent, list(pairwise ~ Target + SessionOrder), adjust = "tukey")
-ggplot(clean_aggregate_data_stats, aes(x=Target, y=TeamScore)) +
-  geom_jitter() +
-  geom_boxplot(alpha = .8) +
-  facet_grid(. ~ SessionOrder) +
-  labs(x = "Target",
-       y = "Team Score") 
+# ggplot(clean_aggregate_data_stats, aes(x=Target, y=TeamScore)) +
+#   geom_jitter() +
+#   geom_boxplot(alpha = .8) +
+#   facet_grid(. ~ SessionOrder) +
+#   labs(x = "Target",
+#        y = "Team Score")
 
 # Target
 emmeans(fit_rand_dependent, list(pairwise ~ Target), adjust = "tukey")
-ggplot(clean_aggregate_data_stats, aes(x=Target, y=TeamScore)) +
-  geom_jitter() +
-  geom_boxplot(alpha = .8) +
-  # facet_grid(. ~ SessionOrder) +
-  labs(x = "Target",
-       y = "Team Score") 
+# ggplot(clean_aggregate_data_stats, aes(x=Target, y=TeamScore)) +
+#   geom_jitter() +
+#   geom_boxplot(alpha = .8) +
+#   # facet_grid(. ~ SessionOrder) +
+#   labs(x = "Target",
+#        y = "Team Score") 
 
 # Session Order
 emmeans(fit_rand_dependent, list(pairwise ~ SessionOrder), adjust = "tukey")
-ggplot(clean_aggregate_data_stats, aes(x=SessionOrder, y=TeamScore)) +
-  geom_jitter() +
-  geom_boxplot(alpha = .8) +
-  # facet_grid(. ~ SessionOrder) +
-  labs(x = "Session",
-       y = "Team Score") 
+# ggplot(clean_aggregate_data_stats, aes(x=SessionOrder, y=TeamScore)) +
+#   geom_jitter() +
+#   geom_boxplot(alpha = .8) +
+#   # facet_grid(. ~ SessionOrder) +
+#   labs(x = "Session",
+#        y = "Team Score") 
+
+# ANOVA ----
+anova(fit_rand_dependent, test = "Chisq")
