@@ -312,6 +312,9 @@ collection_rate_ind <- function(data_position, data_inventory, teamnum, playernu
   # This takes into account the total items (incorrect or correct) collected by the individual
   
   total_items_collected <- total_items_collected_in_session_by_individual(data_inventory, teamnum, playernumber, condition)
+  if(total_items_collected == 0){
+    return(0)
+  }
   player_data <- data_position %>% filter(teamnumber == teamnum & playernum == playernumber & expcondition == condition)
   player_data_last_line <- tail(player_data, 1)
   duration_ind <- player_data_last_line[1,"duration_ind"]
@@ -333,6 +336,9 @@ collection_rate_correct_items_ind <- function(data_position, data_inventory, tea
   # This takes into account the total correct items (team and individual) collected by the individual
   
   total_items_collected <- total_correct_items_collected_in_session_by_individual(data_inventory, teamnum, playernumber, condition)
+  if(total_items_collected == 0){
+    return(0)
+  }
   player_data <- data_position %>% filter(teamnumber == teamnum & playernum == playernumber & expcondition == condition)
   player_data_last_line <- tail(player_data, 1)
   duration_ind <- player_data_last_line[1,"duration_ind"]
@@ -355,6 +361,9 @@ collection_rate_team <-  function(data_position, data_inventory, teamnum, condit
   # This takes into account the total items (incorrect or correct) collected by the team
   
   total_items_collected <- total_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+  if(total_items_collected == 0){
+    return(0)
+  }
   team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
   team_data_last_line <- tail(team_data, 1)
   duration_team <- team_data_last_line[1,"duration"]
@@ -377,6 +386,9 @@ collection_rate_correct_items_team <- function(data_position, data_inventory, te
   # This takes into account the total correct items (team and individual) collected by a team
   
   total_items_collected <- total_correct_items_collected_in_session_by_team(data_inventory, teamnum, condition)
+  if(total_items_collected == 0){
+    return(0)
+  }
   team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
   team_data_last_line <- tail(team_data, 1)
   duration_team <- team_data_last_line[1,"duration"]
