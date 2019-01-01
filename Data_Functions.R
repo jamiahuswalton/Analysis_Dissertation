@@ -747,15 +747,6 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
   # The N text to add to title for Inds 
   N_ind_full_text <- paste("(N = ", N_ind, ")", sep = "")
   
-  # # Test
-  # 
-  # figure_titles <- c("Individual Scores", "Correct Items Collected")
-  # y_values_ind <- c("IndividualScore", "CI_ind")
-  # y_labels_ind <- c("Individual Score", "Correct Items (Individual)")
-  # x_values_ind <- c("SessionOrder", "Target")
-  # x_labels_ind <- c("Session", "Target")
-  # plot_types_ind <- c("Group_Bar", "Boxplot", "Point_plot")
-  
   for(y_current in y_values_ind){
     for (x_current in x_values_ind){
       index_for_y <- which(y_current == y_values_ind)
@@ -768,8 +759,10 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
         filename_graph <- paste("ind_",y_label,"_by_",x_label,"_",plot,".png", sep = "")
         
         if(plot == "Group_Bar"){
+          Data_filtered<- Data %>%
+            mutate(position = rank(-Data[,y_current], ties.method="first"))
           # print(paste("team_",y_label,"_by_",x_label,"_",plot, sep = ""))
-          ggplot(data = Data, aes_string(x = x_current, y = y_current, fill = "Player_ID")) +
+          ggplot(data = Data_filtered, aes_string(x = x_current, y = y_current, fill = "Player_ID", group = "position")) +
             geom_bar(stat = "identity", position = "dodge") +
             labs(title = paste(figure_title, N_ind_full_text) , x = x_label, y = y_label) +
             guides(fill=FALSE)
@@ -798,3 +791,18 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 #Test ----
+
+x_current <- "Target"
+y_current <- "Collection_rate_correct_item_team"
+Data <- clean_aggregate_data_stats 
+Data_filtered<- Data %>%
+  mutate(position = rank(-Data[,y_current], ties.method="first"))
+figure_title<- "Title"
+N_ind_full_text <- "39"
+x_label<- "Test"
+y_label<- "Testy"
+
+ggplot(data = Data_filtered, aes_string(x = x_current, y = y_current, fill = "Player_ID", group = "position")) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = paste(figure_title, N_ind_full_text) , x = x_label, y = y_label) +
+  guides(fill=FALSE)
