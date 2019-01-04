@@ -9,15 +9,18 @@ my_II_team <- "II_team"
 my_time_remaining_team <- "Time_remaining"
 my_errors_uniqe_team <- "Errors_Unique"
 my_collection_rate_team <- "team_collection_rate"
+my_collection_rate_correct_item_team <- "team_collection_rate_correct_items"
 
 my_individualScore <- "IndividualScore"
 my_CI_ind <- "CI_ind"
 my_II_ind <- "II_ind"
 my_time_remaining_ind <- "Time_remaining_ind"
 my_errors_uniqe_ind <- "ERROR_ind_unique"
+my_collection_rate_ind <- "Collection_rate_ind"
+my_collection_rate_correct_item_ind <- "Collection_rate_correct_item_ind"
 
 # Dependant variable ----
-dependet_variable <- my_collection_rate_team
+dependet_variable <- my_collection_rate_correct_item_ind
 
 # Data ----
 
@@ -71,6 +74,12 @@ if(dependet_variable == my_teamScore){
   fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_collection_rate_team.png"
   QQ_plot_file_name <- "Residual_QQ_collection_rate_team.png"
+} else if(dependet_variable == my_collection_rate_correct_item_team){
+  fit_rand_dependent <- lmer(Collection_rate_correct_item_team~Target*SessionOrder+(1|Team), data = clean_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_correct_item_team.png"
+  historgram_plot_file_name <- "Residuals_Histogram_collection_rate_correct_item_team.png"
+  QQ_plot_file_name <- "Residual_QQ_collection_rate_correct_item_team.png"
 } else if(dependet_variable == my_individualScore){
   fit_rand_dependent <- lmer(IndividualScore~Target*SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
   #Files names for assumptions
@@ -101,6 +110,15 @@ if(dependet_variable == my_teamScore){
   fitted_plot_file_name <- "Residuals_Fitted_Plot_ERROR_unique_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_ERROR_unique_ind.png"
   QQ_plot_file_name <- "Residual_QQ_ERROR_unique_ind.png"
+} else if(dependet_variable == my_collection_rate_ind){
+  fit_rand_dependent <- lmer(Collection_rate_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
+  #Files names for assumptions
+  fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_ind.png"
+  historgram_plot_file_name <- "Residuals_Histogram_collection_rate_ind.png"
+  QQ_plot_file_name <- "Residual_QQ_collection_rate_ind.png"
+} else if(dependet_variable == my_collection_rate_correct_item_ind){
+  fit_rand_dependent <- lmer(Collection_rate_correct_item_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = clean_aggregate_data_stats)
+  
 } else {
   stop("The dependent variable is not recognized")
 }
