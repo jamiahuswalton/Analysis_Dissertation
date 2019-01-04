@@ -24,18 +24,39 @@ clean_inventory_data_by_removing_game_enteries <- function(inventory_data, colum
 
 # Function to count the total number of errors commited by a team (regarless of if this rule was broken before) ----
 total_number_of_errors_team <- function(date_errors, teamNum, condition){
-  total_errors_team <- 0
-  total_errors_team <- sum(date_errors$teamnumber == teamNum & 
-                             date_errors$expcondition == condition)
+  team_errors_data <- data_errors %>% 
+    filter(teamnumber == teamNum & expcondition == condition)
+  return(length(team_errors_data[,"ID"]))
+}
+
+# Function to calculate the total error rate (i.e., Duration / total errors) for a team Units: Sec / Error
+error_rate_team <- function(data_position, data_errors, teamNum, condition){
+  error_count_team <- total_number_of_errors_team(data_errors, teamNum, condition)
+  
+  data_team <- data_position %>% filter(teamnumber == teamNum & playernum == 1 & expcondition == condition)
+  data_team_last_line <- tail(data_team,1) 
+  duration_team<- data_team_last_line[1,"duration"]
+  
+  return(duration_team / error_count_team)
 }
 
 # Function to count the total number of errors commited by a player (regarless of if this rule was broken before) ----
-total_number_of_errors_individual <- function(data_errors, teamNum, playernum, condition){
-  total_errors_individual <- 0
-  total_errors_individual <- sum(data_errors$playernum == playernum & 
-                                   data_errors$teamnumber == teamNum & 
-                                   data_errors$expcondition == condition)
+total_number_of_errors_individual <- function(data_errors, teamNum, player, condition){
+  ind_errors_data <- data_errors %>% 
+    filter(teamnumber == teamNum & playernum == player & expcondition == condition)
+  total_errors_individual <- length(ind_errors_data[,"ID"])
   return(total_errors_individual)
+}
+
+# Function to calculate the total error rate (i.e., Duration / total errors) for an individual. Units: Sec / Error
+error_rate_ind <- function(data_position, data_errors, teamNum, playerNum, condition){
+  error_count_ind <- total_number_of_errors_individual(data_errors, teamNum, playerNum, condition)
+  
+  data_ind <- data_position %>% filter(teamnumber == teamNum & playernum == playerNum & expcondition == condition)
+  data_ind_last_line <- tail(data_ind,1) 
+  duration_ind<- data_ind_last_line[1,"duration_ind"]
+  
+  return(duration_ind / error_count_ind)
 }
 
 # Function to factor the columns ----
