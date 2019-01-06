@@ -227,9 +227,6 @@ utterance_count_for_a_player<- function(positionData, condition, team_number, pl
   
 }
 
-# Function that counts that calculates the average utterance duration----
-
-
 # Function to generate the IDs for a player on a given team (Assuming there are 3 members per team)----
 generate_player_id <- function(playernum, teamnum){
   
@@ -265,6 +262,18 @@ generate_player_id <- function(playernum, teamnum){
   }
   
   return(palyer_ID)
+}
+
+#Function to retrive the NASA TLX value for a specific scale, for a specific player, in a specific team, in a specific condition
+scale_value_NASA_TLX <- function (TLX_table, teamNum, playerNum, condition, scale){
+  
+  player_tlx <- TLX_table %>%
+    filter(Team == teamNum, Player == playerNum, Condition == condition)
+  if(length(player_tlx[,scale] == 1)){
+    return(player_tlx[,scale])
+  } else {
+    stop(paste("There is not exactly 1 entery for player", playerNum, "in team", teamNum, "in condition", condition))
+  }
 }
 
 # Function to find session order ----
