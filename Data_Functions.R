@@ -271,6 +271,8 @@ scale_value_NASA_TLX <- function (TLX_table, teamNum, playerNum, condition, scal
     filter(Team == teamNum, Player == playerNum, Condition == condition)
   if(length(player_tlx[,scale] == 1)){
     return(player_tlx[,scale])
+  } else if(length(player_tlx[,scale]) == 0){
+    stop(paste("No TLX data found for player", playerNum, "in team", teamNum, "in condition", condition))
   } else {
     stop(paste("There is not exactly 1 entery for player", playerNum, "in team", teamNum, "in condition", condition))
   }
