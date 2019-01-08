@@ -1,13 +1,15 @@
 # Packages that will be used
+library(tidyverse)
 library(lme4)
 library(lmerTest)
-library(car)
+# library(car)
 library(emmeans)
-library(ggplot2)
-library(simr)
+# library(ggplot2)
+# library(simr)
 library(svMisc)
 library(MuMIn)
-library(dplyr)
+# library(dplyr)
+library(modelr)
 
 # File output names
 file_name_output <- "team_player_aggragate_stats.csv"
@@ -65,6 +67,9 @@ set_4 <- c("A", "B", "D", "C")
 set_5 <- c("A", "C", "D", "B")
 set_6 <- c("A", "D", "B", "C")
 
+# NASA TLX scale names
+TLX_Scale_Names <- c("Mental.Demand", "Physical.Demand", "Temporal.Demand", "Performance", "Effort", "Frustration" )
+
 # Data frame that contains the session order set. The session in the first row was the first condition, second row was the seconds condition...
 counter_balance_set <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6)) # Put the session orders into a data frame
 
@@ -115,12 +120,13 @@ col_names<- c("Team",
               go_together_name,
               go_alone_name,
               mix_name,
-              "Dominate Strategy")
+              "Dominate Strategy",
+              TLX_Scale_Names)
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
 my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, 
-                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names)
+                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names)
 
 #Save aggregate data to csv file
 aggregate_name_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location

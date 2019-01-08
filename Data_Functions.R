@@ -23,7 +23,7 @@ clean_inventory_data_by_removing_game_enteries <- function(inventory_data, colum
 }
 
 # Function to count the total number of errors commited by a team (regarless of if this rule was broken before) ----
-total_number_of_errors_team <- function(date_errors, teamNum, condition){
+total_number_of_errors_team <- function(data_errors, teamNum, condition){
   team_errors_data <- data_errors %>% 
     filter(teamnumber == teamNum & expcondition == condition)
   return(length(team_errors_data[,"ID"]))
@@ -64,7 +64,7 @@ re_factor_columns <- function(userData, columnNames){
   factorData <- userData
   for(column in columnNames){
     print(column)
-    factorData[,column] <- as.factor(factorData[,column])
+    factorData[,column] <- factor(factorData[,column])
   }
   return(factorData)
 }
@@ -520,7 +520,7 @@ is_post_session_data_correct <- function(post_session_data, team_number_column_n
 
 # Generate aggragate data (final team score, final individual score, ) ----
 generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, 
-                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names){
+                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX){
   # Final data output
   number_of_columns<- length(col.names)
   data_output_final<- matrix(0, nrow = 0, ncol = number_of_columns)
@@ -547,7 +547,7 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
       player_utterance_count_list<- rep(x = 0, times = length(player_num_list))
       
       #Get the total number of errors for team
-      total_errors_team <- total_number_of_errors_team(date_errors = clean_error_data, team, condition)
+      total_errors_team <- total_number_of_errors_team(clean_error_data, team, condition)
       
       #Find the count for each palyer (i.e., index 1 is player 1)
       for(player in player_num_list){
@@ -681,6 +681,13 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         # Collection rate for individual (correct items)(team and individual items)
         individual_collection_rate_correct_items <- collection_rate_correct_items_ind(clean_position_data, clean_invent_data, team, player, condition)
         
+        # TLX values for player
+        TLX_values<- vector()
+        for(name in names_TLX){
+          value<- scale_value_NASA_TLX(NASA_TLX_table, team, player, condition, name)
+          TLX_values<- append(TLX_values,value)
+        }
+        
         #This should be the same as the col_names variable above.
         data_output_final<- rbind(data_output_final, 
                                   c(team, 
@@ -714,7 +721,8 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     current_go_together_count,
                                     current_go_alone_count,
                                     current_mix,
-                                    dominate_strategy_used))
+                                    dominate_strategy_used,
+                                    TLX_values))
       }
     }
     
@@ -836,17 +844,32 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-x_current <- "Target"
-y_current <- "Collection_rate_correct_item_team"
-Data <- clean_aggregate_data_stats 
-Data_filtered<- Data %>%
-  mutate(position = rank(-Data[,y_current], ties.method="first"))
-figure_title<- "Title"
-N_ind_full_text <- "39"
-x_label<- "Test"
-y_label<- "Testy"
+#TODO: Get TLX value for player in a specific team in a specific condition
+# teamNum<- 18
+# playerNum<- 3
+# condition<- "B"
+# scale <- "Mental.Demand"
+# 
+# player_tlx <- NASA_TLX_table %>%
+#   filter(Team == teamNum, Player == playerNum, Condition == condition)
+# if(length(player_tlx[,scale] == 1)){
+#   player_tlx[,scale]
+# } else {
+#   stop(paste("There is not exactly 1 entery for player", playerNum, "in team", teamNum, "in condition", condition))
+# }
+# 
+# scale_value_NASA_TLX(NASA_TLX_table, 18, 3, "B", "Mental.Demand")
+# 
+# 
+# 
+# 
+# scale_value_NASA_TLX(NASA_TLX_table, 18, 2, "A", 'Effort')
+# TLX_values<- vector()
+# for(name in TLX_Scale_Names){
+#   value<- scale_value_NASA_TLX(NASA_TLX_table, 18, 2, "A", name)
+#   TLX_values<- append(TLX_values,value)
+#   
+#   print(value)
+# }
+# TLX_values
 
-ggplot(data = Data_filtered, aes_string(x = x_current, y = y_current, fill = "Player_ID", group = "position")) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = paste(figure_title, N_ind_full_text) , x = x_label, y = y_label) +
-  guides(fill=FALSE)
