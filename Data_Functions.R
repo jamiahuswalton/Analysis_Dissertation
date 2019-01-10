@@ -29,15 +29,23 @@ total_number_of_errors_team <- function(data_errors, teamNum, condition){
   return(length(team_errors_data[,"ID"]))
 }
 
-# Function to calculate the total error rate (i.e., Duration / total errors) for a team Units: Sec / Error
+# Function to calculate the total error rate (i.e., Duration / total errors) for a team Units: Sec / Error.
+# Duration is retruned if error count is 0.
 error_rate_team <- function(data_position, data_errors, teamNum, condition){
-  error_count_team <- total_number_of_errors_team(data_errors, teamNum, condition)
   
+  error_count_team <- total_number_of_errors_team(data_errors, teamNum, condition)
   data_team <- data_position %>% filter(teamnumber == teamNum & playernum == 1 & expcondition == condition)
   data_team_last_line <- tail(data_team,1) 
   duration_team<- data_team_last_line[1,"duration"]
   
-  return(duration_team / error_count_team)
+  if(error_count_team == 0){
+    return(duration_team)
+  } else if(error_count_team > 0){
+    return(duration_team / error_count_team)
+  } else if(error_count_team < 0){
+    message<- paste("error_rate_team: the error count generated for team", teamNum, "in condition", condition)
+    stop(message)
+  }
 }
 
 # Function to count the total number of errors commited by a player (regarless of if this rule was broken before) ----
@@ -49,14 +57,22 @@ total_number_of_errors_individual <- function(data_errors, teamNum, player, cond
 }
 
 # Function to calculate the total error rate (i.e., Duration / total errors) for an individual. Units: Sec / Error
+# Duration is retruned if error count is 0.
 error_rate_ind <- function(data_position, data_errors, teamNum, playerNum, condition){
-  error_count_ind <- total_number_of_errors_individual(data_errors, teamNum, playerNum, condition)
   
+  error_count_ind <- total_number_of_errors_individual(data_errors, teamNum, playerNum, condition)
   data_ind <- data_position %>% filter(teamnumber == teamNum & playernum == playerNum & expcondition == condition)
   data_ind_last_line <- tail(data_ind,1) 
   duration_ind<- data_ind_last_line[1,"duration_ind"]
   
-  return(duration_ind / error_count_ind)
+  if(error_count_ind == 0){
+    return(duration_ind)
+  } else if(error_count_ind > 0){
+    return(duration_ind / error_count_ind)
+  } else if(error_count_ind < 0){
+    message<- paste("error_rate_ind: the error count generated for player", playerNum, "in team", teamNum, "in condition", condition)
+    stop(message)
+  }
 }
 
 # Function to factor the columns ----
@@ -337,21 +353,26 @@ total_items_collected_in_session_by_individual <- function(inventory_data, team_
   return(length(inventory_data_filtered[,1]))
 }
 
-# Collection Rate - Individual - Total time (sec) per item (team and individual items)
+# Function to calculate the Collection Rate (i.e., duration / total items collected): Sec / Error.
+# Duration is retruned if error count is 0.
 collection_rate_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
   # The units for this value is Sec / item. 
   # This takes into account the total items (incorrect or correct) collected by the individual
   
   total_items_collected <- total_items_collected_in_session_by_individual(data_inventory, teamnum, playernumber, condition)
-  if(total_items_collected == 0){
-    return(0)
-  }
   player_data <- data_position %>% filter(teamnumber == teamnum & playernum == playernumber & expcondition == condition)
   player_data_last_line <- tail(player_data, 1)
   duration_ind <- player_data_last_line[1,"duration_ind"]
   
-  return (duration_ind / total_items_collected)
+  if(total_items_collected == 0){
+    return(duration_ind)
+  } else if(total_items_collected > 0){
+    return(duration_ind / total_items_collected )
+  } else if(total_items_collected < 0){
+    message<- paste("collection_rate_ind: the total item count for player", playerNum, "in team", teamNum, "in condition", condition)
+    stop(message)
+  }
 }
 
 # Total correct items (team and individual items) collected by a player in a given session
@@ -361,21 +382,26 @@ total_correct_items_collected_in_session_by_individual <- function(inventory_dat
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Collection Rate for correct item - Individual - Total time (sec) per item (team and individual items)
+# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error.
+# Duration is retruned if error count is 0.
 collection_rate_correct_items_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
   # The units for this value is Sec / item. 
   # This takes into account the total correct items (team and individual) collected by the individual
   
   total_items_collected <- total_correct_items_collected_in_session_by_individual(data_inventory, teamnum, playernumber, condition)
-  if(total_items_collected == 0){
-    return(0)
-  }
   player_data <- data_position %>% filter(teamnumber == teamnum & playernum == playernumber & expcondition == condition)
   player_data_last_line <- tail(player_data, 1)
   duration_ind <- player_data_last_line[1,"duration_ind"]
   
-  return(duration_ind / total_items_collected)
+  if(total_items_collected == 0){
+    return(duration_ind)
+  } else if(total_items_collected > 0){
+    return(duration_ind / total_items_collected)
+  } else if(total_items_collected < 0){
+    message<- paste("collection_rate_correct_items_ind: the total correct item count for player", playerNum, "in team", teamNum, "in condition", condition)
+    stop(message)
+  }
 }
 
 # Total items (correct and incorrect)(team and individual) collected by a team in a given session
@@ -386,21 +412,26 @@ total_items_collected_in_session_by_team <- function(data_inventory, team_num, c
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Collection Rate - Team - Total time (sec) per item (team and individual items)
+# Function to calculate the Collection Rate (i.e., duration / total items collected): Sec / Error.
+# Duration is retruned if error count is 0.
 collection_rate_team <-  function(data_position, data_inventory, teamnum, condition){
   # This is the item collection rate for a team
   # The units for this value is Sec / item. 
   # This takes into account the total items (incorrect or correct) collected by the team
   
   total_items_collected <- total_items_collected_in_session_by_team(data_inventory, teamnum, condition)
-  if(total_items_collected == 0){
-    return(0)
-  }
   team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
   team_data_last_line <- tail(team_data, 1)
   duration_team <- team_data_last_line[1,"duration"]
   
-  return(duration_team / total_items_collected)
+  if(total_items_collected == 0){
+    return(duration_team)
+  } else if(total_items_collected > 0){
+    return(duration_team / total_items_collected)
+  } else if(total_items_collected < 0){
+    message<- paste("collection_rate_team: the total item count for team", teamNum, "in condition", condition)
+    stop(message)
+  }
 }
 
 # Total correct items (team and individual items) collected by a team in a given session
@@ -411,21 +442,26 @@ total_correct_items_collected_in_session_by_team <- function(data_inventory, tea
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Collection Rate for correct item - Team - Total time (sec) per item (team and individual items)
+# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error.
+# Duration is retruned if error count is 0.
 collection_rate_correct_items_team <- function(data_position, data_inventory, teamnum, condition){
   # This is the item collection rate for a team
   # The units for this value is Sec / item. 
   # This takes into account the total correct items (team and individual) collected by a team
   
   total_items_collected <- total_correct_items_collected_in_session_by_team(data_inventory, teamnum, condition)
-  if(total_items_collected == 0){
-    return(0)
-  }
   team_data <- data_position %>% filter(teamnumber == teamnum & playernum == 1, expcondition == condition)
   team_data_last_line <- tail(team_data, 1)
   duration_team <- team_data_last_line[1,"duration"]
   
-  return(duration_team/total_items_collected)
+  if(total_items_collected == 0){
+    return(duration_team)
+  } else if(total_items_collected > 0){
+    return(duration_team / total_items_collected)
+  } else if(total_items_collected < 0){
+    message<- paste("collection_rate_correct_items_team: the total correct item count for team", teamNum, "in condition", condition)
+    stop(message)
+  }
 }
 
 # Check to see if the random numbers in demographics surveys match the random numbers in the post surveys ----
