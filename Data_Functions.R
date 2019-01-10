@@ -880,32 +880,13 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-#TODO: Get TLX value for player in a specific team in a specific condition
-# teamNum<- 18
-# playerNum<- 3
-# condition<- "B"
-# scale <- "Mental.Demand"
-# 
-# player_tlx <- NASA_TLX_table %>%
-#   filter(Team == teamNum, Player == playerNum, Condition == condition)
-# if(length(player_tlx[,scale] == 1)){
-#   player_tlx[,scale]
-# } else {
-#   stop(paste("There is not exactly 1 entery for player", playerNum, "in team", teamNum, "in condition", condition))
-# }
-# 
-# scale_value_NASA_TLX(NASA_TLX_table, 18, 3, "B", "Mental.Demand")
-# 
-# 
-# 
-# 
-# scale_value_NASA_TLX(NASA_TLX_table, 18, 2, "A", 'Effort')
-# TLX_values<- vector()
-# for(name in TLX_Scale_Names){
-#   value<- scale_value_NASA_TLX(NASA_TLX_table, 18, 2, "A", name)
-#   TLX_values<- append(TLX_values,value)
-#   
-#   print(value)
-# }
-# TLX_values
+teamNum<- 18
+playerNum<- 3
+data_errors<- error_log_data
+data_position<- positionTable
+data_inventory<- inventory_table
+condition<- "B"
 
+error_rate_team(data_position, data_errors, teamNum, condition)
+
+collection_rate_correct_items_team(data_position, data_inventory, teamNum, condition)

@@ -20,7 +20,7 @@ my_collection_rate_ind <- "Collection_rate_ind"
 my_collection_rate_correct_item_ind <- "Collection_rate_correct_item_ind"
 
 # Dependant variable ----
-dependet_variable <- my_teamScore
+dependet_variable <- my_collection_rate_correct_item_team
 
 # Data ----
 
@@ -170,7 +170,7 @@ ggsave(filename = historgram_plot_file_name)
 
 # QQ plot
 setwd(figure_directory)
-ggplot(data = clean_aggregate_data_stats, aes(sample = residuals_formula)) +
+ggplot(data = dependent_data, aes(sample = residuals_formula)) +
   stat_qq() +
   labs(title = "Normal Q-Q Plot", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) +
