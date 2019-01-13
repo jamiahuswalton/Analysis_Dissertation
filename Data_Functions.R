@@ -618,6 +618,9 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
       # Collection rate for team in a condition (correct items) (team and individual items)
       team_collection_rate_correct_items <- collection_rate_correct_items_team(clean_position_data, clean_invent_data, team, condition)
       
+      # Error rate for the team 
+      team_error_rate <- error_rate_team(clean_position_data, clean_error_data, team, condition)
+      
       for(player in player_num_list){
         # The next step is to add all of the values for each cloumn
         
@@ -724,6 +727,9 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
           TLX_values<- append(TLX_values,value)
         }
         
+        # Error Rate for individual
+        ind_error_rate <- error_rate_ind(clean_position_data, clean_error_data, team, player, condition)
+        
         #This should be the same as the col_names variable above.
         data_output_final<- rbind(data_output_final, 
                                   c(team, 
@@ -742,6 +748,7 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     individual_collection_rate_correct_items,
                                     errors_individual_unique,
                                     total_errors_ind,
+                                    ind_error_rate,
                                     total_dis_ind,
                                     correct_team_items_collected,
                                     incorrect_team_item_collected,
@@ -749,6 +756,7 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     team_collection_rate_correct_items,
                                     errors_team_unique,
                                     total_errors_team,
+                                    team_error_rate,
                                     total_dis_team,
                                     total_transmition_ind,
                                     total_transmition_team,
@@ -880,13 +888,13 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-teamNum<- 18
-playerNum<- 3
-data_errors<- error_log_data
-data_position<- positionTable
-data_inventory<- inventory_table
-condition<- "B"
-
-error_rate_team(data_position, data_errors, teamNum, condition)
-
-collection_rate_correct_items_team(data_position, data_inventory, teamNum, condition)
+# teamNum<- 7
+# playerNum<- 1
+# data_errors<- error_log_data
+# data_position<- positionTable
+# data_inventory<- inventory_table
+# condition<- "A"
+# 
+# error_rate_team(data_position, data_errors, teamNum, condition)
+# 
+# collection_rate_correct_items_team(data_position, data_inventory, teamNum, condition)
