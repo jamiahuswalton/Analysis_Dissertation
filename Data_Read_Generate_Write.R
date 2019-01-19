@@ -2,17 +2,15 @@
 library(tidyverse)
 library(lme4)
 library(lmerTest)
-# library(car)
 library(emmeans)
-# library(ggplot2)
-# library(simr)
 library(svMisc)
 library(MuMIn)
-# library(dplyr)
 library(modelr)
+library(sjstats)
 
-# File output names
+# File output names and file locations
 file_name_output <- "team_player_aggragate_stats.csv"
+aggregate_name_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
 
 # Read in data ----
 
@@ -131,7 +129,6 @@ my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, c
                                              player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names)
 
 #Save aggregate data to csv file
-aggregate_name_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
 write.csv(file = aggregate_name_location,x = my_aggregate_data)
 
 #Read aggregaate data

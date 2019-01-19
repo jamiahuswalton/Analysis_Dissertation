@@ -61,10 +61,11 @@ plot_data_team <- team_data %>%
             Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
             StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
 
-ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape=SessionOrder)) +
+ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape = SessionOrder)) +
   geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder)) + 
-  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) 
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  labs(y = "Time (Sec)", x = "Target", title = "Time Remaining Vs. Target")
 
 
 
@@ -84,6 +85,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color =
   ggsave(filename = "Ind_Interaction_between_Session_and_Target.png")
 
 # Is there an interaction between dominate strategy and target levels (Individual)?
+# Individual Score
 plot_data_ind <- ind_data %>%
   select(Target, IndividualScore, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -92,8 +94,23 @@ plot_data_ind <- ind_data %>%
             SE = sd(IndividualScore)/sqrt(length(IndividualScore)), 
             N = length(IndividualScore))
 
-ggplot(data= plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color = factor(Dominate.Strategy))) +
+ggplot(data= plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color = factor(Dominate.Strategy), shape = factor(Dominate.Strategy))) +
   geom_point(size = 3) + 
   geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
   geom_errorbar(aes(ymin = IndividualScoreAverage - SE, ymax = IndividualScoreAverage + SE, width = 0.2)) +
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target.png")
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_score.png")
+
+# Individual time remaining
+plot_data_ind <-  ind_data %>%
+  select(Target, timeRemaining_ind, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(TimeRemainingAverage = mean(timeRemaining_ind), 
+            SD = sd(timeRemaining_ind),
+            SE = sd(timeRemaining_ind) / sqrt(length(timeRemaining_ind)),
+            N = length(timeRemaining_ind))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = TimeRemainingAverage, color = Dominate.Strategy)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
+  geom_errorbar(aes(ymin = TimeRemainingAverage - SE, ymax = TimeRemainingAverage + SE, width = 0.2)) +
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_timeRemaining.png")

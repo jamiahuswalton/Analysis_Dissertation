@@ -114,8 +114,8 @@ ggplot(data= plot_data_ind, aes(x = Target, y = timeRemaining_ind_avg, color = f
 
 
 # Explore models ----
-team_data_exploritory <- team_data %>% filter(Dominate.Strategy == "Go Together")
-# team_data_exploritory<- team_data
+# team_data_exploritory <- team_data %>% filter(Dominate.Strategy == "Go Together")
+team_data_exploritory<- team_data
 
 model1 <- lm(TeamScore ~ 1, data= team_data_exploritory)
 model2 <- lm(TeamScore ~ Target, data= team_data_exploritory)
@@ -128,13 +128,15 @@ model8 <- lmer(TeamScore ~ Target * SessionOrder + (1|Team), data = team_data_ex
 model9 <- lmer(TeamScore ~ Target * SessionOrder + Dominate.Strategy + (1|Team), data = team_data_exploritory)
 model10 <- lmer(TeamScore ~ Target * SessionOrder + Dominate.Strategy*SessionOrder + (1|Team), data = team_data_exploritory)
 anova(model3, model2, model4, test = "Chisq")
-anova(model4, model3, model2)
-anova(model5, model6, model7, model8, model9, model10)
+anova(model6, model7, model8)
+anova(model2, model3, model4)
 
 
 
 ind_data_exploritory <- ind_data %>%
   filter(Dominate.Strategy == "Go Together")
+ind_data_exploritory <- ind_data
+
 model1 <- lm(timeRemaining_ind ~ 1, data= ind_data_exploritory)
 model2 <- lm(timeRemaining_ind ~ Target, data= ind_data_exploritory)
 model3 <- lm(timeRemaining_ind ~ Target + SessionOrder, data= ind_data_exploritory)
