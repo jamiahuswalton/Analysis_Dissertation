@@ -52,64 +52,7 @@ my_errors_uniqe_ind <- "ERROR_ind_unique"
 my_collection_rate_ind <- "Collection_rate_ind"
 my_collection_rate_correct_item_ind <- "Collection_rate_correct_item_ind"
 
-dependet_variable <- my_collection_rate_correct_item_team
-
-# Explore data ----
-#Team
-#Exploring interaction between session and Target
-
-# Is there an interaction between the session order and the Target levels?
-plot_data_team <- team_data %>%
-  select(Target, SessionOrder, timeRemaining_team) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
-
-ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape=SessionOrder)) +
-  geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = timeRemaining_teamAverage - Stdv, ymax = timeRemaining_teamAverage + Stdv), width = 0.2)
-
-# Is there an interaction between dominate strategy and target levels?
-plot_data_team <- team_data %>%
-  select(Target, TeamScore, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(TeamScore_avg = mean(TeamScore), TeamScore_SD = sd(TeamScore), TeamScore_SE = sd(TeamScore)/sqrt(length(TeamScore)), TeamScore_N = length(TeamScore))
-
-ggplot(data = plot_data_team, aes(x = Target, y = TeamScore_avg, color = factor(Dominate.Strategy), shape = factor(Dominate.Strategy))) +
-  geom_point(size = 3) +
-  geom_line(aes(group=Dominate.Strategy)) + 
-  geom_errorbar(aes(ymin = TeamScore_avg - TeamScore_SE, ymax = TeamScore_avg + TeamScore_SE), width = 0.2)
-  
-
-#Individual
-# Is there an interaction between Session Order and Target level?
-plot_data_ind <- ind_data %>%
-  select(Target, SessionOrder, CI_ind) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(CI_indAverage = mean(CI_ind), 
-            Stdv =sd(CI_ind), 
-            n = length(CI_ind), 
-            StEr = sd(CI_ind) / sqrt(length(CI_ind)))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = CI_indAverage, color = SessionOrder, shape=SessionOrder)) +
-  geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = CI_indAverage - StEr, ymax = CI_indAverage + StEr), width = 0.2)
-
-# Is there an interaction between dominate strategy and target levels?
-plot_data_ind <- ind_data %>%
-  select(Target, CI_ind, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(CI_indAverage = mean(CI_ind), 
-            SD = sd(CI_ind), 
-            SE = sd(CI_ind)/sqrt(length(CI_ind)), 
-            N = length(CI_ind))
-
-ggplot(data= plot_data_ind, aes(x = Target, y = timeRemaining_ind_avg, color = factor(Dominate.Strategy))) +
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = timeRemaining_ind_avg - SE, ymax = timeRemaining_ind_avg + SE, width = 0.2)) + 
-  facet_grid(. ~ Dominate.Strategy)
+dependet_variable <- my_time_remaining_ind
 
 
 
