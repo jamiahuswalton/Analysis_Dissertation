@@ -154,98 +154,91 @@ anova(model6, model7, model8)
 # Fit Model ----
 
 if(dependet_variable == my_teamScore){
-  fit_rand_dependent <- lmer(TeamScore~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = team_data)
   # File names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_TeamScoreMode.png"
   historgram_plot_file_name <- "Residuals_Histogram_TeamScoreModel.png"
   QQ_plot_file_name <- "Residual_QQ_TeamScore.png"
 } else if(dependet_variable == my_CI_team){
   dependent_data<- team_data
-  fit_rand_dependent <- lmer(CI_team~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(CI_team~Target+SessionOrder+(1|Team), data = team_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_CI_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_CI_team.png"
   QQ_plot_file_name <- "Residual_QQ_CI_team.png"
 } else if (dependet_variable == my_II_team){
   dependent_data<- team_data
-  fit_rand_dependent <- lmer(II_team~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(II_team~Target+SessionOrder+(1|Team), data = team_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_II_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_II_team.png"
   QQ_plot_file_name <- "Residual_QQ_II.png"
 } else if(dependet_variable == my_time_remaining_team){
   dependent_data<- team_data
-  fit_rand_dependent <- lmer(timeRemaining_team~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(timeRemaining_team~Target+SessionOrder+(1|Team), data = team_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_time_remaining_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_time_remaining_team.png"
   QQ_plot_file_name <- "Residual_QQ_time_remaining_team.png"
 } else if(dependet_variable == my_errors_uniqe_team) {
   dependent_data<- team_data
-  fit_rand_dependent <- lmer(ERROR_team_unique~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(ERROR_team_unique~Target+SessionOrder+(1|Team), data = team_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_time_ERROR_unique_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_ERROR_unique_team.png"
   QQ_plot_file_name <- "Residual_QQ_ERROR_unique_team.png"
 } else if(dependet_variable == my_collection_rate_team){
   dependent_data<- team_data
-  fit_rand_dependent <- lmer(Collection_rate_team~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(Collection_rate_team~Target+SessionOrder+(1|Team), data = team_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_collection_rate_team.png"
   QQ_plot_file_name <- "Residual_QQ_collection_rate_team.png"
 } else if(dependet_variable == my_collection_rate_correct_item_team){
   dependent_data<- team_data
-  fit_rand_dependent <- lmer(Collection_rate_correct_item_team~Target*SessionOrder+(1|Team), data = team_data)
+  fit_rand_dependent <- lmer(Collection_rate_correct_item_team~Target+SessionOrder+(1|Team), data = team_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_correct_item_team.png"
   historgram_plot_file_name <- "Residuals_Histogram_collection_rate_correct_item_team.png"
   QQ_plot_file_name <- "Residual_QQ_collection_rate_correct_item_team.png"
 } else if(dependet_variable == my_individualScore){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(IndividualScore~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(IndividualScore~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_IndividualScore_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_IndividualScore_ind.png"
   QQ_plot_file_name <- "Residual_QQ_IndividualScore_ind.png"
 } else if(dependet_variable == my_CI_ind){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(CI_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(CI_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_CI_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_CI_ind.png"
   QQ_plot_file_name <- "Residual_QQ_CI_ind.png"
 } else if(dependet_variable == my_II_ind){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(II_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(II_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_II_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_II_ind.png"
   QQ_plot_file_name <- "Residual_QQ_II_ind.png"
 } else if(dependet_variable == my_time_remaining_ind){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(timeRemaining_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(timeRemaining_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_time_remaining_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_time_remaining_ind.png"
   QQ_plot_file_name <- "Residual_QQ_time_remaining_ind.png"
 } else if(dependet_variable == my_errors_uniqe_ind){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(ERROR_ind_unique~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(ERROR_ind_unique~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_ERROR_unique_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_ERROR_unique_ind.png"
   QQ_plot_file_name <- "Residual_QQ_ERROR_unique_ind.png"
 } else if(dependet_variable == my_collection_rate_ind){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(Collection_rate_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(Collection_rate_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_collection_rate_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_collection_rate_ind.png"
   QQ_plot_file_name <- "Residual_QQ_collection_rate_ind.png"
 } else if(dependet_variable == my_collection_rate_correct_item_ind){
-  dependent_data<- individual_data
-  fit_rand_dependent <- lmer(Collection_rate_correct_item_ind~Target*SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
+  fit_rand_dependent <- lmer(Collection_rate_correct_item_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = ind_data)
   #Files names for assumptions
   fitted_plot_file_name <- "Residuals_Fitted_Plot_correct_collection_rate_ind.png"
   historgram_plot_file_name <- "Residuals_Histogram_correct_collection_rate_ind.png"
