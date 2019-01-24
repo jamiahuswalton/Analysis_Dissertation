@@ -10,12 +10,11 @@ library(sjstats)
 
 # File output names and file locations
 file_name_output <- "team_player_aggragate_stats.csv"
+folder_location <- "Database"
 folder_location_database <- paste(main_work_directory_name, folder_location, sep = "")
 aggregate_name_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
 
 # Read in data ----
-
-folder_location <- "Database"
 setwd(folder_location_database)
 
 positiondatafilename<- "position_for_players.csv"
