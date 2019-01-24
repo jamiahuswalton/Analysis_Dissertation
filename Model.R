@@ -29,8 +29,20 @@ summary(model_team)
 
 data_modified_ind <- ind_data %>%
   filter(Dominate.Strategy == "Go Together") %>%
-  select(IndividualScore, CI_ind, II_ind, timeRemaining_ind,ERROR_ind_total, Collection_rate_correct_item_ind, Target, SessionOrder, Team, Player_ID, Dominate.Strategy)
-model_ind <- lmer(Collection_rate_correct_item_ind~Target+SessionOrder+(1|Team)+(1|Player_ID), data = data_modified_ind)
+  select(IndividualScore, 
+         CI_ind, 
+         II_ind, 
+         timeRemaining_ind,
+         ERROR_ind_total, 
+         Collection_rate_correct_item_ind,
+         Dis_total_ind,
+         Mental.Demand,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID, 
+         Dominate.Strategy)
+model_ind <- lmer(Mental.Demand~Target+SessionOrder+(1|Team)+(1|Player_ID), data = data_modified_ind)
 summary(model_ind)
 
 
