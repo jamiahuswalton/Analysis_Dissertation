@@ -89,7 +89,7 @@ plot_data_ind <- ind_data %>%
             n = length(IndividualScore), 
             StEr = sd(IndividualScore) / sqrt(length(IndividualScore)))
 
-ggplot(data = plot_data_ind, aes(x = Target, y = ITndividualScoreAverage, color = SessionOrder, shape=SessionOrder)) +
+ggplot(data = plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color = SessionOrder, shape=SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = IndividualScoreAverage - StEr, ymax = IndividualScoreAverage + StEr), width = 0.2) + 
@@ -142,4 +142,90 @@ ggplot(data = plot_data_ind, aes(x = Target, y = ERROR_ind_totalAverage, color =
   geom_point(size = 3) + 
   geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
   geom_errorbar(aes(ymin = ERROR_ind_totalAverage - SE, ymax = ERROR_ind_totalAverage + SE, width = 0.2)) +
+  facet_grid(.~ Dominate.Strategy) + 
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_errorsTotal.png")
+
+
+# Incorrect Items Collected
+plot_data_ind <-  ind_data %>%
+  select(Target, II_ind, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(II_indAverage = mean(II_ind),
+            SD = sd(II_ind),
+            SE = sd(II_ind) / sqrt(length(II_ind)),
+            N = length(II_ind))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = II_indAverage, color = Dominate.Strategy)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
+  geom_errorbar(aes(ymin = II_indAverage - SE, ymax = II_indAverage + SE, width = 0.2)) +
+  facet_grid(.~ Dominate.Strategy) + 
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_IncorrectItems.png")
+
+
+# Correct item collection rate
+plot_data_ind <- ind_data %>%
+  select(Target, Collection_rate_correct_item_ind, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(Collection_rate_correct_item_indAverage = mean(Collection_rate_correct_item_ind),
+            SD = sd(Collection_rate_correct_item_ind),
+            SE = sd(Collection_rate_correct_item_ind) / sqrt(length(Collection_rate_correct_item_ind)),
+            N = length(Collection_rate_correct_item_ind))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Collection_rate_correct_item_indAverage, color = Dominate.Strategy)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
+  geom_errorbar(aes(ymin = Collection_rate_correct_item_indAverage - SE, ymax = Collection_rate_correct_item_indAverage + SE, width = 0.2)) +
+  facet_grid(.~ Dominate.Strategy) + 
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_CorrectItemCollectionRate.png")
+
+
+# Distance traveled by an individual 
+plot_data_ind <- ind_data %>%
+  select(Target, Dis_total_ind, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(Dis_total_indAverage = mean(Dis_total_ind),
+            SD = sd(Dis_total_ind),
+            SE = sd(Dis_total_ind) / sqrt(length(Dis_total_ind)),
+            N = length(Dis_total_ind))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Dis_total_indAverage, color = Dominate.Strategy)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
+  geom_errorbar(aes(ymin = Dis_total_indAverage - SE, ymax = Dis_total_indAverage + SE, width = 0.2)) +
+  facet_grid(.~ Dominate.Strategy) + 
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_disTraveled.png")
+
+
+# Self-reported performance by individual
+plot_data_ind <- ind_data %>%
+  select(Target, Performance, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(PerformanceAverage = mean(Performance),
+            SD = sd(Performance),
+            SE = sd(Performance) / sqrt(length(Performance)),
+            N = length(Performance))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = PerformanceAverage, color = Dominate.Strategy)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
+  geom_errorbar(aes(ymin = PerformanceAverage - SE, ymax = PerformanceAverage + SE, width = 0.2)) +
+  facet_grid(.~ Dominate.Strategy) + 
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_PerformanceAverage.png")
+
+
+# Self-reported Mental Demand by individual
+plot_data_ind <- ind_data %>%
+  select(Target, Mental.Demand, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(Mental.DemandAverage = mean(Mental.Demand),
+            SD = sd(Mental.Demand),
+            SE = sd(Mental.Demand) / sqrt(length(Mental.Demand)),
+            N = length(Mental.Demand))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Mental.DemandAverage, color = Dominate.Strategy)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
+  geom_errorbar(aes(ymin = Mental.DemandAverage - SE, ymax = Mental.DemandAverage + SE, width = 0.2)) + 
+  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_Mental.DemandAverage.png")
+
