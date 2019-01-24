@@ -28,11 +28,14 @@ ind_data <- clean_aggregate_data_stats
 is_missing_data <- F
 for(i in seq_along(team_data)){
   missing_total <- sum(is.na(team_data[[i]]))
-  print(missing_total)
   if(missing_total > 0){
     is_missing_data <- T
     break
   }
+}
+
+if(is_missing_data){
+  stop("There is missing data")
 }
 
 # Pick dependent variable ----
@@ -52,7 +55,7 @@ my_errors_uniqe_ind <- "ERROR_ind_unique"
 my_collection_rate_ind <- "Collection_rate_ind"
 my_collection_rate_correct_item_ind <- "Collection_rate_correct_item_ind"
 
-dependet_variable <- my_time_remaining_ind
+dependet_variable <- my_errors_uniqe_ind
 
 
 
@@ -70,6 +73,8 @@ model7 <- lmer(TeamScore ~ Target + SessionOrder + (1|Team), data = team_data_ex
 model8 <- lmer(TeamScore ~ Target * SessionOrder + (1|Team), data = team_data_exploritory)
 model9 <- lmer(TeamScore ~ Target * SessionOrder + Dominate.Strategy + (1|Team), data = team_data_exploritory)
 model10 <- lmer(TeamScore ~ Target * SessionOrder + Dominate.Strategy*SessionOrder + (1|Team), data = team_data_exploritory)
+anova(model5,model6, model7, model8, model9, model10)
+anova(model7, model9)
 anova(model3, model2, model4, test = "Chisq")
 anova(model6, model7, model8)
 anova(model2, model3, model4)
