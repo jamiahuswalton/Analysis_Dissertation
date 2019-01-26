@@ -299,7 +299,7 @@ post_session_survey_value<- function(data_post_session, team, player, condition,
   player_data<- data_post_session %>%
     filter(Condition == condition, Team == team, Player == player)
   
-  if(length(test[[1]]) != 1){
+  if(length(player_data[[1]]) != 1){
     message <- paste("Could not find post session survey data for player", player, "in team", team, "for condition", condition)
     stop(message)
   }
@@ -587,7 +587,7 @@ is_post_session_data_correct <- function(post_session_data, team_number_column_n
 
 # Generate aggragate data (final team score, final individual score, ) ----
 generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, 
-                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX){
+                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX, names_PostSession){
   # Final data output
   number_of_columns<- length(col.names)
   data_output_final<- matrix(0, nrow = 0, ncol = number_of_columns)
@@ -758,6 +758,14 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
           TLX_values<- append(TLX_values,value)
         }
         
+        # Post-Session Survey values
+        Post_Session_Values<- vector()
+        for (name in names_PostSession) {
+          index<- which(names_PostSession == name)
+          value<- as.character(post_session_survey_value(post_session_table, team, player,condition, name))
+          Post_Session_Values[index] <- value
+        }
+        
         # Error Rate for individual
         ind_error_rate <- error_rate_ind(clean_position_data, clean_error_data, team, player, condition)
         
@@ -797,7 +805,8 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     current_go_alone_count,
                                     current_mix,
                                     dominate_strategy_used,
-                                    TLX_values))
+                                    TLX_values, 
+                                    Post_Session_Values))
       }
     }
     
@@ -919,19 +928,19 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-data_tlx <- NASA_TLX_table
-rand_num_list <- demographic_table$Rand
-
-is_valid <- T
-
-for (rand in rand_num_list) {
-  data_tlxTemp <- data_tlx %>%
-    filter(Rand.Num == rand)
-  
-  if(length(data_tlxTemp[[1]]) != 4){
-    message <- paste("There is not exactly 4 entries in the TLX for random number ", rand)
-    is_valid <- F
-    stop(message)
-    break
-  }
-}
+# data_tlx <- NASA_TLX_table
+# rand_num_list <- demographic_table$Rand
+# 
+# is_valid <- T
+# 
+# for (rand in rand_num_list) {
+#   data_tlxTemp <- data_tlx %>%
+#     filter(Rand.Num == rand)
+#   
+#   if(length(data_tlxTemp[[1]]) != 4){
+#     message <- paste("There is not exactly 4 entries in the TLX for random number ", rand)
+#     is_valid <- F
+#     stop(message)
+#     break
+#   }
+# }
