@@ -294,6 +294,19 @@ scale_value_NASA_TLX <- function (TLX_table, teamNum, playerNum, condition, scal
   }
 }
 
+# Get post-session value
+post_session_survey_value<- function(data_post_session, team, player, condition, survey_value){
+  player_data<- data_post_session %>%
+    filter(Condition == condition, Team == team, Player == player)
+  
+  if(length(test[[1]]) != 1){
+    message <- paste("Could not find post session survey data for player", player, "in team", team, "for condition", condition)
+    stop(message)
+  }
+  
+  return(player_data[[survey_value]])
+}
+
 # Function to find session order ----
 session_order_number <- function(teamNum, counter_balance_set_dataframe, condition){
   set_index <- teamNum %% length(counter_balance_set_dataframe) #If this equal 0 then that means this team used the last set
@@ -495,6 +508,24 @@ is_demographic_rand_num_in_post_survey <- function(post_session_table, demo_surv
   }
   
   return(is_in_post_survey)
+}
+
+# Check to make sure TLX survey is correct (i.e., make sure every player in the key has the correct number of TLX values 4)
+is_TLX_survey_correct <- function(data_tlx, rand_num_list){
+  is_valid <- T
+  
+  for (rand in rand_num_list) {
+    data_tlxTemp <- data_tlx %>%
+      filter(Rand.Num == rand)
+    
+    if(length(data_tlxTemp[[1]]) != 4){
+      message <- paste("There is not exactly 4 entries in the TLX for random number ", rand)
+      is_valid <- F
+      stop(message)
+      break
+    }
+  }
+  return(is_valid)
 }
 
 # Function to Check to make sure each rand number in the post survey responses are the same for each player in each team ( for all of the conditions) ----
@@ -888,13 +919,19 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-# teamNum<- 7
-# playerNum<- 1
-# data_errors<- error_log_data
-# data_position<- positionTable
-# data_inventory<- inventory_table
-# condition<- "A"
-# 
-# error_rate_team(data_position, data_errors, teamNum, condition)
-# 
-# collection_rate_correct_items_team(data_position, data_inventory, teamNum, condition)
+data_tlx <- NASA_TLX_table
+rand_num_list <- demographic_table$Rand
+
+is_valid <- T
+
+for (rand in rand_num_list) {
+  data_tlxTemp <- data_tlx %>%
+    filter(Rand.Num == rand)
+  
+  if(length(data_tlxTemp[[1]]) != 4){
+    message <- paste("There is not exactly 4 entries in the TLX for random number ", rand)
+    is_valid <- F
+    stop(message)
+    break
+  }
+}
