@@ -26,6 +26,9 @@ set_6 <- c("A", "D", "B", "C")
 # NASA TLX scale names
 TLX_Scale_Names <- c("Mental.Demand", "Physical.Demand", "Temporal.Demand", "Performance", "Effort", "Frustration" )
 
+# Post Session questions names
+PostSession_names <- c("NoticeFeedback", "Feedback_Helpful", "My_Performance", "Team_Performance", "Our_Communication", "Team_perform_well")
+
 # Data frame that contains the session order set. The session in the first row was the first condition, second row was the seconds condition...
 counter_balance_set <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6)) # Put the session orders into a data frame
 
@@ -79,14 +82,16 @@ col_names<- c("Team",
               go_alone_name,
               mix_name,
               "Dominate Strategy",
-              TLX_Scale_Names)
+              TLX_Scale_Names,
+              PostSession_names)
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
 my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, 
-                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names)
+                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names)
 
 # Save aggregate data to csv file
+setwd(folder_location_database)
 write.csv(file = aggregate_folder_location,x = my_aggregate_data)
 
 # Read aggregaate data
