@@ -53,6 +53,7 @@ if(is_missing_data){
 
 setwd(figure_directory)
 
+# Performance Metrics ----
 # Is there an interaction between the session order and the Target levels (Team)?
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, TeamScore) %>%
@@ -229,3 +230,85 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Mental.DemandAverage, color = D
   geom_errorbar(aes(ymin = Mental.DemandAverage - SE, ymax = Mental.DemandAverage + SE, width = 0.2)) + 
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_Mental.DemandAverage.png")
 
+# Surevy ----
+
+# Team
+# Did they notice the feedback?
+plot_data_ind <- ind_data %>%
+  select(Target, NoticeFeedback) %>%
+  group_by(Target) %>%
+  count(NoticeFeedback)
+
+ggplot(data = plot_data_ind, aes(x = NoticeFeedback, y = n, fill = NoticeFeedback)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(.~ Target)
+
+plot_data_ind <- ind_data %>%
+  select(Target, Dominate.Strategy, NoticeFeedback) %>%
+  group_by(Target) %>%
+  count(NoticeFeedback, Dominate.Strategy)
+
+ggplot(data = plot_data_ind, aes(x = NoticeFeedback, y = n, fill = NoticeFeedback)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(Dominate.Strategy ~ Target)
+
+# Did they find the feedback helpful?
+plot_data_ind <- ind_data %>%
+  select(Target, Feedback_Helpful) %>%
+  group_by(Target) %>%
+  count(Feedback_Helpful)
+
+ggplot(data = plot_data_ind, aes(x = Feedback_Helpful, y = n, fill = Feedback_Helpful)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  geom_text(aes(label = n, y = n + 1)) +
+  facet_grid(Target ~ .)
+
+plot_data_ind <- ind_data %>%
+  select(Target, Dominate.Strategy, Feedback_Helpful) %>%
+  group_by(Target) %>%
+  count(Feedback_Helpful, Dominate.Strategy)
+
+ggplot(data = plot_data_ind, aes(x = Feedback_Helpful, y = n, fill = Feedback_Helpful)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  geom_text(aes(label = n, y = n + 1)) +
+  facet_grid(Target ~ Dominate.Strategy)
+
+# How do they rate their performance
+plot_data_ind <- ind_data %>%
+  select(Target, My_Performance) %>%
+  group_by(Target) %>%
+  count(My_Performance)
+
+ggplot(data = plot_data_ind, aes(x = My_Performance, y = n, fill = My_Performance)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(.~ Target)
+
+plot_data_ind <- ind_data %>%
+  select(Target, Dominate.Strategy, My_Performance) %>%
+  group_by(Target) %>%
+  count(My_Performance, Dominate.Strategy)
+
+ggplot(data = plot_data_ind, aes(x = My_Performance, y = n, fill = My_Performance)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(Dominate.Strategy~ Target)
+
+
+# How do they rate the team communication?
+plot_data_ind <- ind_data %>%
+  select(Target, Our_Communication) %>%
+  group_by(Target) %>%
+  count(Our_Communication)
+
+ggplot(data = plot_data_ind, aes(x = Our_Communication, y = n, fill = Our_Communication)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(.~ Target)
+
+plot_data_ind <- ind_data %>%
+  select(Target, Dominate.Strategy, Our_Communication) %>%
+  group_by(Target) %>%
+  count(Our_Communication, Dominate.Strategy)
+
+ggplot(data = plot_data_ind, aes(x = Our_Communication, y = n, fill = Our_Communication)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  geom_text(aes(label = n, y = n + 1)) +
+  facet_grid(Dominate.Strategy~ Target)

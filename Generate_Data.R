@@ -1,45 +1,4 @@
-# Packages that will be used
-library(tidyverse)
-library(lme4)
-library(lmerTest)
-library(emmeans)
-library(svMisc)
-library(MuMIn)
-library(modelr)
-library(sjstats)
-
-# File output names and file locations
-file_name_output <- "team_player_aggragate_stats.csv"
-folder_location <- "Database"
-folder_location_database <- paste(main_work_directory_name, folder_location, sep = "")
-aggregate_name_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
-
-# Read in data ----
-setwd(folder_location_database)
-
-positiondatafilename<- "position_for_players.csv"
-positionTable <- read.csv(positiondatafilename)
-
-inventory_data_filename<- "inventory_activity.csv"
-inventory_table<- read.csv(inventory_data_filename)
-
-error_log_filename<- "error_log.csv"
-error_log_data<- read.csv(error_log_filename)
-
-#-------------------------------#
-folder_location <- "Survey"
-folder_location_survey <- paste(main_work_directory_name, folder_location, sep = "")
-setwd(folder_location_survey)
-
-post_session_filename <- "Data_Post-Session.csv"
-post_session_table <- read.csv(post_session_filename)
-
-
-demographic_filename <- "Data_Demographics_Pre-Survey.csv"
-demographic_table <- read.csv(demographic_filename)
-
-NASA_TLX_filename <- "Data_NASA-TLX.csv"
-NASA_TLX_table <- read.csv(NASA_TLX_filename)
+# Generate aggergate data
 
 #These are the teams that should be removed from analysis (i.e., removed from the raw data)
 #These teams ran through the study with a different interface version (i.e., the periodic report). Team 9 had technical difficulties
@@ -66,6 +25,9 @@ set_6 <- c("A", "D", "B", "C")
 
 # NASA TLX scale names
 TLX_Scale_Names <- c("Mental.Demand", "Physical.Demand", "Temporal.Demand", "Performance", "Effort", "Frustration" )
+
+# Post Session questions names
+PostSession_names <- c("NoticeFeedback", "Feedback_Helpful", "My_Performance", "Team_Performance", "Our_Communication", "Team_perform_well")
 
 # Data frame that contains the session order set. The session in the first row was the first condition, second row was the seconds condition...
 counter_balance_set <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6)) # Put the session orders into a data frame
@@ -120,20 +82,17 @@ col_names<- c("Team",
               go_alone_name,
               mix_name,
               "Dominate Strategy",
-              TLX_Scale_Names)
+              TLX_Scale_Names,
+              PostSession_names)
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
 my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, 
-                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names)
+                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names)
 
-#Save aggregate data to csv file
-write.csv(file = aggregate_name_location,x = my_aggregate_data)
+# Save aggregate data to csv file
+setwd(folder_location_database)
+write.csv(file = aggregate_folder_location,x = my_aggregate_data)
 
-#Read aggregaate data
-my_aggregate_data <- read.csv(file =  aggregate_name_location)
-
-# Make sure post session survey and demographic survey is clean and correct
-is_post_session_data_correct(post_session_table, "Team", "Player", "Rand")
-is_demographic_rand_num_in_post_survey(post_session_table, demographic_table, "Team", "Player", "Rand")
-#Need a function to check the TLX (maybe I can just use the post session function)
+# Read aggregaate data
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
