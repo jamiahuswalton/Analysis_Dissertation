@@ -1,0 +1,9 @@
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
