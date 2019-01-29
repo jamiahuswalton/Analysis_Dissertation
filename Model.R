@@ -36,12 +36,48 @@ data_modified_team <- team_data %>%
          Target, 
          SessionOrder, 
          Team)
-model_team <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = data_modified_team)
-summary(model_team)
 
-emmeans(model_team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(model_team, list(pairwise ~ SessionOrder), adjust = "tukey")
+# Model selection
+    # TeamScore   
+model.null <- lmer(TeamScore ~ 1 + (1|Team), REML = FALSE, data = data_modified_team )
+model.All <- lmer(TeamScore~Target*SessionOrder+(1|Team), REML = FALSE, data = data_modified_team)
+model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
+model.NoTarget <- update(model.All, . ~. - Target)
+model.NoSession <- update(model.All, . ~. - SessionOrder)
 
+comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
+
+rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
+
+selected.model.team <- model.NoInteraction
+
+summary(selected.model.team)
+
+emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
+emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
+
+    # Time remaining - Team
+model.null <- lmer(timeRemaining_team ~ 1 + (1|Team), REML = FALSE, data = data_modified_team )
+model.All <- lmer(timeRemaining_team~Target*SessionOrder+(1|Team), REML = FALSE, data = data_modified_team)
+model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
+model.NoTarget <- update(model.All, . ~. - Target)
+model.NoSession <- update(model.All, . ~. - SessionOrder)
+
+comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
+
+rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
+
+selected.model.team <- model.NoInteraction
+
+summary(selected.model.team)
+
+emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
+emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
+
+    # Correct Items Collected - Team
+    # Incorrect Items Collected 
+    # Unique Errors Committed - Team
+    
 
 
 # Fit mmodel - Based on strategy
