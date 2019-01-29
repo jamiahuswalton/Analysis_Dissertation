@@ -1,4 +1,4 @@
-# Tidy data
+# Tidy data ----
 
 # clean_aggregate_data_stats <- my_aggregate_data
 clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
@@ -19,8 +19,9 @@ team_data <- clean_aggregate_data_stats %>%
 
 ind_data <- clean_aggregate_data_stats
 
-# Fit model
+# Fit and pick model ----
 
+# Team
 data_modified_team <- team_data %>%
   select(TeamScore, 
          CI_team, 
