@@ -55,7 +55,7 @@ my_errors_uniqe_ind <- "ERROR_ind_unique"
 my_collection_rate_ind <- "Collection_rate_ind"
 my_collection_rate_correct_item_ind <- "Collection_rate_correct_item_ind"
 
-dependet_variable <- my_errors_uniqe_ind
+dependet_variable <- my_CI_team
 
 
 
@@ -220,8 +220,9 @@ ggsave(filename = historgram_plot_file_name)
 
 # QQ plot
 setwd(figure_directory)
-ggplot(data = dependent_data, aes(sample = residuals_formula)) +
+ggplot(data = team_data, aes(sample = residuals_formula)) +
   stat_qq() +
+  stat_qq_line()+
   labs(title = "Normal Q-Q Plot", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) +
   ggsave(filename = QQ_plot_file_name)
