@@ -19,15 +19,42 @@ team_data <- clean_aggregate_data_stats %>%
 
 ind_data <- clean_aggregate_data_stats
 
-# Fit mmodel
+# Fit model
 
 data_modified_team <- team_data %>%
-  filter(Dominate.Strategy == "Go Together")%>%
-  select(TeamScore, CI_team, II_team, timeRemaining_team, ERROR_team_total, Collection_rate_correct_item_team, Target, SessionOrder, Team)
-model_team <- lmer(timeRemaining_team~Target+SessionOrder+(1|Team), data = data_modified_team)
+  select(TeamScore, 
+         CI_team, 
+         II_team, 
+         timeRemaining_team, 
+         ERROR_team_total, 
+         Collection_rate_team,
+         Collection_rate_correct_item_team, 
+         Dis_total_team,
+         transmitting_total_team_sec,
+         utterance_count_team,
+         Target, 
+         SessionOrder, 
+         Team)
+model_team <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = data_modified_team)
 summary(model_team)
 
-data_modified_ind <- ind_data %>%
+emmeans(model_team, list(pairwise ~ Target), adjust = "tukey")
+emmeans(model_team, list(pairwise ~ SessionOrder), adjust = "tukey")
+
+
+
+# Fit mmodel - Based on strategy
+
+data_modified_team_strategy <- team_data %>%
+  filter(Dominate.Strategy == "Go Together")%>%
+  select(TeamScore, CI_team, II_team, timeRemaining_team, ERROR_team_total, Collection_rate_correct_item_team, Target, SessionOrder, Team)
+model_team_strategy <- lmer(timeRemaining_team~Target+SessionOrder+(1|Team), data = data_modified_team_strategy)
+summary(model_team_strategy)
+
+emmeans(model_team, list(pairwise ~ Target), adjust = "tukey")
+
+
+data_modified_ind_strategy <- ind_data %>%
   filter(Dominate.Strategy == "Go Together") %>%
   select(IndividualScore, 
          CI_ind, 
@@ -37,13 +64,18 @@ data_modified_ind <- ind_data %>%
          Collection_rate_correct_item_ind,
          Dis_total_ind,
          Mental.Demand,
+         Physical.Demand,
+         Temporal.Demand,
+         Effort,
+         Frustration,
+         Performance,
          Target, 
          SessionOrder, 
          Team, 
          Player_ID, 
          Dominate.Strategy)
-model_ind <- lmer(Mental.Demand~Target+SessionOrder+(1|Team)+(1|Player_ID), data = data_modified_ind)
-summary(model_ind)
+model_ind_strategy <- lmer(Temporal.Demand ~ Target+SessionOrder+(1|Team)+(1|Player_ID), data = data_modified_ind_strategy)
+summary(model_ind_strategy)
 
 
 # Estimated Marginal Means
