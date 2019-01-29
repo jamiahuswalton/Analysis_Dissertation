@@ -75,6 +75,23 @@ emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
 emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
 
     # Correct Items Collected - Team
+model.null <- lmer(CI_team ~ 1 + (1|Team), REML = FALSE, data = data_modified_team )
+model.All <- lmer(CI_team~Target*SessionOrder+(1|Team), REML = FALSE, data = data_modified_team)
+model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
+model.NoTarget <- update(model.All, . ~. - Target)
+model.NoSession <- update(model.All, . ~. - SessionOrder)
+
+comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
+
+rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
+
+selected.model.team <- model.NoInteraction
+
+summary(selected.model.team)
+
+emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
+emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
+
     # Incorrect Items Collected 
     # Unique Errors Committed - Team
     
