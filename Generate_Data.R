@@ -27,7 +27,28 @@ set_6 <- c("A", "D", "B", "C")
 TLX_Scale_Names <- c("Mental.Demand", "Physical.Demand", "Temporal.Demand", "Performance", "Effort", "Frustration" )
 
 # Post Session questions names
-PostSession_names <- c("NoticeFeedback", "Feedback_Helpful", "My_Performance", "Team_Performance", "Our_Communication", "Team_perform_well")
+PostSession_names <- c("NoticeFeedback", 
+                       "Feedback_Helpful", 
+                       "My_Performance", 
+                       "Team_Performance", 
+                       "Our_Communication",
+                       "P1_can_communi",
+                       "P1_performance",
+                       "P1_work_with_again",
+                       "P2_can_communi",
+                       "P2_performance",
+                       "P2_work_with_again",
+                       "P3_can_communi",
+                       "P3_performance",
+                       "P3_work_with_again",
+                       "Team_perform_well",
+                       "Belief_incompatible_with_team",
+                       "Member_belief_incompatible_with_other_member",
+                       "Confident_team_comm_important_details_quickly",	
+                       "Confident_team_comm_important_events",
+                       "Confident_team_accurately_assess_handling_information",
+                       "Confident_team_quickly_assess_handling_information",
+                       "Confident_team_accurately_transfer_information")
 
 # Data frame that contains the session order set. The session in the first row was the first condition, second row was the seconds condition...
 counter_balance_set <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6)) # Put the session orders into a data frame
