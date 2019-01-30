@@ -9,6 +9,10 @@ You should run all lines in the files in the following order:
 - Packages
 - Read_Data
 - Valiadate_Data
-- Generate_Data
 
-After you run these files. You use the other files to look at the data (e.g., Explore or Model)
+
+# Generate Data
+If you need to generate and save the aggregate data, run the whole "Generate_Data" script. If you have already generated the aggregate data, then you only need to run the last line of code that reads the data from a specified location. 
+
+# Explore - Model Data
+Once the data is loaded, you use the other files to look at the data (e.g., Explore or Model).
