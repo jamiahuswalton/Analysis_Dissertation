@@ -1,5 +1,5 @@
 # Analysis_Dissertation
-The purpose of this repositroy it to develop R scripts to analysis team performance for dissertation
+The purpose of this repositroy it to develop R scripts to analysis team performance for Jamiahus Walton's dissertation
 
 # How to use
 You should run all lines in the files in the following order:
