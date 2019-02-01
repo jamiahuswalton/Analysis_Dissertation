@@ -104,17 +104,15 @@ knitr::kable(
 
 I seek to answer the following general questions: 1) Are there patters in the data, Is there an interaction between Target (i.e., individual, team, and Indvidual_Team) and Session Order.
 
-### Performance Metrics
+### Exploring Interactions in Performance Metrics
 
 I first want to explore the main performance metrics. The main performance metrics are the score (individual and team), correct items collected, incorrect items collected, errors (total and unique), and time remaining. I want to do this for the individual and team level analysis.
 
-#### Scores - Averages
-
-##### Team 
-
 Main question: *Is there an interaction between the Target and SessionOrder variable?*
 
-###### Team Score
+#### Scores
+
+##### Team
 
 ```{r}
 plot_data_team <- team_data %>%
@@ -131,7 +129,7 @@ ggplot(data = plot_data_team, aes(x = Target, y = TeamScore, fill = Team, group 
 Visually, there is not obvious pattern. In slop from the highest scores to the lowest score in the team condition seemes to be a little steeper than than the other conditions.
 
 
-```{r TeamScore_v_Target_Plot}
+```{r}
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, TeamScore) %>%
   group_by(SessionOrder, Target) %>%
@@ -148,9 +146,16 @@ ggplot(data = plot_data_team, aes(x = Target, y = TeamScoreAverage, color = Sess
 ```
 
 Visually, there appears to be no interaction between Target and SessionOrder for Team Score dependent variable. 
-  
-  
-###### Correct Items Collected
+
+
+
+##### Individual
+
+#### Correct Items Collected
+
+##### Team
+
+
 ```{r}
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, CI_team) %>%
@@ -168,7 +173,11 @@ ggplot(data = plot_data_team, aes(x = Target, y = CI_teamAverage, color = Sessio
 
 Visually, there appears to be no apparent interaction between Target and SessionOrder for Correct Items dependent variable. An argument could be made that there is an interaction between session 3 and 4 and Individual and Individual_Team. The graph suggests that the number of team items collected has little increase from sesssion 3 to session 4. The graph suggests there is a larger increase in correct items collected from session 3 to session 4. These arugements are complicated by the large standard errors.
 
-#### Incorrect Items Collected 
+##### Individual
+
+#### Incorrect Items Collected
+
+##### Team
 
 ```{r}
 plot_data_team <- team_data %>%
@@ -187,7 +196,12 @@ ggplot(data = plot_data_team, aes(x = Target, y = II_teamAverage, color = Sessio
 
 Visually, there appears to be some interaction between Target and SessionOrder for Incorrect items. It looks like in the individual condition, the teams collected about the same number of incorrect items. It also looks like participants collected the least amount of incorrect items in the Team and Individual_Team condition. It is difficul to draw conclusions because the standard errors are so large. 
 
+##### Individual
+
+
 #### Time remaining
+
+##### Team
 
 ```{r}
 plot_data_team <- team_data %>%
@@ -206,26 +220,11 @@ ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, col
 
 Visually, there appears to be no interaction between Target and SessionOrder for time remaining. The graph suggests that time increase the amount of time remaining at the end of the session faster when in the Team condition. In other words, when given team feedback, the amount of time remaning at the end of each session increases faster. 
 
-#### Errors (Unique)
-
-```{r}
-plot_data_team <- team_data %>%
-  select(Target, SessionOrder, ERROR_team_unique) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(ERROR_team_uniqueAverage = mean(ERROR_team_unique), 
-            Stdv =sd(ERROR_team_unique), n = length(ERROR_team_unique), 
-            StEr = sd(ERROR_team_unique) / sqrt(length(ERROR_team_unique)))
-
-ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_uniqueAverage, color = SessionOrder, shape = SessionOrder)) +
-  geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = ERROR_team_uniqueAverage - StEr, ymax = ERROR_team_uniqueAverage + StEr), width = 0.2) +
-  labs(y = "Count", x = "Target", title = "Unique Errors Vs. Target", color = "Session", shape = "Session")
-```
-
-Visually, there appears to be no interaction between Target and SessionOrder for Amount of unique errors committed.
+##### Individual
 
 #### Errors (Total)
+
+##### Team
 
 ```{r}
 plot_data_team <- team_data %>%
@@ -244,16 +243,61 @@ ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_totalAverage, color
 
 Visually, there appears to be no interaction between Target and SessionOrder for the total errors committed.
 
-```{r cars}
-summary(cars)
+##### Individual
+
+#### Errors (Unique)
+
+##### Team
+
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, ERROR_team_unique) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(ERROR_team_uniqueAverage = mean(ERROR_team_unique), 
+            Stdv =sd(ERROR_team_unique), n = length(ERROR_team_unique), 
+            StEr = sd(ERROR_team_unique) / sqrt(length(ERROR_team_unique)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_uniqueAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = ERROR_team_uniqueAverage - StEr, ymax = ERROR_team_uniqueAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Unique Errors Vs. Target", color = "Session", shape = "Session")
 ```
 
-## Including Plots
+Visually, there appears to be no interaction between Target and SessionOrder for Amount of unique errors committed.
 
-You can also embed plots, for example:
+##### Individual
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+### Exploreing the Influence of Team Strategy on Performance Metrics
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+(COntent)
+
+#### Scores
+
+##### Team
+##### Individual
+
+#### Correct Items Collected
+
+##### Team
+##### Individual
+
+#### Incorrect Items Collected
+
+##### Team
+##### Individual
+
+#### Time remaining
+
+##### Team
+##### Individual
+
+#### Errors (Total)
+
+##### Team
+##### Individual
+
+#### Errors (Unique)
+
+##### Team
+##### Individual
