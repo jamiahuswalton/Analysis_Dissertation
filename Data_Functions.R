@@ -928,19 +928,8 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 
 #Test ----
 
-# data_tlx <- NASA_TLX_table
-# rand_num_list <- demographic_table$Rand
-# 
-# is_valid <- T
-# 
-# for (rand in rand_num_list) {
-#   data_tlxTemp <- data_tlx %>%
-#     filter(Rand.Num == rand)
-#   
-#   if(length(data_tlxTemp[[1]]) != 4){
-#     message <- paste("There is not exactly 4 entries in the TLX for random number ", rand)
-#     is_valid <- F
-#     stop(message)
-#     break
-#   }
-# }
+dependent <- "TeamScore"
+data.to.use <- team_data
+
+
+lmer(as.formula(paste(dependent, "~ Target * SessionOrder + (1|Team)")), data.to.use)
