@@ -1,4 +1,4 @@
-# Tidy data
+# Tidy data ----
 
 # clean_aggregate_data_stats <- my_aggregate_data
 clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
@@ -28,7 +28,7 @@ ind_data <- clean_aggregate_data_stats
 
 
 
-# Is data missing?
+# Is data missing? ----
 # Team
 is_missing_data <- F
 for(i in seq_along(team_data)){
@@ -61,7 +61,7 @@ if(is_missing_data){
 setwd(figure_directory)
 
 # Performance Metrics ----
-# Is there an interaction between the session order and the Target levels - Team Score(Team)?
+# Is there an interaction between the session order and the Target levels - Team Score(Team)? - NO ----
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, TeamScore) %>%
   group_by(SessionOrder, Target) %>%
@@ -73,12 +73,10 @@ ggplot(data = plot_data_team, aes(x = Target, y = TeamScoreAverage, color = Sess
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = TeamScoreAverage - StEr, ymax = TeamScoreAverage + StEr), width = 0.2) +
-  labs(y = "Score", x = "Target", title = "Time Remaining Vs. Team Score")
+  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", color = "Session", shape = "Session")
 
 
-
-
-# Is there an interaction between the session order and the Target levels - Team Score(Team)?
+# Is there an interaction between the session order and the Target levels - Correct Items Colleced (Team)? ----
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, CI_team) %>%
   group_by(SessionOrder, Target) %>%
@@ -90,10 +88,10 @@ ggplot(data = plot_data_team, aes(x = Target, y = CI_teamAverage, color = Sessio
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = CI_teamAverage - StEr, ymax = CI_teamAverage + StEr), width = 0.2) +
-  labs(y = "Score", x = "Target", title = "Time Remaining Vs. Team Score")
+  labs(y = "Count", x = "Target", title = "Correct Items Vs. Target", color = "Session", shape = "Session")
 
 
-# Is there an interaction between Session Order and Target level (Individual)?
+# Is there an interaction between Session Order and Target level - Individual Score (Individual)? ----
 plot_data_ind <- ind_data %>%
   select(Target, SessionOrder, IndividualScore) %>%
   group_by(SessionOrder, Target) %>%
@@ -108,8 +106,8 @@ ggplot(data = plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color =
   geom_errorbar(aes(ymin = IndividualScoreAverage - StEr, ymax = IndividualScoreAverage + StEr), width = 0.2) + 
   ggsave(filename = "Ind_Interaction_between_Session_and_Target.png")
 
-# Is there an interaction between dominate strategy and target levels (Individual)?
-# Individual Score
+# Is there an interaction between dominate strategy and target levels (Individual)? ----
+# Individual Score ----
 plot_data_ind <- ind_data %>%
   select(Target, IndividualScore, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -125,7 +123,7 @@ ggplot(data= plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color = 
   facet_grid(.~Dominate.Strategy) + 
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_score.png")
 
-# Individual time remaining
+# Individual time remaining ----
 plot_data_ind <-  ind_data %>%
   select(Target, timeRemaining_ind, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -142,7 +140,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = TimeRemainingAverage, color = D
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_timeRemaining.png", scale = 1.5)
 
 
-# Individual Total Errors
+# Individual Total Errors ----
 plot_data_ind <-  ind_data %>%
   select(Target, ERROR_ind_total, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -159,7 +157,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = ERROR_ind_totalAverage, color =
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_errorsTotal.png")
 
 
-# Incorrect Items Collected
+# Incorrect Items Collected ----
 plot_data_ind <-  ind_data %>%
   select(Target, II_ind, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -176,7 +174,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = II_indAverage, color = Dominate
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_IncorrectItems.png")
 
 
-# Correct item collection rate
+# Correct item collection rate ----
 plot_data_ind <- ind_data %>%
   select(Target, Collection_rate_correct_item_ind, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -193,7 +191,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Collection_rate_correct_item_in
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_CorrectItemCollectionRate.png")
 
 
-# Distance traveled by an individual 
+# Distance traveled by an individual----
 plot_data_ind <- ind_data %>%
   select(Target, Dis_total_ind, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -210,7 +208,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Dis_total_indAverage, color = D
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_disTraveled.png")
 
 
-# Self-reported performance by individual
+# Self-reported performance by individual ----
 plot_data_ind <- ind_data %>%
   select(Target, Performance, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -227,7 +225,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = PerformanceAverage, color = Dom
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_PerformanceAverage.png")
 
 
-# Self-reported Mental Demand by individual
+# Self-reported Mental Demand by individual ----
 plot_data_ind <- ind_data %>%
   select(Target, Mental.Demand, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -243,7 +241,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Mental.DemandAverage, color = D
   ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_Mental.DemandAverage.png")
 
 
-# Self-reported Frustration
+# Self-reported Frustration ----
 plot_data_ind <- ind_data %>%
   select(Target, Frustration, Dominate.Strategy) %>%
   group_by(Target, Dominate.Strategy) %>%
@@ -262,7 +260,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = FrustrationAverage, color = Dom
 
 # Surevy Individual Level ----
 
-# Did you notice the feedback?
+# Did you notice the feedback? ----
 plot_data_ind <- ind_data %>%
   select(Target, NoticeFeedback) %>%
   group_by(Target) %>%
@@ -281,7 +279,7 @@ ggplot(data = plot_data_ind, aes(x = NoticeFeedback, y = n, fill = NoticeFeedbac
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(Dominate.Strategy ~ Target)
 
-# Did you find the feedback helpful?
+# Did you find the feedback helpful? ----
 plot_data_ind <- ind_data %>%
   select(Target, Feedback_Helpful) %>%
   group_by(Target) %>%
@@ -302,7 +300,7 @@ ggplot(data = plot_data_ind, aes(x = Feedback_Helpful, y = n, fill = Feedback_He
   geom_text(aes(label = n, y = n + 1)) +
   facet_grid(Target ~ Dominate.Strategy)
 
-# How do you rate your own performance?
+# How do you rate your own performance? ----
 plot_data_ind <- ind_data %>%
   select(Target, My_Performance) %>%
   group_by(Target) %>%
@@ -321,7 +319,7 @@ ggplot(data = plot_data_ind, aes(x = My_Performance, y = n, fill = My_Performanc
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(Dominate.Strategy~ Target)
 
-# How do you rate your team performance?
+# How do you rate your team performance? ----
 plot_data_ind <- ind_data %>%
   select(Target, Team_Performance) %>%
   group_by(Target) %>%
@@ -343,7 +341,7 @@ ggplot(data = plot_data_ind, aes(x = Team_Performance, y = n, fill = Team_Perfor
   facet_grid(Dominate.Strategy~ Target)
 
 
-# How do you rate your team communication?
+# How do you rate your team communication? ----
 plot_data_ind <- ind_data %>%
   select(Target, Our_Communication) %>%
   group_by(Target) %>%
@@ -364,7 +362,7 @@ ggplot(data = plot_data_ind, aes(x = Our_Communication, y = n, fill = Our_Commun
   geom_text(aes(label = n, y = n + 1)) +
   facet_grid(Dominate.Strategy~ Target)
 
-# Did your team perform well?
+# Did your team perform well? ----
 plot_data_ind <- ind_data %>%
   select(Target, Team_perform_well) %>%
   group_by(Target) %>%
@@ -384,7 +382,7 @@ ggplot(data = plot_data_ind, aes(x = Team_perform_well, y = n, fill = Team_perfo
   facet_grid(Dominate.Strategy~ Target)
 
 
-# How do you believe your belifs line up with other team members belief of the task
+# How do you believe your belifs line up with other team members belief of the task ----
 plot_data_ind <- ind_data %>%
   select(Target, Belief_incompatible_with_team) %>%
   group_by(Target) %>%
@@ -394,7 +392,7 @@ ggplot(data = plot_data_ind, aes(x = Belief_incompatible_with_team, y = n, fill 
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(.~ Target)
 
-# Was another members belif about the task incompatiable with the other members belif?
+# Was another members belif about the task incompatiable with the other members belif? ----
 plot_data_ind <- ind_data %>%
   select(Target, Member_belief_incompatible_with_other_member) %>%
   group_by(Target) %>%
@@ -405,7 +403,7 @@ ggplot(data = plot_data_ind, aes(x = Member_belief_incompatible_with_other_membe
   facet_grid(.~ Target)
 
 
-# How confident are you that your team can communicate inmportant details quickly?
+# How confident are you that your team can communicate inmportant details quickly? ----
 plot_data_ind <- ind_data %>%
   select(Target, Confident_team_comm_important_details_quickly) %>%
   group_by(Target) %>%
@@ -425,7 +423,7 @@ ggplot(data = plot_data_ind, aes(x = Confident_team_comm_important_details_quick
   facet_grid(Dominate.Strategy ~ Target)
 
 
-# How confident are you that your team can communicate inmportant events?
+# How confident are you that your team can communicate inmportant events? ----
 plot_data_ind <- ind_data %>%
   select(Target, Confident_team_comm_important_events) %>%
   group_by(Target) %>%

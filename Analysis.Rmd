@@ -1,0 +1,259 @@
+---
+title: "Dissertation Analysis"
+author: "Jamiahus Walton"
+Date: '2019-02-01'
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+
+# Functions used is documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+#Folder locations ----
+main_work_directory_name <- main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID", 
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly")
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+## Purpose
+
+The purpose of this document is to record data analysis for my Dissertation.
+
+## Experimental Design
+
+This is a within subject experimental desing. The main variable was the feedback condition (i.e., Target). The variable levels are None, Individual, Team, and Indvidiaul_Team. Each team expereinced each condition. The first condition for each team was the none condition. The remaining three condition were counter balanced. For example, the condition order for team 7 is the following: None, Individual, Team, Individual_Team. The condition order for team 8 is the following: None, Team, Individual, Individual_Team. 
+
+## Data Description
+
+The was collected from **`r N_ind`** participants that formed **`r N_teams`** teams. Below is a sample of the data for the main metrics
+```{r main_metrics_table, echo=FALSE}
+knitr::kable(
+  clean_aggregate_data_stats[1:5,c("TeamScore", 
+                           "IndividualScore", 
+                           "CI_team", 
+                           "CI_ind", 
+                           "II_team", 
+                           "II_ind", 
+                           "ERROR_team_unique", 
+                           "ERROR_ind_unique", 
+                           "ERROR_team_total",
+                           "ERROR_ind_total")]
+)
+```
+
+## Explore
+
+I seek to answer the following general questions: 1) Are there patters in the data, Is there an interaction between Target (i.e., individual, team, and Indvidual_Team) and Session Order.
+
+### Performance Metrics
+
+I first want to explore the main performance metrics. The main performance metrics are the score (individual and team), correct items collected, incorrect items collected, errors (total and unique), and time remaining. I want to do this for the individual and team level analysis.
+
+#### Scores - Averages
+
+##### Team 
+
+Main question: *Is there an interaction between the Target and SessionOrder variable?*
+
+###### Team Score
+
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, TeamScore, Team) %>%
+  mutate(rank_order = -rank(team_data[["TeamScore"]]))
+
+ggplot(data = plot_data_team, aes(x = Target, y = TeamScore, fill = Team, group = rank_order)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", fill = "Teams")
+```
+
+Visually, there is not obvious pattern. In slop from the highest scores to the lowest score in the team condition seemes to be a little steeper than than the other conditions.
+
+
+```{r TeamScore_v_Target_Plot}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, TeamScore) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(TeamScoreAverage = mean(TeamScore), 
+            Stdv =sd(TeamScore), n = length(TeamScore), 
+            StEr = sd(TeamScore) / sqrt(length(TeamScore)))
+
+
+ggplot(data = plot_data_team, aes(x = Target, y = TeamScoreAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = TeamScoreAverage - StEr, ymax = TeamScoreAverage + StEr), width = 0.2) +
+  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be no interaction between Target and SessionOrder for Team Score dependent variable. 
+  
+  
+###### Correct Items Collected
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, CI_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(CI_teamAverage = mean(CI_team), 
+            Stdv =sd(CI_team), n = length(CI_team), 
+            StEr = sd(CI_team) / sqrt(length(CI_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = CI_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = CI_teamAverage - StEr, ymax = CI_teamAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Correct Items Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be no apparent interaction between Target and SessionOrder for Correct Items dependent variable. An argument could be made that there is an interaction between session 3 and 4 and Individual and Individual_Team. The graph suggests that the number of team items collected has little increase from sesssion 3 to session 4. The graph suggests there is a larger increase in correct items collected from session 3 to session 4. These arugements are complicated by the large standard errors.
+
+#### Incorrect Items Collected 
+
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, II_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(II_teamAverage = mean(II_team), 
+            Stdv =sd(II_team), n = length(II_team), 
+            StEr = sd(II_team) / sqrt(length(II_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = II_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = II_teamAverage - StEr, ymax = II_teamAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Incorrect Items Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be some interaction between Target and SessionOrder for Incorrect items. It looks like in the individual condition, the teams collected about the same number of incorrect items. It also looks like participants collected the least amount of incorrect items in the Team and Individual_Team condition. It is difficul to draw conclusions because the standard errors are so large. 
+
+#### Time remaining
+
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, timeRemaining_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
+            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
+            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  labs(y = "Time (Sec)", x = "Target", title = "Time Remaining Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be no interaction between Target and SessionOrder for time remaining. The graph suggests that time increase the amount of time remaining at the end of the session faster when in the Team condition. In other words, when given team feedback, the amount of time remaning at the end of each session increases faster. 
+
+#### Errors (Unique)
+
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, ERROR_team_unique) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(ERROR_team_uniqueAverage = mean(ERROR_team_unique), 
+            Stdv =sd(ERROR_team_unique), n = length(ERROR_team_unique), 
+            StEr = sd(ERROR_team_unique) / sqrt(length(ERROR_team_unique)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_uniqueAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = ERROR_team_uniqueAverage - StEr, ymax = ERROR_team_uniqueAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Unique Errors Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be no interaction between Target and SessionOrder for Amount of unique errors committed.
+
+#### Errors (Total)
+
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, ERROR_team_total) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(ERROR_team_totalAverage = mean(ERROR_team_total), 
+            Stdv =sd(ERROR_team_total), n = length(ERROR_team_total), 
+            StEr = sd(ERROR_team_total) / sqrt(length(ERROR_team_total)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_totalAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = ERROR_team_totalAverage - StEr, ymax = ERROR_team_totalAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Total Errors Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be no interaction between Target and SessionOrder for the total errors committed.
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
