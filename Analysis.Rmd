@@ -1,0 +1,177 @@
+---
+title: "Dissertation Analysis"
+author: "Jamiahus Walton"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+params: N_teams
+Date: '2019-02-01'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+
+# Functions used is documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+#Folder locations ----
+main_work_directory_name <- main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID", 
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly")
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+## Purpose
+
+The purpose of this document is to record data analysis for my Dissertation.
+
+## Experimental Design
+
+This is a within subject experimental desing. The main variable was the feedback condition (i.e., Target). The variable levels are None, Individual, Team, and Indvidiaul_Team. Each team expereinced each condition. The first condition for each team was the none condition. The remaining three condition were counter balanced. For example, the condition order for team 7 is the following: None, Individual, Team, Individual_Team. The condition order for team 8 is the following: None, Team, Individual, Individual_Team. 
+
+## Data Description
+
+The was collected from **`r N_ind`** participants that formed **`r N_teams`** teams. Below is a sample of the data for the main metrics
+```{r main_metrics_table, echo=FALSE}
+knitr::kable(
+  clean_aggregate_data_stats[1:5,c("TeamScore", 
+                           "IndividualScore", 
+                           "CI_team", 
+                           "CI_ind", 
+                           "II_team", 
+                           "II_ind", 
+                           "ERROR_team_unique", 
+                           "ERROR_ind_unique", 
+                           "ERROR_team_total",
+                           "ERROR_ind_total")]
+)
+```
+
+## Explore
+
+I seek to answer the following general questions: 1) Are there patters in the data, Is there an interaction between Target (i.e., individual, team, and Indvidual_Team) and Session Order.
+
+### Performance Metrics
+
+I first want to explore the main performance metrics. The main performance metrics are the score (individual and team), correct items collected, incorrect items collected, errors (total and unique), and time remaining. I want to do this for the individual and team level analysis.
+
+#### Scores
+
+##### Team 
+
+Main question: *Is there an interaction between the Target and SessionOrder variable?*
+
+###### Team Score
+
+```{r TeamScore_v_Target_Plot, echo=FALSE}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, TeamScore) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(TeamScoreAverage = mean(TeamScore), 
+            Stdv =sd(TeamScore), n = length(TeamScore), 
+            StEr = sd(TeamScore) / sqrt(length(TeamScore)))
+
+
+ggplot(data = plot_data_team, aes(x = Target, y = TeamScoreAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = TeamScoreAverage - StEr, ymax = TeamScoreAverage + StEr), width = 0.2) +
+  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", color = "Session", shape = "Session")
+```
+
+Visually, there appears to be no interaction between Target and SessionOrder for Team Score dependent variable. 
+
+###### Correct Items Collected
+```{r}
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, CI_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(CI_teamAverage = mean(CI_team), 
+            Stdv =sd(CI_team), n = length(CI_team), 
+            StEr = sd(CI_team) / sqrt(length(CI_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = CI_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = CI_teamAverage - StEr, ymax = CI_teamAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Correct Items Vs. Target", color = "Session", shape = "Session")
+```
+
+
+#### Correct Items Collected 
+
+#### Incorrect Items Collected 
+
+#### Time remaining
+
+#### Errors (Unique)
+
+#### Errors (Total)
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
