@@ -75,6 +75,16 @@ ggplot(data = plot_data_team, aes(x = Target, y = TeamScoreAverage, color = Sess
   geom_errorbar(aes(ymin = TeamScoreAverage - StEr, ymax = TeamScoreAverage + StEr), width = 0.2) +
   labs(y = "Score", x = "Target", title = "Team Score Vs. Target", color = "Session", shape = "Session")
 
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, TeamScore, Team) %>%
+  mutate(rank_order = -rank(team_data[["TeamScore"]]))
+
+ggplot(data = plot_data_team, aes(x = Target, y = TeamScore, fill = Team, group = rank_order)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", fill = "Teams")
+
 
 # Is there an interaction between the session order and the Target levels - Correct Items Colleced (Team)? ----
 plot_data_team <- team_data %>%
@@ -89,6 +99,63 @@ ggplot(data = plot_data_team, aes(x = Target, y = CI_teamAverage, color = Sessio
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = CI_teamAverage - StEr, ymax = CI_teamAverage + StEr), width = 0.2) +
   labs(y = "Count", x = "Target", title = "Correct Items Vs. Target", color = "Session", shape = "Session")
+
+
+# Is there an interaction between the session order and the Target levels - Incorrect Items Colleced (Team)? ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, II_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(II_teamAverage = mean(II_team), 
+            Stdv =sd(II_team), n = length(II_team), 
+            StEr = sd(II_team) / sqrt(length(II_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = II_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = II_teamAverage - StEr, ymax = II_teamAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Incorrect Items Vs. Target", color = "Session", shape = "Session")
+
+# Is there an interaction between the session order and the Target levels - Time remaining (Team)? ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, timeRemaining_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
+            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
+            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  labs(y = "Time (Sec)", x = "Target", title = "Time Remaining Vs. Target", color = "Session", shape = "Session")
+
+# Is there an interaction between the session order and the Target levels - Unique errors (Team)? ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, ERROR_team_unique) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(ERROR_team_uniqueAverage = mean(ERROR_team_unique), 
+            Stdv =sd(ERROR_team_unique), n = length(ERROR_team_unique), 
+            StEr = sd(ERROR_team_unique) / sqrt(length(ERROR_team_unique)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_uniqueAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = ERROR_team_uniqueAverage - StEr, ymax = ERROR_team_uniqueAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Unique Errors Vs. Target", color = "Session", shape = "Session")
+
+# Is there an interaction between the session order and the Target levels - Total errors (Team)? ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, ERROR_team_total) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(ERROR_team_totalAverage = mean(ERROR_team_total), 
+            Stdv =sd(ERROR_team_total), n = length(ERROR_team_total), 
+            StEr = sd(ERROR_team_total) / sqrt(length(ERROR_team_total)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_totalAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = ERROR_team_totalAverage - StEr, ymax = ERROR_team_totalAverage + StEr), width = 0.2) +
+  labs(y = "Count", x = "Target", title = "Total Errors Vs. Target", color = "Session", shape = "Session")
 
 
 # Is there an interaction between Session Order and Target level - Individual Score (Individual)? ----
