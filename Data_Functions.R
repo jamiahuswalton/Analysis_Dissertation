@@ -510,7 +510,7 @@ is_demographic_rand_num_in_post_survey <- function(post_session_table, demo_surv
   return(is_in_post_survey)
 }
 
-# Check to make sure TLX survey is correct (i.e., make sure every player in the key has the correct number of TLX values 4)
+# Check to make sure TLX survey is correct (i.e., make sure every player in the key has the correct number of TLX values 4) ----
 is_TLX_survey_correct <- function(data_tlx, rand_num_list){
   is_valid <- T
   
@@ -926,10 +926,42 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
   setwd(previous_wd_location)
 }
 
+
+# Model the data for the team level anlysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team){
+  
+  if(is.team){
+    if(model.type == "null"){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team)")))
+    } else if(model.type == "NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
+}
+
 #Test ----
 
-dependent <- "TeamScore"
-data.to.use <- team_data
-
-
-lmer(as.formula(paste(dependent, "~ Target * SessionOrder + (1|Team)")), data.to.use)
+# dependent <- "TeamScore"
+# data.to.use <- team_data
+# 
+# test <- function(df, dependent, model.type){
+#   if(model.type == "null"){
+#     lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+#   } else if(model.type == "All"){
+#     lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+#   }
+# }
+# 
+# # anova(test(team_data, "TeamScore", "null"), test(team_data, "TeamScore", "All"))
+# anova(model_data_Target_Session(team_data, "TeamScore", "null",T), model_data_Target_Session(team_data, "TeamScore", "All",T), model_data_Target_Session(team_data, "TeamScore", "NoInteraction",T))
+# test1 <- model_data_Target_Session(team_data, "TeamScore", "All",T)
+# summary(update(test1, . ~ . -Target:Session))
+# lmer(as.formula(paste(dependent, "~ Target * SessionOrder + (1|Team)")), data.to.use)
