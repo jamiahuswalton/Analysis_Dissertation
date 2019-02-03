@@ -32,6 +32,27 @@ data_modified_team <- team_data %>%
          SessionOrder, 
          Team)
 
+  # General Dependent Vairbale 
+response_variable <- "TeamScore"
+model.null <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "null", is.team = TRUE)
+model.All <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "All", is.team = TRUE)
+model.NoInteraction <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
+model.NoTarget <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoTarget", is.team = TRUE)
+model.NoSession <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoSession", is.team = TRUE)
+
+comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
+comparision.results
+
+rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
+
+selected.model.team <- model.NoInteraction
+
+summary(selected.model.team)
+
+emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
+emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
+
+
     # TeamScore ----
 response_variable <- "TeamScore"
 model.null <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "null", is.team = T)
