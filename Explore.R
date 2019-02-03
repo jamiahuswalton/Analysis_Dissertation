@@ -61,6 +61,29 @@ if(is_missing_data){
 setwd(figure_directory)
 
 # Performance Metrics ----
+# Is there an interaction between the session order and the Target levels?
+
+dependent_response <- "timeRemaining_team"
+y_label <- "Time (Sec)"
+x_label <- "Target"
+title_response <- "Time Remianing Vs. Target"
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response]]), 
+            Stdv =sd(.data[[dependent_response]]), n = length(.data[[dependent_response]]), 
+            StEr = sd(.data[[dependent_response]]) / sqrt(length(.data[[dependent_response]])))
+
+ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
+
+
+
+
+
 # Is there an interaction between the session order and the Target levels - Team Score(Team)? - NO ----
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, TeamScore) %>%
