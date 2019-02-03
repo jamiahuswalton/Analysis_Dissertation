@@ -32,274 +32,6 @@ data_modified_team <- team_data %>%
          SessionOrder, 
          Team)
 
-    # TeamScore ----
-response_variable <- "TeamScore"
-model.null <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "null", is.team = T)
-model.All <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "All", is.team = T)
-model.NoInteraction <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoInteraction", is.team = T)
-model.NoTarget <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoTarget", is.team = T)
-model.NoSession <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoSession", is.team = T)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Time remaining - Team ----
-response_variable <- "timeRemaining_team"
-model.null <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "null", is.team = T)
-model.All <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "All", is.team = T)
-model.NoInteraction <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoInteraction", is.team = T)
-model.NoTarget <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoTarget", is.team = T)
-model.NoSession <- model_data_Target_Session(df = team_data, dependent =  response_variable, model.type =  "NoSession", is.team = T)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Correct Items Collected - Team ----
-model.null <- lmer(CI_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team )
-model.All <- lmer(CI_team ~ Target * SessionOrder + (1|Team), REML = TRUE, data = data_modified_team)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Incorrect Items Collected - Team ----
-model.null <- lmer(II_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team )
-model.All <- lmer(II_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # In this case, the Null model was not significantly different then the other modeles.
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Unique Errors Committed - Team ----
-model.null <- lmer(ERROR_team_unique ~ 1 + (1|Team), REML = TRUE, data = data_modified_team )
-model.All <- lmer(ERROR_team_unique~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Total Errors - Team ----
-model.null <- lmer(ERROR_team_total ~ 1 + (1|Team), REML = TRUE, data = data_modified_team )
-model.All <- lmer(ERROR_team_total~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Time Remaining - Team ----
-model.null <- lmer(timeRemaining_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team )
-model.All <- lmer(timeRemaining_team ~ Target * SessionOrder + (1|Team), REML = TRUE, data = data_modified_team)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-  # Individual data to fit ----
-data_modified_ind <- ind_data %>%
-  select(IndividualScore, 
-         CI_ind, 
-         II_ind, 
-         timeRemaining_ind, 
-         ERROR_ind_total,
-         ERROR_ind_unique,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID)
-
-    # Individual Score ----
-model.null <- lmer(IndividualScore ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind )
-model.All <- lmer(IndividualScore~Target*SessionOrder+ + (1 | Player_ID), REML = TRUE, data = data_modified_ind)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Correct Items collected - Individual ----
-model.null <- lmer(CI_ind ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind )
-model.All <- lmer(CI_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Incorrect Items collected - Individual ----
-model.null <- lmer(II_ind ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind )
-model.All <- lmer(II_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # The null model produced the lowest AIC value. 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Uniqe Errors - Individual ----
-model.null <- lmer(ERROR_ind_unique ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind )
-model.All <- lmer(ERROR_ind_unique~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Total Errors - Individual ----
-model.null <- lmer(ERROR_ind_total ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind )
-model.All <- lmer(ERROR_ind_total~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Time Remaining - Individual ----
-model.null <- lmer(timeRemaining_ind ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind )
-model.All <- lmer(timeRemaining_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-
-
-
-
-# Fit mmodel - Based on strategy ----
-
 data_modified_team_GT <- team_data %>%
   filter(Dominate.Strategy == "Go Together")%>%
   select(TeamScore, 
@@ -323,236 +55,20 @@ data_modified_team_GA <- team_data %>%
          Target, 
          SessionOrder, 
          Team)
+  
+  # Individual Data to Fit ----
+data_modified_ind <- ind_data %>%
+  select(IndividualScore, 
+         CI_ind, 
+         II_ind, 
+         timeRemaining_ind, 
+         ERROR_ind_total,
+         ERROR_ind_unique,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
 
-    # TeamScore - Go Together  ----
-model.null <- lmer(TeamScore ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GT )
-model.All <- lmer(TeamScore ~ Target * SessionOrder + (1|Team), REML = TRUE, data = data_modified_team_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # TeamScore - Go Alone ----
-model.null <- lmer(TeamScore ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GA )
-model.All <- lmer(TeamScore ~ Target * SessionOrder + (1|Team), REML = TRUE, data = data_modified_team_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Correct Items Collected - Team - Go Together ----
-model.null <- lmer(CI_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GT )
-model.All <- lmer(CI_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Correct Items Collected - Team - Go Alone ----
-model.null <- lmer(CI_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GA )
-model.All <- lmer(CI_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # Null model produced lowest AIC value
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Incorrect Items Collected - Team - Go Together ----
-model.null <- lmer(II_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GT )
-model.All <- lmer(II_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # In this case, the Null model was not significantly different then the other modeles.
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Incorrect Items Collected - Team - Go Alone ----
-model.null <- lmer(II_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GA )
-model.All <- lmer(II_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # In this case, the Null model was not significantly different then the other modeles.
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Unique Errors Committed - Team - Go Together ----
-model.null <- lmer(ERROR_team_unique ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GT )
-model.All <- lmer(ERROR_team_unique~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Unique Errors Committed - Team - Go Alone ----
-model.null <- lmer(ERROR_team_unique ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GA )
-model.All <- lmer(ERROR_team_unique~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Total Errors - Team - Go Together ----
-model.null <- lmer(ERROR_team_total ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GT )
-model.All <- lmer(ERROR_team_total~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Total Errors - Team - Go Alone ----
-model.null <- lmer(ERROR_team_total ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GA )
-model.All <- lmer(ERROR_team_total~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Time Remaining - Team - Go Together ----
-model.null <- lmer(timeRemaining_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GT )
-model.All <- lmer(timeRemaining_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Time Remaining - Team - Go Alone ----
-model.null <- lmer(timeRemaining_team ~ 1 + (1|Team), REML = TRUE, data = data_modified_team_GA )
-model.All <- lmer(timeRemaining_team~Target*SessionOrder+(1|Team), REML = TRUE, data = data_modified_team_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-  # Individual data to fit - Strategy ----
 data_modified_ind_GT <- ind_data %>%
   filter(Dominate.Strategy == "Go Together") %>%
   select(IndividualScore, 
@@ -561,6 +77,7 @@ data_modified_ind_GT <- ind_data %>%
          timeRemaining_ind, 
          ERROR_ind_total,
          ERROR_ind_unique,
+         Collection_rate_correct_item_ind,
          Target, 
          SessionOrder, 
          Team, 
@@ -574,35 +91,21 @@ data_modified_ind_GA <- ind_data %>%
          timeRemaining_ind, 
          ERROR_ind_total,
          ERROR_ind_unique,
+         Collection_rate_correct_item_ind,
          Target, 
          SessionOrder, 
          Team, 
          Player_ID)
-    # Individual Score - Go Together ----
-model.null <- lmer(IndividualScore ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT )
-model.All <- lmer(IndividualScore~Target*SessionOrder + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
 
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # The null model produced the lowest AIC 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Individual Score - Go Alone ----
-model.null <- lmer(IndividualScore ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.All <- lmer(IndividualScore~Target*SessionOrder+ + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
+  # General Dependent Vairbale ----
+    # Team Level ----
+response_variable <- "TeamScore"
+data_focus_team <- data_modified_team_GA
+model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
+model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
+model.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget", is.team = TRUE)
+model.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoSession", is.team = TRUE)
 
 comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
 comparision.results
@@ -616,192 +119,21 @@ summary(selected.model.team)
 emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
 emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
 
-    # Correct Items collected - Individual - Go Together ----
-model.null <- lmer(CI_ind ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT )
-model.All <- lmer(CI_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
+    # Individul Level ----
+response_variable <- "Collection_rate_correct_item_ind"
+data_focus_ind <- data_modified_ind_GT
+model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE)
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE)
+model.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget", is.team = FALSE)
+model.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoSession", is.team = FALSE)
 
 comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
 comparision.results
 
 rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
 
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Correct Items collected - Individual - Go Alone ----
-model.null <- lmer(CI_ind ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA )
-model.All <- lmer(CI_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # THe null model produced the lowest AIC value 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Incorrect Items collected - Individual - Go Together ----
-model.null <- lmer(II_ind ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT )
-model.All <- lmer(II_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction 
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Incorrect Items collected - Individual - Go Alone ----
-model.null <- lmer(II_ind ~ 1 + (1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA )
-model.All <- lmer(II_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.null # Null model produced the lowest AIC
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Uniqe Errors - Individual - Go Together ----
-model.null <- lmer(ERROR_ind_unique ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind_GT )
-model.All <- lmer(ERROR_ind_unique~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Uniqe Errors - Individual - Go Alone ----
-model.null <- lmer(ERROR_ind_unique ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind_GA )
-model.All <- lmer(ERROR_ind_unique~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Total Errors - Individual - Go Together ----
-model.null <- lmer(ERROR_ind_total ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind_GT )
-model.All <- lmer(ERROR_ind_total~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-    # Total Errors - Individual - Go Alone ----
-model.null <- lmer(ERROR_ind_total ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.All <- lmer(ERROR_ind_total~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-
-    # Time Remaining - Individual - Go Together ----
-model.null <- lmer(timeRemaining_ind ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.All <- lmer(timeRemaining_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GT)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoSession  
-
-summary(selected.model.team)
-
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
-
-
-    # Time Remaining - Individual - Go Alone ----
-model.null <- lmer(timeRemaining_ind ~ 1 + (1|Team) + (1|Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.All <- lmer(timeRemaining_ind~Target*SessionOrder+(1|Team) + (1 | Player_ID), REML = TRUE, data = data_modified_ind_GA)
-model.NoInteraction <- update(model.All, . ~. - Target:SessionOrder)
-model.NoTarget <- update(model.All, . ~. - Target)
-model.NoSession <- update(model.All, . ~. - SessionOrder)
-
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
-comparision.results
-
-rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
-
-selected.model.team <- model.NoInteraction  
+selected.model.team <- model.NoInteraction
 
 summary(selected.model.team)
 
