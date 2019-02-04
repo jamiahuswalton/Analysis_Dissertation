@@ -61,17 +61,31 @@ if(is_missing_data){
 setwd(figure_directory)
 
 # Performance Metrics ----
-# Is there an interaction between the session order and the Target levels?
+  # Team ----
+dependent_response_team <- "timeRemaining_team"
+y_label_team <- "Time (Sec)"
+x_label_team <- "Target"
+title_response_team <- "Time Remianing Vs. Target"
 
-dependent_response <- "timeRemaining_team"
-y_label <- "Time (Sec)"
-x_label <- "Target"
-title_response <- "Time Remianing Vs. Target"
+    # What does the raw data look like? ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team, Team) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_team]]))
+
+ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_team, fill = "Team", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = y_label, x = x_label, title = title_response, fill = "Teams")
+
+
+    # Is there an interaction between the session order and the Target levels? -----
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, dependent_response) %>%
   group_by(SessionOrder, Target) %>%
   summarise(Average = mean(.data[[dependent_response]]), 
-            Stdv =sd(.data[[dependent_response]]), n = length(.data[[dependent_response]]), 
+            Stdv =sd(.data[[dependent_response]]), 
+            n = length(.data[[dependent_response]]), 
             StEr = sd(.data[[dependent_response]]) / sqrt(length(.data[[dependent_response]])))
 
 ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape = SessionOrder)) +
@@ -79,6 +93,43 @@ ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder,
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
+
+  # Individual ----
+dependent_response_ind <- "IndividualScore"
+y_label_ind <- "Socre"
+x_label_ind <- "Target"
+title_response_ind <- "Score (individual) Vs. Target"
+
+    # What does the raw data look like? ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Player_ID) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_ind]]))
+
+ggplot(data = plot_data_ind, aes_string(x = "Target", y = dependent_response_ind, fill = "Player_ID", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = paste("Ind_Raw_Data_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
+
+
+    # Is there an interaction between the session order and the Target levels? ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") 
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
+
+
 
 
 
