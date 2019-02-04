@@ -123,10 +123,10 @@ ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder,
   labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
 
   # Individual ----
-dependent_response_ind <- "IndividualScore"
-y_label_ind <- "Socre"
+dependent_response_ind <- "Performance"
+y_label_ind <- "TLX Score"
 x_label_ind <- "Target"
-title_response_ind <- "Score (individual) Vs. Target"
+title_response_ind <- "Performance Vs. Target"
 
     # What does the raw data look like? ----
 plot_data_ind <- ind_data %>%
