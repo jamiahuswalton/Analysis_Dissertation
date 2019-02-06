@@ -62,10 +62,10 @@ setwd(figure_directory)
 
 # Performance Metrics ----
   # Team ----
-dependent_response_team <- "timeRemaining_team"
-y_label_team <- "Time (Sec)"
+dependent_response_team <- "utterance_count_team"
+y_label_team <- "Count"
 x_label_team <- "Target"
-title_response_team <- "Time Remianing Vs. Target"
+title_response_team <- "Utterance Count Vs. Target"
 
     # What does the raw data look like split up by session and Target? ----
 plot_data_team <- team_data %>%
@@ -76,7 +76,7 @@ ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_te
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(. ~ SessionOrder) + 
   guides(fill = FALSE) +
-  labs(y = y_label_team, x = x_label_team, title = title_response, fill = "Teams")
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
 
       # By Strategy ----
 plot_data_team <- team_data %>%
@@ -88,7 +88,7 @@ ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_te
   facet_grid(. ~ SessionOrder) + 
   guides(fill = FALSE) +
   facet_grid(. ~ Dominate.Strategy) +
-  labs(y = y_label_team, x = x_label_team, title = title_response, fill = "Teams") 
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") 
 
  
     # Is there an interaction between the session order and the Target levels? -----
