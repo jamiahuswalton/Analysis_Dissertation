@@ -61,267 +61,155 @@ if(is_missing_data){
 setwd(figure_directory)
 
 # Performance Metrics ----
-# Is there an interaction between the session order and the Target levels - Team Score(Team)? - NO ----
+  # Team ----
+dependent_response_team <- "TeamScore"
+y_label_team <- "Count"
+x_label_team <- "Target"
+title_response_team <- "Utterance Count Vs. Target"
+
+    # What is the distrabution of the data ----
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, TeamScore) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(TeamScoreAverage = mean(TeamScore), 
-            Stdv =sd(TeamScore), n = length(TeamScore), 
-            StEr = sd(TeamScore) / sqrt(length(TeamScore)))
+  select(dependent_response_team, Target)
 
-ggplot(data = plot_data_team, aes(x = Target, y = TeamScoreAverage, color = SessionOrder, shape = SessionOrder)) +
-  geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = TeamScoreAverage - StEr, ymax = TeamScoreAverage + StEr), width = 0.2) +
-  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", color = "Session", shape = "Session")
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 10) +
+  facet_grid(. ~ Target)
 
+ggplot(data = )
+
+    # What does the raw data look like split up by session and Target? ----
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, TeamScore, Team) %>%
-  mutate(rank_order = -rank(team_data[["TeamScore"]]))
+  select(Target, SessionOrder, dependent_response_team, Team) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_team]]))
 
-ggplot(data = plot_data_team, aes(x = Target, y = TeamScore, fill = Team, group = rank_order)) +
+ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_team, fill = "Team", group = "rank_order")) +
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(. ~ SessionOrder) + 
   guides(fill = FALSE) +
-  labs(y = "Score", x = "Target", title = "Team Score Vs. Target", fill = "Teams")
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
 
-
-# Is there an interaction between the session order and the Target levels - Correct Items Colleced (Team)? ----
+      # By Strategy ----
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, CI_team) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(CI_teamAverage = mean(CI_team), 
-            Stdv =sd(CI_team), n = length(CI_team), 
-            StEr = sd(CI_team) / sqrt(length(CI_team)))
+  select(Target, SessionOrder, dependent_response_team, Team, Dominate.Strategy) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_team]]))
 
-ggplot(data = plot_data_team, aes(x = Target, y = CI_teamAverage, color = SessionOrder, shape = SessionOrder)) +
-  geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = CI_teamAverage - StEr, ymax = CI_teamAverage + StEr), width = 0.2) +
-  labs(y = "Count", x = "Target", title = "Correct Items Vs. Target", color = "Session", shape = "Session")
+ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_team, fill = "Team", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  facet_grid(. ~ Dominate.Strategy) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") 
 
-
-# Is there an interaction between the session order and the Target levels - Incorrect Items Colleced (Team)? ----
+ 
+    # Is there an interaction between the session order and the Target levels? -----
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, II_team) %>%
+  select(Target, SessionOrder, dependent_response) %>%
   group_by(SessionOrder, Target) %>%
-  summarise(II_teamAverage = mean(II_team), 
-            Stdv =sd(II_team), n = length(II_team), 
-            StEr = sd(II_team) / sqrt(length(II_team)))
+  summarise(Average = mean(.data[[dependent_response]]), 
+            Stdv =sd(.data[[dependent_response]]), 
+            n = length(.data[[dependent_response]]), 
+            StEr = sd(.data[[dependent_response]]) / sqrt(length(.data[[dependent_response]])))
 
-ggplot(data = plot_data_team, aes(x = Target, y = II_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape = SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = II_teamAverage - StEr, ymax = II_teamAverage + StEr), width = 0.2) +
-  labs(y = "Count", x = "Target", title = "Incorrect Items Vs. Target", color = "Session", shape = "Session")
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
 
-# Is there an interaction between the session order and the Target levels - Time remaining (Team)? ----
+      # By Streategy ----
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, timeRemaining_team) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
-            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
-            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+  select(Target, SessionOrder, dependent_response, Dominate.Strategy) %>%
+  group_by(SessionOrder, Target, Dominate.Strategy) %>%
+  summarise(Average = mean(.data[[dependent_response]]), 
+            Stdv =sd(.data[[dependent_response]]), 
+            n = length(.data[[dependent_response]]), 
+            StEr = sd(.data[[dependent_response]]) / sqrt(length(.data[[dependent_response]])))
 
-ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape = SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
-  labs(y = "Time (Sec)", x = "Target", title = "Time Remaining Vs. Target", color = "Session", shape = "Session")
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  facet_grid(. ~ Dominate.Strategy) + 
+  labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
 
-# Is there an interaction between the session order and the Target levels - Unique errors (Team)? ----
-plot_data_team <- team_data %>%
-  select(Target, SessionOrder, ERROR_team_unique) %>%
+  # Individual ----
+dependent_response_ind <- "timeRemaining_ind"
+y_label_ind <- "Time Remaining"
+x_label_ind <- "Target"
+title_response_ind <- "Time Vs. Target"
+
+# What is the distrabution of the data ----
+plot_data_ind <- ind_data %>%
+  select(dependent_response_ind, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = dependent_response_ind), bins = 10) +
+  facet_grid(. ~ Target)
+
+    # What does the raw data look like? ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Player_ID) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_ind]]))
+
+ggplot(data = plot_data_ind, aes_string(x = "Target", y = dependent_response_ind, fill = "Player_ID", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = paste("Ind_Raw_Data_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
+
+      # By Streategy ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Player_ID, Dominate.Strategy) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_ind]]))
+
+ggplot(data = plot_data_ind, aes_string(x = "Target", y = dependent_response_ind, fill = "Player_ID", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  facet_grid(. ~ Dominate.Strategy) + 
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = paste("Ind_Raw_Data_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
+
+
+    # Is there an interaction between the session order and the Target levels? ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
   group_by(SessionOrder, Target) %>%
-  summarise(ERROR_team_uniqueAverage = mean(ERROR_team_unique), 
-            Stdv =sd(ERROR_team_unique), n = length(ERROR_team_unique), 
-            StEr = sd(ERROR_team_unique) / sqrt(length(ERROR_team_unique)))
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
 
-ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_uniqueAverage, color = SessionOrder, shape = SessionOrder)) +
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = ERROR_team_uniqueAverage - StEr, ymax = ERROR_team_uniqueAverage + StEr), width = 0.2) +
-  labs(y = "Count", x = "Target", title = "Unique Errors Vs. Target", color = "Session", shape = "Session")
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
 
-# Is there an interaction between the session order and the Target levels - Total errors (Team)? ----
-plot_data_team <- team_data %>%
-  select(Target, SessionOrder, ERROR_team_total) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(ERROR_team_totalAverage = mean(ERROR_team_total), 
-            Stdv =sd(ERROR_team_total), n = length(ERROR_team_total), 
-            StEr = sd(ERROR_team_total) / sqrt(length(ERROR_team_total)))
+      # By strategy ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Dominate.Strategy) %>%
+  group_by(SessionOrder, Target, Dominate.Strategy) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
 
-ggplot(data = plot_data_team, aes(x = Target, y = ERROR_team_totalAverage, color = SessionOrder, shape = SessionOrder)) +
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = ERROR_team_totalAverage - StEr, ymax = ERROR_team_totalAverage + StEr), width = 0.2) +
-  labs(y = "Count", x = "Target", title = "Total Errors Vs. Target", color = "Session", shape = "Session")
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  facet_grid(. ~ Dominate.Strategy)+
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))  
+  
 
 
-# Is there an interaction between Session Order and Target level - Individual Score (Individual)? ----
-plot_data_ind <- ind_data %>%
-  select(Target, SessionOrder, IndividualScore) %>%
-  group_by(SessionOrder, Target) %>%
-  summarise(IndividualScoreAverage = mean(IndividualScore), 
-            Stdv =sd(IndividualScore), 
-            n = length(IndividualScore), 
-            StEr = sd(IndividualScore) / sqrt(length(IndividualScore)))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color = SessionOrder, shape=SessionOrder)) +
-  geom_point(size = 3) +
-  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = IndividualScoreAverage - StEr, ymax = IndividualScoreAverage + StEr), width = 0.2) + 
-  ggsave(filename = "Ind_Interaction_between_Session_and_Target.png")
-
-# Is there an interaction between dominate strategy and target levels (Individual)? ----
-# Individual Score ----
-plot_data_ind <- ind_data %>%
-  select(Target, IndividualScore, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(IndividualScoreAverage = mean(IndividualScore), 
-            SD = sd(IndividualScore), 
-            SE = sd(IndividualScore)/sqrt(length(IndividualScore)), 
-            N = length(IndividualScore))
-
-ggplot(data= plot_data_ind, aes(x = Target, y = IndividualScoreAverage, color = factor(Dominate.Strategy), shape = factor(Dominate.Strategy))) +
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = IndividualScoreAverage - SE, ymax = IndividualScoreAverage + SE, width = 0.2)) +
-  facet_grid(.~Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_score.png")
-
-# Individual time remaining ----
-plot_data_ind <-  ind_data %>%
-  select(Target, timeRemaining_ind, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(TimeRemainingAverage = mean(timeRemaining_ind),
-            SD = sd(timeRemaining_ind),
-            SE = sd(timeRemaining_ind) / sqrt(length(timeRemaining_ind)),
-            N = length(timeRemaining_ind))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = TimeRemainingAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = TimeRemainingAverage - SE, ymax = TimeRemainingAverage + SE, width = 0.2)) + 
-  facet_grid(.~Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_timeRemaining.png", scale = 1.5)
 
 
-# Individual Total Errors ----
-plot_data_ind <-  ind_data %>%
-  select(Target, ERROR_ind_total, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(ERROR_ind_totalAverage = mean(ERROR_ind_total),
-            SD = sd(ERROR_ind_total),
-            SE = sd(ERROR_ind_total) / sqrt(length(ERROR_ind_total)),
-            N = length(ERROR_ind_total))
 
-ggplot(data = plot_data_ind, aes(x = Target, y = ERROR_ind_totalAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = ERROR_ind_totalAverage - SE, ymax = ERROR_ind_totalAverage + SE, width = 0.2)) +
-  facet_grid(.~ Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_errorsTotal.png")
-
-
-# Incorrect Items Collected ----
-plot_data_ind <-  ind_data %>%
-  select(Target, II_ind, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(II_indAverage = mean(II_ind),
-            SD = sd(II_ind),
-            SE = sd(II_ind) / sqrt(length(II_ind)),
-            N = length(II_ind))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = II_indAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = II_indAverage - SE, ymax = II_indAverage + SE, width = 0.2)) +
-  facet_grid(.~ Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_IncorrectItems.png")
-
-
-# Correct item collection rate ----
-plot_data_ind <- ind_data %>%
-  select(Target, Collection_rate_correct_item_ind, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(Collection_rate_correct_item_indAverage = mean(Collection_rate_correct_item_ind),
-            SD = sd(Collection_rate_correct_item_ind),
-            SE = sd(Collection_rate_correct_item_ind) / sqrt(length(Collection_rate_correct_item_ind)),
-            N = length(Collection_rate_correct_item_ind))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = Collection_rate_correct_item_indAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = Collection_rate_correct_item_indAverage - SE, ymax = Collection_rate_correct_item_indAverage + SE, width = 0.2)) +
-  facet_grid(.~ Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_CorrectItemCollectionRate.png")
-
-
-# Distance traveled by an individual----
-plot_data_ind <- ind_data %>%
-  select(Target, Dis_total_ind, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(Dis_total_indAverage = mean(Dis_total_ind),
-            SD = sd(Dis_total_ind),
-            SE = sd(Dis_total_ind) / sqrt(length(Dis_total_ind)),
-            N = length(Dis_total_ind))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = Dis_total_indAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = Dis_total_indAverage - SE, ymax = Dis_total_indAverage + SE, width = 0.2)) +
-  facet_grid(.~ Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_disTraveled.png")
-
-
-# Self-reported performance by individual ----
-plot_data_ind <- ind_data %>%
-  select(Target, Performance, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(PerformanceAverage = mean(Performance),
-            SD = sd(Performance),
-            SE = sd(Performance) / sqrt(length(Performance)),
-            N = length(Performance))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = PerformanceAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = PerformanceAverage - SE, ymax = PerformanceAverage + SE, width = 0.2)) +
-  facet_grid(.~ Dominate.Strategy) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_PerformanceAverage.png")
-
-
-# Self-reported Mental Demand by individual ----
-plot_data_ind <- ind_data %>%
-  select(Target, Mental.Demand, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(Mental.DemandAverage = mean(Mental.Demand),
-            SD = sd(Mental.Demand),
-            SE = sd(Mental.Demand) / sqrt(length(Mental.Demand)),
-            N = length(Mental.Demand))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = Mental.DemandAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = Mental.DemandAverage - SE, ymax = Mental.DemandAverage + SE, width = 0.2)) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_Mental.DemandAverage.png")
-
-
-# Self-reported Frustration ----
-plot_data_ind <- ind_data %>%
-  select(Target, Frustration, Dominate.Strategy) %>%
-  group_by(Target, Dominate.Strategy) %>%
-  summarise(FrustrationAverage = mean(Frustration),
-            SD = sd(Frustration),
-            SE = sd(Frustration) / sqrt(length(Frustration)),
-            N = length(Frustration))
-
-ggplot(data = plot_data_ind, aes(x = Target, y = FrustrationAverage, color = Dominate.Strategy)) + 
-  geom_point(size = 3) + 
-  geom_line(aes(group = Dominate.Strategy, color = factor(Dominate.Strategy))) + 
-  geom_errorbar(aes(ymin = FrustrationAverage - SE, ymax = FrustrationAverage + SE, width = 0.2)) + 
-  ggsave(filename = "Ind_Interaction_between_Strategy_and_Target_Mental.DemandAverage.png")
 
 
 

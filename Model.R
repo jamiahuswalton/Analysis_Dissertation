@@ -28,6 +28,7 @@ data_modified_team <- team_data %>%
          timeRemaining_team, 
          ERROR_team_total,
          ERROR_team_unique,
+         Performance,
          Target, 
          SessionOrder, 
          Team)
@@ -40,6 +41,7 @@ data_modified_team_GT <- team_data %>%
          timeRemaining_team, 
          ERROR_team_total,
          ERROR_team_unique,
+         Performance,
          Target, 
          SessionOrder, 
          Team)
@@ -52,6 +54,7 @@ data_modified_team_GA <- team_data %>%
          timeRemaining_team, 
          ERROR_team_total,
          ERROR_team_unique,
+         Performance,
          Target, 
          SessionOrder, 
          Team)
@@ -64,6 +67,7 @@ data_modified_ind <- ind_data %>%
          timeRemaining_ind, 
          ERROR_ind_total,
          ERROR_ind_unique,
+         Performance,
          Target, 
          SessionOrder, 
          Team, 
@@ -77,6 +81,7 @@ data_modified_ind_GT <- ind_data %>%
          timeRemaining_ind, 
          ERROR_ind_total,
          ERROR_ind_unique,
+         Performance,
          Collection_rate_correct_item_ind,
          Target, 
          SessionOrder, 
@@ -91,6 +96,7 @@ data_modified_ind_GA <- ind_data %>%
          timeRemaining_ind, 
          ERROR_ind_total,
          ERROR_ind_unique,
+         Performance,
          Collection_rate_correct_item_ind,
          Target, 
          SessionOrder, 
@@ -99,7 +105,7 @@ data_modified_ind_GA <- ind_data %>%
 
   # General Dependent Vairbale ----
     # Team Level ----
-response_variable <- "TeamScore"
+response_variable <- "Performance"
 data_focus_team <- data_modified_team_GA
 model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
@@ -120,7 +126,7 @@ emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
 emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
 
     # Individul Level ----
-response_variable <- "Collection_rate_correct_item_ind"
+response_variable <- "Performance"
 data_focus_ind <- data_modified_ind_GT
 model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE)
 model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE)
