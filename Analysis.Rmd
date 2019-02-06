@@ -190,7 +190,7 @@ The distrabution for each condition is similar to the overall condition. This te
 
 Overall, the data looks to be skewed to the left. According to the count at the individual and team level, the teams and players that finished with more than 50 seconds or so left at the end of the session were high performing teams. There did not seem to be any obvious patter when grouping the data by Feedback conditions. Maybe the feedback conditions had an influence on the amount of time remaiming depending on their experience (i.e., session order)? 
 
-### Q: Is there interesting variation among the * time remaining * that explains how the feedback conditions influences the time remaining when session order is taken into consideration?
+### Q: Is there interesting variation among the *time remaining* that explains how the feedback conditions influences the time remaining when session order is taken into consideration?
 
 #### Team
 
