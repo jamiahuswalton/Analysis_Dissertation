@@ -62,10 +62,20 @@ setwd(figure_directory)
 
 # Performance Metrics ----
   # Team ----
-dependent_response_team <- "utterance_count_team"
+dependent_response_team <- "TeamScore"
 y_label_team <- "Count"
 x_label_team <- "Target"
 title_response_team <- "Utterance Count Vs. Target"
+
+    # What is the distrabution of the data ----
+plot_data_team <- team_data %>%
+  select(dependent_response_team, Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 10) +
+  facet_grid(. ~ Target)
+
+ggplot(data = )
 
     # What does the raw data look like split up by session and Target? ----
 plot_data_team <- team_data %>%
