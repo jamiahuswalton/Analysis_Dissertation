@@ -133,10 +133,18 @@ ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder,
   labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
 
   # Individual ----
-dependent_response_ind <- "Performance"
-y_label_ind <- "TLX Score"
+dependent_response_ind <- "timeRemaining_ind"
+y_label_ind <- "Time Remaining"
 x_label_ind <- "Target"
-title_response_ind <- "Performance Vs. Target"
+title_response_ind <- "Time Vs. Target"
+
+# What is the distrabution of the data ----
+plot_data_ind <- ind_data %>%
+  select(dependent_response_ind, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = dependent_response_ind), bins = 10) +
+  facet_grid(. ~ Target)
 
     # What does the raw data look like? ----
 plot_data_ind <- ind_data %>%
