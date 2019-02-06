@@ -668,12 +668,12 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         if(condition == "A"){
           target_for_feedback<- c("None")
         } else if(condition == "B"){
-          target_for_feedback<- c("Individual")
+          target_for_feedback<- c("Ind")
         } else if (condition == "C"){
           target_for_feedback<- c("Team")
         } else if (condition == "D"){
           #The only other condition is condition D
-          target_for_feedback<- c("Individual_Team")
+          target_for_feedback<- c("Ind_Team")
         } else {
           stop("A condition value was not recognized.")
         }
@@ -925,7 +925,6 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
   
   setwd(previous_wd_location)
 }
-
 
 # Model the data for the team level anlysis ----
 model_data_Target_Session <- function(df, dependent, model.type, is.team){
