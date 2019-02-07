@@ -122,11 +122,11 @@ plot_data_team <- team_data %>%
   select(dependent_response_team, Target)
 
 ggplot(data = plot_data_team) + 
-  geom_histogram(aes_string(x = dependent_response_team), bins = 10) +
+  geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
   labs(title = title_response_team, x = x_label_team, y = y_label_team)
 ```
 
-Overall, the distrabution of the time remaining is skwed to the left. This tells me that most of the teams had around 50 seconds left at the end of each session. 
+Overall, the distrabution of the time remaining is skwed to the left. This tells me that most of the teams had around 50 seconds left at the end of each session, or less. 
 
 ```{r}
 dependent_response_team <- "timeRemaining_team"
@@ -138,7 +138,7 @@ plot_data_team <- team_data %>%
   select(dependent_response_team, Target)
 
 ggplot(data = plot_data_team) + 
-  geom_histogram(aes_string(x = dependent_response_team), bins = 15) +
+  geom_histogram(aes_string(x = dependent_response_team), bins = 25) +
   facet_grid(. ~ Target) +
   labs(title = title_response_team, x = x_label_team)
 ```
@@ -204,7 +204,7 @@ plot_data_team <- team_data %>%
   select(dependent_response_team, Target, SessionOrder)
 
 ggplot(data = plot_data_team) + 
-  geom_histogram(aes_string(x = dependent_response_team), bins = 20) +
+  geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
   labs(title = title_response_team, x = x_label_team, y = y_label_team) +
   facet_grid( SessionOrder ~ Target)
 ```
@@ -244,6 +244,129 @@ It looks like the distrabution of the time remaining in the indvidiaul condition
 
 Overall, the distrabution is teling me that over time, teams move through the task quciker when given team or ind_team feedback but not individual feedback. This suggest that if I looked at the fourth session and group the data by the feedback conditions, I would see that the time remaining in the individual_team and Team condition would be significantly different from the time remaining in the individual condition.
 
+
+### Q: Is there an *interaction* between the Target and Session Order for the *time remaining*?
+
+I am interested in this question for modeling purposes. Right now I want know if I need to include the interaction between Target and Session Order. 
+
+#### Team
+```{r}
+dependent_response_team <- "timeRemaining_team"
+y_label_team <- "Time Remaining"
+x_label_team <- "Target"
+title_response_team <- "Time Remaining (Team) Vs. Target"
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, timeRemaining_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
+            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
+            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+
+ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
+```
+
+Visually, there appears to be some level of interaction between Target and SessionOrder for time remaining. The interaction does not seem like a strong interaction. The graph suggests that the average time remaining at the end of the session increases over time. The increase is particularly notciable in the Ind_Team condition going from session 3 to session 4.  In other words, when given team feedback, the amount of time remaning at the end of each session increases faster. 
+
+*Reflection:* There seems to be some level of interaction but I am getting the sense that it is not a strong interaction. I'll have to run statistical test to examin the strength of the effect if there is an interaction effect. 
+
+```{r}
+dependent_response_team <- "timeRemaining_team"
+y_label_team <- "Time Remaining"
+x_label_team <- "Target"
+title_response_team <- "Time Remaining (Team) Vs. Session Order"
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, timeRemaining_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
+            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
+            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+
+ggplot(data = plot_data_team, aes(x = SessionOrder , y = timeRemaining_teamAverage, color = Target, shape = Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
+```
+
+There appears to be interaction between the Target and Session Order variable. This figure tells me that over time the amount of time remaining at the end of each session increases over time. This figure tells me that in the session session, the amount of time remaining at the end of each session is roughly the same. However, over time, the amount of time remaining at the end of the session changes differently depending on the session. 
+  
+  
+The individual session steadly improves over time. 
+
+The Indivdual_Team session has a small improvement from session 2 to session 3 but there is a large increase from session 3 to session 4. This tells me that for some reason there was little change between session 2 and session 3 but something happened that caused a major improvement from session 3 to session 4. 
+
+The team session showed a large increase from session 2 to 3 but a small improvement from session 3 to session 4. This suggests that for some reason there was major improvement between session 2 and session 3 but then there was little gaine between session 3 and session 4. This could mean that the feedback was not longer useful between 3 and 4 or that the teams reached their highest performance. 
+
+*Reflection:* I am getting the session that the team condition encourage teams to move quicker through the session. There was a large increase in the amount of time remaining at the end of the session in the team condition when moving from session 2 to session 3. I am also getting the sesnse that the individual_team feedback condition may be encouraging team to move quicker through the task as well. However, it looks like the effect of the inddividual_team feedback takes a longer to take effection. Even so, there amount of time remaining at the end of the session ended up being about the same after four session in the individual_team and the team condition. 
+
+
+#### Individual
+
+```{r}
+dependent_response_ind <- "timeRemaining_ind"
+y_label_ind <- "Time Remaining"
+x_label_ind <- "Target"
+title_response_ind <- "Time Remaining (Individual) Vs. Target"
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+```
+
+There appears to be an interaction between Target and Session Order. Overall, the amount of time at the end of the session increases over time. It looks like there is a huge increase in the amount of time remaining in the Team condition. This large increase suggests that giving team feedback results in teams moving faster. It looks like there is something interesting happening in the team and individual_team condition. In the individual condition, there is a steady increase in the amount of time remaining. In the Individual_Team condition there was little to not change in the time remaining between session 2 and 3. 
+
+*Reflection:* I am getting the sense that there is something happening with the individual_team and the team condition. For some reason there are these large inrases in time remainig. 
+
+```{r}
+dependent_response_ind <- "timeRemaining_ind"
+y_label_ind <- "Time Remaining"
+x_label_ind <- "Target"
+title_response_ind <- "Time Remaining (Individual) Vs. Target"
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+```
+
+There seems to be an interaction between the session order and target variable. 
+
+In the individual condition there is a steading increase in time remaining at the individual level. 
+
+In the team condition, there is a large imporve from session 2 to session 3 but little to no improvement from session 3 to session 4. 
+
+In the individual_team condition, there is little to no improvment from session 2 to session 3 but a large improvement from session 3 to session 4. 
+
+*Reflection:* There is a session that something interesting is going on with the individual_team and team conditions. It seems as though the effect of the team condition happen qicker than the effect of the individual_team condition
+
+#### Summary / Reflection
+
+I am getting the sense that there is something interesting happening with the individual_team condition and team condtion. For some reason, the positive effect (i.e., the large increase in time remainming at the end of the session) happens quicker than the positive effect from the individual_team condition. More exploration is needed to understand why this apprent effect is happening. Some statical analysis is needed to determine the strength of this effect if it exisits.
 
 ### Exploring Interactions in Performance Metrics
 
