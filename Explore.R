@@ -188,6 +188,13 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
   ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
 
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
+
       # By strategy ----
 plot_data_ind <- ind_data %>%
   select(Target, SessionOrder, dependent_response_ind, Dominate.Strategy) %>%
