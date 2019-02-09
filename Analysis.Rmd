@@ -1,15 +1,23 @@
 ---
 title: "Dissertation Analysis"
 author: "Jamiahus Walton"
-Date: '2019-02-01'
 output:
   html_document: default
-    df_print: paged
-  word_document: 
+  pdf_document: default
+Date: '2019-02-01'
+bibliography: bibliography.bib
+csl: apa.csl
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
 # Packages for data analysis
 library(tidyverse)
 library(lme4)
@@ -19,6 +27,8 @@ library(svMisc)
 library(MuMIn)
 library(modelr)
 library(sjstats)
+library(knitr)
+library(kableExtra)
 
 # Functions used is documents ----
 remove_measures_with_given_value <- function(data_set, col_name, value){
@@ -27,6 +37,7 @@ remove_measures_with_given_value <- function(data_set, col_name, value){
   return(data_set[-rows_to_move,])
 }
 
+# Factor columns that need it.
 re_factor_columns <- function(userData, columnNames){
   factorData <- userData
   for(column in columnNames){
@@ -34,6 +45,53 @@ re_factor_columns <- function(userData, columnNames){
     factorData[,column] <- factor(factorData[,column])
   }
   return(factorData)
+}
+
+# Model the data for the team level analysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team){
+  
+  if(is.team){
+    if(model.type == "null"){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team)")))
+    } else if(model.type == "NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "NoTarget_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target:SessionOrder + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  } else {
+    # Run this code if individual level model
+    if(model.type == "null"){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoTarget_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target:SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
 }
 
 #Folder locations ----
@@ -140,7 +198,7 @@ plot_data_team <- team_data %>%
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 25) +
   facet_grid(. ~ Target) +
-  labs(title = title_response_team, x = x_label_team)
+  labs(title = title_response_team, x = x_label_team, y = y_label_team)
 ```
 
 The skewed to the left pattern continues when grouping the time remaining by the feedback conditions. Most of the teams seem to have about 50 seconds remaining when the completed the task. 
@@ -250,6 +308,38 @@ Overall, the distrabution is teling me that over time, teams move through the ta
 I am interested in this question for modeling purposes. Right now I want know if I need to include the interaction between Target and Session Order. 
 
 #### Team
+
+```{r fig.width= 10}
+dependent_response_team <- "timeRemaining_team"
+y_label_team <- "Time Remaining"
+x_label_team <- "Target"
+title_response_team <- "Time Remaining (Team) Vs. Target"
+value_threshold <- 120
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team, Team) %>%
+  mutate(rank_order = -rank(team_data[[dependent_response_team]])) %>%
+  mutate(above_value_threshold = .data[[dependent_response_team]] > value_threshold)
+
+names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[,"Team"]), "")
+
+ggplot(data = plot_data_team, 
+       aes(x = factor(SessionOrder), 
+                  y = .data[[dependent_response_team]], 
+                  fill = Team, group = rank_order,
+                  label = names )) +
+  geom_text(position = position_dodge(1), vjust = 0, aes(y = .data[[dependent_response_team]] + 10), check_overlap = FALSE) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ Target) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
+```
+
+Visually, the first thing that jumps out to me is seems to be a few outliers that may be influencing the results. The teams that are labeled had more than 120 second (2 minutes) remaining at the end of the session. Lets call a "fast" a team that has more than 120 seconds left at the end of the session. The teams that are labeled in all the conditions (Target levels) are team 26, 45, 13 (there may be more I am missing). Some of these teams data may be outliers. 
+
+*Reflection:* This figures tells me that I may need to conider removing these teams because they may be outliers. 
+
+
 ```{r}
 dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Time Remaining"
@@ -367,6 +457,190 @@ In the individual_team condition, there is little to no improvment from session 
 #### Summary / Reflection
 
 I am getting the sense that there is something interesting happening with the individual_team condition and team condtion. For some reason, the positive effect (i.e., the large increase in time remainming at the end of the session) happens quicker than the positive effect from the individual_team condition. More exploration is needed to understand why this apprent effect is happening. Some statical analysis is needed to determine the strength of this effect if it exisits.
+
+
+### Q: Is there an interaction between the Target and Session Order for the *time remaining* that is statistically significant?
+
+I am interesting in determing if a model of the data should include an interaction between the Target and Session Order variable. When fitting a model, we need to look as the residuals to check assumptions [@Galwey2014]. 
+
+* The residuals should have an approximate normal distribution (i.e., a bell curve) when plotted on a histogram
+* A fitted-value plot should show an almost constant width when viewed from left to right
+* The points on a normal plot should lie on an almost straight line from the bottom left to the top right
+
+There are a few steps I will take before testing the assumptions. First, I fit the model the data using multipl models. Second, I will compare those models to the null model. Second, I will pick the models that are worth exploring further. Third, I will evaluate the effect size ($R^2$) of the fix effect and random effect variables using a method by Nakagawa and Schielzeth (@Nakagawa2013). Lastly, I will analyze the assumptions for the residuals. 
+
+A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R^2$) ($R_{m}^2$) and conditional ($R^2$) ($R_{c}^2$). The $R_{m}^2$ describes how the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ describes how both the variance is described by both the fixed and random effect variables
+
+#### Full Models Used for Team and Individual
+
+The next two secions below are describe the full model for team and individual level analysis. Eight models were fitted and then compared. Eight other models are a subset of the full model (including a null model that has no fixed effect variables). One or two fixed effect are removed from the full model. 
+
+##### Team Full Model
+
+$$ y_{ijt} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} +   \epsilon_{ijt}$$ 
+
+Where $y_{ijt}$ is the response variable (e.g., team score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the ith feedback target category, $\beta_{j}$ is the fixed effect for the jth session order, $\gamma_{t}$ is the random effect for the tth team, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between the feedback target and session order, and $\epsilon_{ijt}$ is the residual for the model. 
+
+##### Individual Team Full Model
+
+$$ y_{ijtp} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} + \theta_{p} + \epsilon_{ijtp}$$ 
+
+Where $y_{ijtp}$ is the response variable (e.g., team score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the ith feedback target category, $\beta_{j}$ is the fixed effect for the jth session order, $\gamma_{t}$ is the random effect for the tth team, $\theta_{p}$ is the random effect for the pth individual, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between the feedback target and session order, and $\epsilon_{ijtp}$ is the residual for the model.
+
+#### Team
+
+```{r message=FALSE}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
+model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
+model.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget", is.team = TRUE)
+model.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoSession", is.team = TRUE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE)
+model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = TRUE)
+
+
+comparision.results <- anova(model.null, 
+                             model.All, 
+                             model.NoInteraction,
+                             model.NoTarget, 
+                             model.NoSession, 
+                             model.NoInteraction.NoTarget,
+                             model.NoInteraction.NoSession,
+                             model.NoTarget.NoSession)
+
+knitr::kable(comparision.results)
+
+# Effect size (R^2)
+
+kable(r.squaredGLMM(model.NoInteraction.NoTarget),
+      caption = "Table: Effect size for for *No Interaction and No Target*") %>%
+   kable_styling(full_width = F)
+
+kable(r.squaredGLMM(model.NoInteraction),
+      caption = "Table: Effect size for for *No Interaction*") %>%
+   kable_styling(full_width = F)
+
+kable(r.squaredGLMM(model.NoTarget.NoSession),
+      caption = "Table: Effect size for for *No Session order and No Target*") %>%
+   kable_styling(full_width = F)
+
+```
+
+The following models were significantly different from the null model: model.NoInteraction.NoTarget, model.NoInteraction, model.NoTarget.NoSession. 
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model. 
+
+model.NoInteraction: Session order and target are the fixed effects in this model. Condition effect size is 
+
+model.NoTarget.NoSession: The interaction of session order and target is the only fixed effect in this model. Condition effect size is.
+
+*Reflection:* Two of the models that are significantly different from the null model are missing the interaction effect. This tells me that the interaction does not have a strong effect when modeling with the main effects. However, the third model that is significantly different from the null model consists only of the interaction effect between session order and target. 
+
+Each model has a similar conditional effect effect size. As well, there was no noticeable difference for the marginal effect sizes for each model either. It seems as though all three models have similar in effectivness. No model is obviously better than the others. The rest of the analyses will focus on the less complex models (i.e., the models with no interaction). 
+
+
+#### Individual
+
+```{r, message=FALSE}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(timeRemaining_ind,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+response_variable <- "timeRemaining_ind"
+data_focus_ind <- data_modified_ind
+model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE)
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE)
+model.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget", is.team = FALSE)
+model.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoSession", is.team = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE)
+model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = FALSE)
+
+comparision.results <- anova(model.null, 
+                             model.All, 
+                             model.NoInteraction, 
+                             model.NoTarget, 
+                             model.NoSession, 
+                             model.NoInteraction.NoTarget,
+                             model.NoInteraction.NoSession,
+                             model.NoTarget.NoSession)
+knitr::kable(comparision.results)
+
+# Effect size (R^2)
+
+kable(r.squaredGLMM(model.NoInteraction.NoTarget),
+      caption = "Table: Effect size for for *No Interaction and No Target*") %>%
+   kable_styling(full_width = F)
+
+kable(r.squaredGLMM(model.NoInteraction),
+      caption = "Table: Effect size for for *No Interaction*") %>%
+   kable_styling(full_width = F)
+
+kable(r.squaredGLMM(model.NoTarget.NoSession),
+      caption = "Table: Effect size for for *No Session order and No Target*") %>%
+   kable_styling(full_width = F)
+
+kable(r.squaredGLMM(model.NoTarget),
+      caption = "Table: Effect size for for *No Target*") %>%
+   kable_styling(full_width = F)
+```
+
+The following models were significantly different from the null model:  model.NoInteraction.NoTarget, model.NoInteraction, model.NoTarget, model.NoTarget.NoSession.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+model.NoInteraction: Session order and target are the fixed effects in this model. 
+
+model.NoTarget: Session Order and the interaction are the fixed effect in this model *May be able to ignore if effect sizes are correct*
+
+model.NoTarget.NoSession: The interaction of session order and target is the only fixed effect in this model. 
+
+*Reflection:* The effect of session order is in three out of the four significantly different models. This tells me that session is important. It is not obious if the Target or interaction effects are notciably important. 
+
+The interaction effect by considered by itself(ie., model.NoTarget.NoSession) seems to be important. The interaction is also important when you consider it with the effect of the session order. 
+
+The Target effect sees to be somewhat important when considered with session order (i.e., model.NoInteraction). Though it is not entierly clear. 
+
+I also find it interesting that the effect sizes (condition and marginal) for model.NoTarget.NoSession and model.NoTarget are exactly the same. The code was reviewed to make sure this was not in error. If this is correct, this means that these two models explain the same amount of varience. So, I would ignore the more complex model (i.e., model.NoTarget) and keep the simplier model (i.e., model.NoTarget.NoSession). 
+
+
+#### Summary / Reflection
+
+
+The three models that were significantly different from the null model were model.NoInteraction.NoTarget, model.NoInteraction, and model.NoTarget.NoSession. The model.NoTarget strangly had the exact same varience as the model.NoTarget.NoSession. If this is correct then that means I should choose the model that has the least complexitiy. In this case, it would be the model.NoTarget.NoSession model because it has fewer terms. 
+
+Overall, these three models (model.NoInteraction.NoTarget, model.NoInteraction, and model.NoTarget.NoSession) seemed to fit the data best. These collection of models tells me that session order effect is important because it is in two of the three models. It also tells me that the Target effect is important when considered with session order and that the interaction is important when it is not considered with Target or Session Order.
+
+It seems as though the answer to the original questions about the interaction is that there does seem to be a significant interaction effect but only when considered by itself. *This make me wonder if the interaction should be considered if the main effect of each variable is not cosidered*. 
+
+My next step is to fit the models and see what I can learn from these models. Are any of the effect in these models significantly different from zero?
+
+
+
+
+
+
+
+
+
+# TODO: Delete the remaining text below!
 
 ### Exploring Interactions in Performance Metrics
 
@@ -565,3 +839,5 @@ Visually, there appears to be no interaction between Target and SessionOrder for
 
 ##### Team
 ##### Individual
+
+# References
