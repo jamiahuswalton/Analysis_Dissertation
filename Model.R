@@ -105,15 +105,26 @@ data_modified_ind_GA <- ind_data %>%
 
   # General Dependent Vairbale ----
     # Team Level ----
-response_variable <- "Performance"
-data_focus_team <- data_modified_team_GA
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
 model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
 model.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget", is.team = TRUE)
 model.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoSession", is.team = TRUE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE)
+model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = TRUE)
 
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
+
+comparision.results <- anova(model.null, 
+                             model.All, 
+                             model.NoInteraction,
+                             model.NoTarget, 
+                             model.NoSession, 
+                             model.NoInteraction.NoTarget,
+                             model.NoInteraction.NoSession,
+                             model.NoTarget.NoSession)
 comparision.results
 
 rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
@@ -125,23 +136,61 @@ summary(selected.model.team)
 emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
 emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
 
+r.squaredGLMM(selected.model.team)[1,"R2c"]
+
+      # Histogram ----
+
+setwd(figure_directory)
+ggplot(selected.model.team, aes(x = residuals(selected.model.team))) +
+  geom_histogram() + 
+  labs(title = paste("Histogram of Residuals"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
     # Individul Level ----
-response_variable <- "Performance"
-data_focus_ind <- data_modified_ind_GT
+response_variable <- "timeRemaining_ind"
+data_focus_ind <- data_modified_ind
 model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE)
 model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE)
 model.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget", is.team = FALSE)
 model.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoSession", is.team = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE)
+model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = FALSE)
 
-comparision.results <- anova(model.null, model.All, model.NoInteraction, model.NoTarget, model.NoSession)
+comparision.results <- anova(model.null, 
+                             model.All, 
+                             model.NoInteraction, 
+                             model.NoTarget, 
+                             model.NoSession, 
+                             model.NoInteraction.NoTarget,
+                             model.NoInteraction.NoSession,
+                             model.NoTarget.NoSession)
 comparision.results
 
 rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
 
-selected.model.team <- model.NoInteraction
+selected.model.ind <- model.NoInteraction
 
-summary(selected.model.team)
+summary(selected.model.ind)
 
-emmeans(selected.model.team, list(pairwise ~ Target), adjust = "tukey")
-emmeans(selected.model.team, list(pairwise ~ SessionOrder), adjust = "tukey")
+emmeans(selected.model.ind, list(pairwise ~ Target), adjust = "tukey")
+emmeans(selected.model.ind, list(pairwise ~ SessionOrder), adjust = "tukey")
+
+
+# Test
+rmodel<- rlmer(data = data_focus_team, as.formula(paste("timeRemaining_team","~ Target + SessionOrder + (1|Team)")))
+rmodel2<- rlmer(data = data_focus_team, as.formula(paste("timeRemaining_team","~ Target + SessionOrder + (1|Team)")), 
+                rho.sigma.e = psi2propII(smoothPsi, k = 1),
+                rho.sigma.b = psi2propII(smoothPsi, k = 1))
+rsb <- list(psi2propII(smoothPsi), psi2propII(smoothPsi, k = 1))
+
+rmodel3<- update(rmodel2, rho.sigma.b = rsb)
+
+compare(rmodel, rmodel2, model.NoInteraction, show.rho.functions = FALSE)
+
+r.squaredGLMM(model.NoInteraction)
+
+summary(model.NoInteraction)
+
+summary(a.mes(m.1.adj = 58.0, m.2.adj = 66.6, sd.adj = 6.91, R = 1, n.1 =  117, n.2 = 117, q = 2))
