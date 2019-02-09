@@ -940,6 +940,12 @@ model_data_Target_Session <- function(df, dependent, model.type, is.team){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team)")))
     } else if(model.type == "NoSession"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "NoTarget_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target:SessionOrder + (1|Team)")))
     } else{
       stop("Model.type not supported")
     }
@@ -955,6 +961,12 @@ model_data_Target_Session <- function(df, dependent, model.type, is.team){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team) + (1| Player_ID)")))
     } else if(model.type == "NoSession"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget"){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoTarget_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target:SessionOrder + (1|Team) + (1| Player_ID)")))
     } else{
       stop("Model.type not supported")
     }
