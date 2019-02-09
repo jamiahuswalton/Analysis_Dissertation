@@ -394,3 +394,43 @@ plot_data_ind <- ind_data %>%
 ggplot(data = plot_data_ind, aes(x = factor(Confident_team_comm_important_events), y = n, fill = factor(Confident_team_comm_important_events))) + 
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(.~ Target)
+
+
+# Testing
+
+dependent_response_team <- "timeRemaining_team"
+y_label_team <- "Time Remaining"
+x_label_team <- "Target"
+title_response_team <- "Time Remaining (Team) Vs. Target"
+value_threshold <- 120
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team, Team) %>%
+  mutate(rank_order = -rank(team_data[[dependent_response_team]])) %>%
+  mutate(above_value_threshold = .data[[dependent_response_team]] > value_threshold)
+
+names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[,"Team"]), NA)
+
+par(mfrow = (c(1,2)))
+test <- ggplot(data = plot_data_team, 
+       aes(x = factor(SessionOrder), 
+                  y = .data[[dependent_response_team]], 
+                  fill = Team, group = rank_order,
+                  label = names )) +
+  geom_label(position = position_dodge(0.9), vjust = 0, aes(y = .data[[dependent_response_team]] + 1)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ Target) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
+
+test2 <- ggplot(data = plot_data_team, 
+       aes(x = factor(SessionOrder), 
+           y = .data[[dependent_response_team]], 
+           fill = Team, group = rank_order,
+           label = names )) +
+  geom_text(position = position_dodge(0.9), vjust = 0, aes(y = .data[[dependent_response_team]] + 1)) +
+  geom_point(position = position_dodge(.9)) +
+  facet_grid(. ~ Target) + 
+  guides(fill = FALSE)
+
+multiplot(test, test2, cols = 2)
