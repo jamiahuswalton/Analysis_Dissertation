@@ -57,16 +57,10 @@ model_data_Target_Session <- function(df, dependent, model.type, is.team){
       lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
     } else if(model.type == "NoInteraction"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
-    } else if(model.type == "NoTarget"){
-      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team)")))
-    } else if(model.type == "NoSession"){
-      lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team)")))
     } else if(model.type == "NoInteraction_NoTarget"){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
     } else if(model.type == "NoInteraction_NoSession"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
-    } else if(model.type == "NoTarget_NoSession"){
-      lmer(data = df, as.formula(paste(dependent,"~ Target:SessionOrder + (1|Team)")))
     } else{
       stop("Model.type not supported")
     }
@@ -78,16 +72,10 @@ model_data_Target_Session <- function(df, dependent, model.type, is.team){
       lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
     } else if(model.type == "NoInteraction"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoTarget"){
-      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + Target:SessionOrder + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoSession"){
-      lmer(data = df, as.formula(paste(dependent,"~ Target + Target:SessionOrder + (1|Team) + (1| Player_ID)")))
     } else if(model.type == "NoInteraction_NoTarget"){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
     } else if(model.type == "NoInteraction_NoSession"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoTarget_NoSession"){
-      lmer(data = df, as.formula(paste(dependent,"~ Target:SessionOrder + (1|Team) + (1| Player_ID)")))
     } else{
       stop("Model.type not supported")
     }
@@ -504,21 +492,15 @@ data_focus_team <- data_modified_team
 model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
-model.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget", is.team = TRUE)
-model.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoSession", is.team = TRUE)
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE)
-model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = TRUE)
 
 
 comparision.results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction,
-                             model.NoTarget, 
-                             model.NoSession, 
                              model.NoInteraction.NoTarget,
-                             model.NoInteraction.NoSession,
-                             model.NoTarget.NoSession)
+                             model.NoInteraction.NoSession)
 
 knitr::kable(comparision.results)
 
@@ -532,23 +514,17 @@ kable(r.squaredGLMM(model.NoInteraction),
       caption = "Table: Effect size for for *No Interaction*") %>%
    kable_styling(full_width = F)
 
-kable(r.squaredGLMM(model.NoTarget.NoSession),
-      caption = "Table: Effect size for for *No Session order and No Target*") %>%
-   kable_styling(full_width = F)
-
 ```
 
-The following models were significantly different from the null model: model.NoInteraction.NoTarget, model.NoInteraction, model.NoTarget.NoSession. 
+The following models were significantly different from the null model: model.NoInteraction.NoTarget, model.NoInteraction. 
 
 model.NoInteraction.NoTarget: Session order is the only fixed effect in this model. 
 
-model.NoInteraction: Session order and target are the fixed effects in this model. Condition effect size is 
+model.NoInteraction: Session order and target are the fixed effects in this model.
 
-model.NoTarget.NoSession: The interaction of session order and target is the only fixed effect in this model. Condition effect size is.
+*Reflection:* Both of the models that are significantly different from the null model are missing the interaction effect. This tells me that the interaction does not have a strong effect when modeling with the main effects.
 
-*Reflection:* Two of the models that are significantly different from the null model are missing the interaction effect. This tells me that the interaction does not have a strong effect when modeling with the main effects. However, the third model that is significantly different from the null model consists only of the interaction effect between session order and target. 
-
-Each model has a similar conditional effect effect size. As well, there was no noticeable difference for the marginal effect sizes for each model either. It seems as though all three models have similar in effectivness. No model is obviously better than the others. The rest of the analyses will focus on the less complex models (i.e., the models with no interaction). 
+Each model has a similar conditional effect effect size. As well, there was no noticeable difference for the marginal effect sizes for each model either. It seems as though all three models have similar in effectivness. No model is obviously better than the others. 
 
 
 #### Individual
@@ -567,20 +543,14 @@ data_focus_ind <- data_modified_ind
 model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE)
 model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE)
-model.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget", is.team = FALSE)
-model.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoSession", is.team = FALSE)
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE)
-model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = FALSE)
 
 comparision.results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction, 
-                             model.NoTarget, 
-                             model.NoSession, 
                              model.NoInteraction.NoTarget,
-                             model.NoInteraction.NoSession,
-                             model.NoTarget.NoSession)
+                             model.NoInteraction.NoSession)
 knitr::kable(comparision.results)
 
 # Effect size (R^2)
@@ -592,45 +562,31 @@ kable(r.squaredGLMM(model.NoInteraction.NoTarget),
 kable(r.squaredGLMM(model.NoInteraction),
       caption = "Table: Effect size for for *No Interaction*") %>%
    kable_styling(full_width = F)
-
-kable(r.squaredGLMM(model.NoTarget.NoSession),
-      caption = "Table: Effect size for for *No Session order and No Target*") %>%
-   kable_styling(full_width = F)
-
-kable(r.squaredGLMM(model.NoTarget),
-      caption = "Table: Effect size for for *No Target*") %>%
-   kable_styling(full_width = F)
 ```
 
-The following models were significantly different from the null model:  model.NoInteraction.NoTarget, model.NoInteraction, model.NoTarget, model.NoTarget.NoSession.
+The following models were significantly different from the null model: model.NoInteraction.NoTarget, model.NoInteraction.
 
 model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
 
-model.NoInteraction: Session order and target are the fixed effects in this model. 
+model.NoInteraction: Session order and target are the fixed effects in this model.
 
-model.NoTarget: Session Order and the interaction are the fixed effect in this model *May be able to ignore if effect sizes are correct*
+*Reflection:* In both of the models that are significantly different from the null model do not include the interaction effect.
 
-model.NoTarget.NoSession: The interaction of session order and target is the only fixed effect in this model. 
-
-*Reflection:* The effect of session order is in three out of the four significantly different models. This tells me that session is important. It is not obious if the Target or interaction effects are notciably important. 
-
-The interaction effect by considered by itself(ie., model.NoTarget.NoSession) seems to be important. The interaction is also important when you consider it with the effect of the session order. 
-
-The Target effect sees to be somewhat important when considered with session order (i.e., model.NoInteraction). Though it is not entierly clear. 
-
-I also find it interesting that the effect sizes (condition and marginal) for model.NoTarget.NoSession and model.NoTarget are exactly the same. The code was reviewed to make sure this was not in error. If this is correct, this means that these two models explain the same amount of varience. So, I would ignore the more complex model (i.e., model.NoTarget) and keep the simplier model (i.e., model.NoTarget.NoSession). 
+The Target effect sees to be somewhat important when considered with session order (i.e., model.NoInteraction). Though it is not significant when considered by itself. 
 
 
 #### Summary / Reflection
 
+The models that were significantly different from the null model were model.NoInteraction.NoTarget and model.NoInteraction. 
 
-The three models that were significantly different from the null model were model.NoInteraction.NoTarget, model.NoInteraction, and model.NoTarget.NoSession. The model.NoTarget strangly had the exact same varience as the model.NoTarget.NoSession. If this is correct then that means I should choose the model that has the least complexitiy. In this case, it would be the model.NoTarget.NoSession model because it has fewer terms. 
+Overall, these models (model.NoInteraction.NoTarget, model.NoInteraction) seemed to fit the data best. These collection of models tells me that session order effect is important because it is in both models. It also tells me that the Target effect is important when considered with session order and that the interaction is not important because it is not in either of the models.
 
-Overall, these three models (model.NoInteraction.NoTarget, model.NoInteraction, and model.NoTarget.NoSession) seemed to fit the data best. These collection of models tells me that session order effect is important because it is in two of the three models. It also tells me that the Target effect is important when considered with session order and that the interaction is important when it is not considered with Target or Session Order.
-
-It seems as though the answer to the original questions about the interaction is that there does seem to be a significant interaction effect but only when considered by itself. *This make me wonder if the interaction should be considered if the main effect of each variable is not cosidered*. 
+It seems as though the answer to the original questions about the interaction is that there seems to be no statistically significant effect from the interaction between the session order and the target. The fact that that there is not statisitically significant effect from the interaction of the session order and target on the individual and team level, suggests that there is no interaction between the variables.  
 
 My next step is to fit the models and see what I can learn from these models. Are any of the effect in these models significantly different from zero?
+
+
+
 
 
 
