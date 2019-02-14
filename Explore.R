@@ -133,10 +133,10 @@ ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder,
   labs(y = y_label, x = x_label, title = title_response, color = "Session", shape = "Session")
 
   # Individual ----
-dependent_response_ind <- "timeRemaining_ind"
-y_label_ind <- "Time Remaining"
+dependent_response_ind <- "Collection_rate_correct_item_ind"
+y_label_ind <- "Correct Item Collection Rate"
 x_label_ind <- "Target"
-title_response_ind <- "Time Vs. Target"
+title_response_ind <- "Rate Vs. Target"
 
 # What is the distrabution of the data ----
 plot_data_ind <- ind_data %>%
@@ -170,6 +170,22 @@ ggplot(data = plot_data_ind, aes_string(x = "Target", y = dependent_response_ind
   facet_grid(. ~ Dominate.Strategy) + 
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
   ggsave(filename = paste("Ind_Raw_Data_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
+
+plot_data_ind <- ind_data %>%
+  select(Target, Dominate.Strategy, dependent_response_ind) %>%
+  group_by(Dominate.Strategy, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strategy, shape=Dominate.Strategy)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Dominate.Strategy, color = Dominate.Strategy)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  facet_grid(. ~ Dominate.Strategy) +
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))
 
 
     # Is there an interaction between the session order and the Target levels? ----
@@ -210,10 +226,28 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
   facet_grid(. ~ Dominate.Strategy)+
-  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = ""))  
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = "")) 
+
+plot_data_ind <- ind_data %>%
+  select(Target, dependent_response_ind, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strategy, shape=Dominate.Strategy)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Dominate.Strategy, color = Dominate.Strategy)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  facet_grid(. ~ Dominate.Strategy)+
+  ggsave(filename = paste("Ind_Interaction_between_Session_and_Target_", dependent_response_ind, ".png", sep = "")) 
+
+
+
+
   
-
-
 
 
 
