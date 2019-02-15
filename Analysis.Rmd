@@ -151,7 +151,7 @@ knitr::kable(
 
 This research attempts to answer the following question: How will teams' performance change if given feedback that displays indicators based on individual performance, team performance, or both?
 
-## Explore
+## Exploratory Data Analysis
 
 In this section, I seek to discover answers, visually, that answer the research question mentioned above.
 
@@ -290,7 +290,6 @@ It looks like the distribution of the time remaining in the individual condition
 #### Summary / Reflection
 
 Overall, the distribution is telling me that over time, teams move through the task quicker when given team or ind_team feedback but not individual feedback. This suggests that if I looked at the fourth session and group the data by the feedback conditions, I would see that the time remaining in the individual_team and Team condition would be significantly different from the time remaining in the individual condition.
-
 
 ### Q: Is there an *interaction* between the Target and Session Order for the *time remaining*?
 
@@ -508,11 +507,11 @@ knitr::kable(comparision.results)
 # Effect size (R^2)
 
 kable(r.squaredGLMM(model.NoInteraction.NoTarget),
-      caption = "Table: Effect size for for *No Interaction and No Target*") %>%
+      caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
 kable(r.squaredGLMM(model.NoInteraction),
-      caption = "Table: Effect size for for *No Interaction*") %>%
+      caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 
 ```
@@ -557,11 +556,11 @@ knitr::kable(comparision.results)
 # Effect size (R^2)
 
 kable(r.squaredGLMM(model.NoInteraction.NoTarget),
-      caption = "Table: Effect size for for *No Interaction and No Target*") %>%
+      caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
 kable(r.squaredGLMM(model.NoInteraction),
-      caption = "Table: Effect size for for *No Interaction*") %>%
+      caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 ```
 
@@ -584,6 +583,75 @@ Overall, these models (model.NoInteraction.NoTarget, model.NoInteraction) seemed
 
 It seems as though the answer to the original questions about the interaction is that there seems to be no statistically significant effect from the interaction between the session order and the target. The fact that that there is no statistically significant effect from the interaction of the session order and target on the individual and team level, suggests that there is no interaction between the variables.  
 
-My next step is to fit the models and see what I can learn from these models. Are any of the effect in these models significantly different from zero?
+My next step is to examin the models and see what I can learn from these models. Are any of the effects in these models significantly different from zero?
+
+
+### Q: Are any of the effects in the two models (model.NoInteraction.NoTarget and model.NoInteraction) statistically different from zero?
+
+The purouse of this questions is to see what we can learn from these models. Before I examine the model I will test the assumption about the residuals of the models. The assumtions are as follows [@Galwey2014]:
+
+* The residuals should have an approximately normal distribution (i.e., a bell curve) when plotted on a histogram
+* A fitted-value plot should show an almost constant width when viewed from left to right
+* The points on a normal plot should lie on an almost straight line from the bottom left to the top right
+
+#### Team
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
+
+# Histogram of Residuals
+residuals_formula_NoInteraction <- residuals(model.NoInteraction)
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+residuals_formula_NoInteraction.NoTarget <- residuals(model.NoInteraction.NoTarget)
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Fitted values
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# QQ plots
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) 
+
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) 
+
+```
+
+
 
 # References
