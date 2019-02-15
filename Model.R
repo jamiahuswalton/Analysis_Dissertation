@@ -110,21 +110,15 @@ data_focus_team <- data_modified_team
 model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
-model.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget", is.team = TRUE)
-model.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoSession", is.team = TRUE)
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE)
-model.NoTarget.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoTarget_NoSession", is.team = TRUE)
 
 
 comparision.results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction,
-                             model.NoTarget, 
-                             model.NoSession, 
                              model.NoInteraction.NoTarget,
-                             model.NoInteraction.NoSession,
-                             model.NoTarget.NoSession)
+                             model.NoInteraction.NoSession)
 comparision.results
 
 rownames(comparision.results)[which(comparision.results$AIC == min(comparision.results$AIC))] # This line of code pickes the model with the lowest AIC score
