@@ -173,18 +173,50 @@ emmeans(selected.model.ind, list(pairwise ~ SessionOrder), adjust = "tukey")
 
 
 # Test
-rmodel<- rlmer(data = data_focus_team, as.formula(paste("timeRemaining_team","~ Target + SessionOrder + (1|Team)")))
-rmodel2<- rlmer(data = data_focus_team, as.formula(paste("timeRemaining_team","~ Target + SessionOrder + (1|Team)")), 
-                rho.sigma.e = psi2propII(smoothPsi, k = 1),
-                rho.sigma.b = psi2propII(smoothPsi, k = 1))
-rsb <- list(psi2propII(smoothPsi), psi2propII(smoothPsi, k = 1))
+test_Data <- data_focus_team %>%
+  mutate(sqrt.val = sqrt(.data[["timeRemaining_team"]]))
+response_variable <- "sqrt.val"
 
-rmodel3<- update(rmodel2, rho.sigma.b = rsb)
+model.null <- model_data_Target_Session(df = test_Data, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust = FALSE)
+model.All <- model_data_Target_Session(df = test_Data, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = test_Data, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = test_Data, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = test_Data, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
+comparision.results <- anova(model.null, 
+                             model.All, 
+                             model.NoInteraction, 
+                             model.NoInteraction.NoTarget,
+                             model.NoInteraction.NoSession)
+comparision.results
 
-compare(rmodel, rmodel2, model.NoInteraction, show.rho.functions = FALSE)
+r.squaredGLMM(model)
 
-r.squaredGLMM(model.NoInteraction)
-
-summary(model.NoInteraction)
+summary(model)
 
 summary(a.mes(m.1.adj = 58.0, m.2.adj = 66.6, sd.adj = 6.91, R = 1, n.1 =  117, n.2 = 117, q = 2))
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+
+if(1 ==1 & 2 == 2){
+  "Test"
+}
