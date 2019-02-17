@@ -927,34 +927,54 @@ generate_figures_ind <- function(Data, num_of_players, figure_titles, y_values_i
 }
 
 # Model the data for the team level anlysis ----
-model_data_Target_Session <- function(df, dependent, model.type, is.team){
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
   
   if(is.team){
-    if(model.type == "null"){
+    if(model.type == "null" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
     } else if(model.type == "All"){
       lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
-    } else if(model.type == "NoInteraction"){
+    } else if(model.type == "NoInteraction" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
-    } else if(model.type == "NoInteraction_NoTarget"){
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
-    } else if(model.type == "NoInteraction_NoSession"){
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
     } else{
       stop("Model.type not supported")
     }
   } else {
     # Run this code if individual level model
-    if(model.type == "null"){
+    if(model.type == "null" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "All"){
+    } else if(model.type == "All" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoInteraction"){
+    } else if(model.type == "NoInteraction" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoInteraction_NoTarget"){
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
     } else if(model.type == "NoInteraction_NoSession"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
     } else{
       stop("Model.type not supported")
     }
