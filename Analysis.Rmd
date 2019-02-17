@@ -30,6 +30,7 @@ library(modelr)
 library(sjstats)
 library(knitr)
 library(kableExtra)
+library(robustlmm)
 
 # Functions used is documents ----
 remove_measures_with_given_value <- function(data_set, col_name, value){
@@ -49,34 +50,54 @@ re_factor_columns <- function(userData, columnNames){
 }
 
 # Model the data for the team level analysis ----
-model_data_Target_Session <- function(df, dependent, model.type, is.team){
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
   
   if(is.team){
-    if(model.type == "null"){
+    if(model.type == "null" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
     } else if(model.type == "All"){
       lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
-    } else if(model.type == "NoInteraction"){
+    } else if(model.type == "NoInteraction" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
-    } else if(model.type == "NoInteraction_NoTarget"){
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
-    } else if(model.type == "NoInteraction_NoSession"){
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
     } else{
       stop("Model.type not supported")
     }
   } else {
     # Run this code if individual level model
-    if(model.type == "null"){
+    if(model.type == "null" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "All"){
+    } else if(model.type == "All" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoInteraction"){
+    } else if(model.type == "NoInteraction" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
-    } else if(model.type == "NoInteraction_NoTarget"){
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
       lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
     } else if(model.type == "NoInteraction_NoSession"){
       lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
     } else{
       stop("Model.type not supported")
     }
@@ -489,11 +510,11 @@ data_modified_team <- team_data %>%
 # Generate models with variable response
 response_variable <- "timeRemaining_team"
 data_focus_team <- data_modified_team
-model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE)
-model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE)
-model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
-model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE)
+model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust =FALSE)
+model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
 
 
 comparision.results <- anova(model.null, 
@@ -540,11 +561,11 @@ data_modified_ind <- ind_data %>%
 
 response_variable <- "timeRemaining_ind"
 data_focus_ind <- data_modified_ind
-model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE)
-model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE)
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE)
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE)
-model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE)
+model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE, is.robust = FALSE)
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
 
 comparision.results <- anova(model.null, 
                              model.All, 
@@ -608,42 +629,46 @@ data_modified_team <- team_data %>%
 # Generate models with variable response
 response_variable <- "timeRemaining_team"
 data_focus_team <- data_modified_team
-model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE)
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 
-# Histogram of Residuals
-residuals_formula_NoInteraction <- residuals(model.NoInteraction)
+# Histogram of Residuals - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5))
 
-residuals_formula_NoInteraction.NoTarget <- residuals(model.NoInteraction.NoTarget)
-ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
-  geom_histogram(bins = 30) + 
-  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-# Fitted values
+# Fitted values - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) 
 
-ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
-  geom_point() + 
-  geom_hline(yintercept = 0)+
-  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-# QQ plots
+# QQ plots - model.NoInteraction
 ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) 
 
+
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# QQ plots - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
@@ -651,6 +676,223 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
    theme(plot.title = element_text(hjust = 0.5)) 
 
 ```
+
+It looks like there are some assumption violation for both models. 
+
+For the model.NoInteraction it looks like there may be a violation of constran error in the fitted-value plot. The QQ plot also shows a slight violation on the tail ends of the plots. 
+
+For the model.NoInteraction.NoTarget it looks like there may be a violation of constran error in the fitted-value plot. The QQ plot also shows a slight violation on the tail ends of the plots. 
+
+I need to determine if this violation influences the model over all.
+
+##### Q: Does the violation influence the linear model estimation?
+
+I will used the robust estimation for linear mixed models found in the robustlmm package by @Koller2016. I will then compare the robust model to the non-robust model. If the estimated values are noticablly different then data will need to be transformed. 
+
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
+
+kable(compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE),
+      caption = "model.NoInteraction")
+
+```
+
+The robust model.NoInteration model is noticablly different when compared to the non-robust model.NoInteration. This suggest that the data should be transformed to satisfy the residual assumptions
+
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction.NoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
+
+
+kable(compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE), 
+      caption = "model.NoInteraction.NoTarget")
+```
+
+The robust model.NoInteraction.NoTarget model is noticablly different when compared to the non-robust model.NoInteraction.NoTarget This suggest that the data should be transformed to satisfy the residual assumptions
+
+*Reflection:* The comparing the normal estimation to the robust models indicates that the data should transformed becuase the estimations are noticablly different.
+
+##### Q: Does data transformtion satisfy the assumptions of the residuals?
+
+I will use the square root transformation method from Tukey's ladder [@Tukey1977]. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[["timeRemaining_team"]]))
+
+response_variable <- "sqrt.value"
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+residuals_formula_NoInteraction <- residuals(model.NoInteraction)
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) 
+
+
+
+```
+
+The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[["timeRemaining_team"]]))
+
+response_variable <- "sqrt.value"
+data_focus_team <- data_modified_team
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction.NoTarget
+
+*Reflection:* The figures suggest that the data transformation resolved the resdiual violations for the both models. I will use the square root transformation and model that data transformation.
+
+##### Q: Are there any effects that are significant?
+
+I want to determine if there is a significant effect from the Target variable. I will examine the model itself and then I will calculate the estimated marginal means to compare all three levels.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[["timeRemaining_team"]]))
+
+response_variable <- "sqrt.value"
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The estaimations are in reference to the individual level for the Target variable and session 2 for the session order variable. The results suggest that that session 3 and 4 have a significant effect. This is expected. The results also suggest that the effect of the team and Ind_Team target levels do not have an effect that is greater than zero.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[["timeRemaining_team"]]))
+
+response_variable <- "sqrt.value"
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+The estimated marginal means show no significant difference among the Target variable. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[["timeRemaining_team"]]))
+
+response_variable <- "sqrt.value"
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The estimated marginal means show a significant different between all of the sessions. This suggests that the amount of time remaining at the end of the session increased over time. 
+
 
 
 
