@@ -157,8 +157,7 @@ This experiment is a within-subject experimental design. The primary variable wa
 
 I collected data from **`r N_ind`** participants that formed **`r N_teams`** teams. Below is a sample of the data for the main metrics
 ```{r main_metrics_table, echo=FALSE}
-knitr::kable(
-  clean_aggregate_data_stats[1:5,c("TeamScore", 
+dt <- clean_aggregate_data_stats[1:5,c("TeamScore", 
                            "IndividualScore", 
                            "CI_team", 
                            "CI_ind", 
@@ -167,8 +166,10 @@ knitr::kable(
                            "ERROR_team_unique", 
                            "ERROR_ind_unique", 
                            "ERROR_team_total",
-                           "ERROR_ind_total")]
-)
+                           "ERROR_ind_total")] 
+dt %>%
+  kable() %>%
+  kable_styling()
 ```
 
 ## Research Question
@@ -519,23 +520,27 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
 
-
-comparision.results <- anova(model.null, 
+comparision_results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction,
                              model.NoInteraction.NoTarget,
                              model.NoInteraction.NoSession)
 
-knitr::kable(comparision.results)
+comparision_results %>%
+  kable() %>%
+  kable_styling()
 
 # Effect size (R^2)
+ES_model.NoInteraction.NoTarget <- r.squaredGLMM(model.NoInteraction.NoTarget)
 
-kable(r.squaredGLMM(model.NoInteraction.NoTarget),
-      caption = "Table: Effect size for *No Interaction and No Target*") %>%
+ES_model.NoInteraction.NoTarget %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
-kable(r.squaredGLMM(model.NoInteraction),
-      caption = "Table: Effect size for *No Interaction*") %>%
+ES_model.NoInteraction <- r.squaredGLMM(model.NoInteraction)
+
+ES_model.NoInteraction %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 
 ```
@@ -570,21 +575,26 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent 
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
 
-comparision.results <- anova(model.null, 
+comparision_results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction, 
                              model.NoInteraction.NoTarget,
                              model.NoInteraction.NoSession)
-knitr::kable(comparision.results)
+
+comparision_results %>%
+  kable() %>%
+  kable_styling()
 
 # Effect size (R^2)
+ES_model.NoInteraction.NoTarget <-r.squaredGLMM(model.NoInteraction.NoTarget)
 
-kable(r.squaredGLMM(model.NoInteraction.NoTarget),
-      caption = "Table: Effect size for *No Interaction and No Target*") %>%
+ES_model.NoInteraction.NoTarget %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
-kable(r.squaredGLMM(model.NoInteraction),
-      caption = "Table: Effect size for *No Interaction*") %>%
+ES_model.NoInteraction <- r.squaredGLMM(model.NoInteraction)
+ES_model.NoInteraction %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 ```
 
@@ -709,8 +719,11 @@ data_focus_team <- data_modified_team
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
 
-kable(compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE),
-      caption = "model.NoInteraction")
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
 
 ```
 
@@ -733,9 +746,11 @@ data_focus_team <- data_modified_team
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
 
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
 
-kable(compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE), 
-      caption = "model.NoInteraction.NoTarget")
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
 ```
 
 The robust model.NoInteraction.NoTarget model is noticeably different when compared to the non-robust model.NoInteraction.NoTarget This suggests that the data should be transformed to satisfy the residual assumptions
@@ -1044,8 +1059,11 @@ data_focus_ind <- data_modified_ind
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
 
-kable(compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE),
-      caption = "model.NoInteraction")
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
 ```
 
 There is a noticeable difference between the non-robust model and the robust model. This indicates that the data should be transformed to attempt to satisfy the assumptions.
@@ -1064,8 +1082,11 @@ response_variable <- "timeRemaining_ind"
 data_focus_ind <- data_modified_ind
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
 
-kable(compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE),
-      caption = "model.NoInteraction.NoTarget")
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget")%>%
+  kable_styling()
 ```
 There is a noticable difference between the non-robust model and the robust model. This indicates that the data should be transformed to attempt to satisfy the assumptions.
 
