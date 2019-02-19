@@ -19,6 +19,9 @@ knitr::opts_chunk$set(echo = TRUE)
 # Equations
 # Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
 
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
 # Packages for data analysis
 library(tidyverse)
 library(lme4)
