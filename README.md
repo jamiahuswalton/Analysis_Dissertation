@@ -1,24 +1,30 @@
 # Analysis_Dissertation
 The purpose of this repositroy it to develop R scripts to analysis team performance for Jamiahus Walton's dissertation
 
-# How to use
-You should run all lines in the files in the following order:
+# How to Generate / Load Data
 
-- Data_functions
-- Folder_File_Location
-- Packages
-- Read_Data
-- Valiadate_Data
-- Generate_Data
-
-
-# Generate Data
 ## First Time
-Run this whole file if you want to generate the aggregate data. The aggregate data is store in the variable my_aggregate_data at the bottom of the script. After the data is generated, it is saved as a CSV file in the location of your choice. 
+
+First you need run the following scripts:
+1. Data_functions: Run the whole script
+2. Folder_File_Location: Run the whole script
+3. Packages: Run the whole script
+4. Read_Data: Run the whole script
+5. Valiadate_Data: Run the whole script
+6. Generate_Data: Run the whole script
+
+File 2: These are the location for the data on my system. This file may look different depending on where the files are located. 
+
+File 4: Problems may arise here if you significantly modify the values in the Folder_File_Location script
+
+File 3: The purpose of this script is to make sure there are no issues in the data. More validation checks may be added later
+
+File 6: This is the script that generate all of the aggragate data using the function and file locations generated in the previous scripts (Data_functions and Folder_File_Location). The aggregate data is store in the variable my_aggregate_data at the bottom of the script. After the data is generated, it is saved as a CSV file in the location defined in the Folder_file_Location script. 
 
 ## Next time
-If you have already generated the aggregate data, then you do not need to run the whole script. You just need to run the line that reads the CSV from a specified location. This value will be stored in the my_aggregate_data variable. This line of code is at the bottom.
+Run File 1 to File 3.
 
+Then you only need to run the last line in File 6. This is the line that reads the previously generated data into the my_aggregate_data variable. 
 # Explore - Model Data
 Once the data is loaded, you use the other files to look at the data (e.g., Explore or Model).
 
