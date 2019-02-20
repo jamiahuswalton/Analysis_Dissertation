@@ -19,6 +19,9 @@ knitr::opts_chunk$set(echo = TRUE)
 # Equations
 # Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
 
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
 # Packages for data analysis
 library(tidyverse)
 library(lme4)
@@ -154,8 +157,7 @@ This experiment is a within-subject experimental design. The primary variable wa
 
 I collected data from **`r N_ind`** participants that formed **`r N_teams`** teams. Below is a sample of the data for the main metrics
 ```{r main_metrics_table, echo=FALSE}
-knitr::kable(
-  clean_aggregate_data_stats[1:5,c("TeamScore", 
+dt <- clean_aggregate_data_stats[1:5,c("TeamScore", 
                            "IndividualScore", 
                            "CI_team", 
                            "CI_ind", 
@@ -164,8 +166,10 @@ knitr::kable(
                            "ERROR_team_unique", 
                            "ERROR_ind_unique", 
                            "ERROR_team_total",
-                           "ERROR_ind_total")]
-)
+                           "ERROR_ind_total")] 
+dt %>%
+  kable() %>%
+  kable_styling()
 ```
 
 ## Research Question
@@ -516,23 +520,27 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
 
-
-comparision.results <- anova(model.null, 
+comparision_results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction,
                              model.NoInteraction.NoTarget,
                              model.NoInteraction.NoSession)
 
-knitr::kable(comparision.results)
+comparision_results %>%
+  kable() %>%
+  kable_styling()
 
 # Effect size (R^2)
+ES_model.NoInteraction.NoTarget <- r.squaredGLMM(model.NoInteraction.NoTarget)
 
-kable(r.squaredGLMM(model.NoInteraction.NoTarget),
-      caption = "Table: Effect size for *No Interaction and No Target*") %>%
+ES_model.NoInteraction.NoTarget %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
-kable(r.squaredGLMM(model.NoInteraction),
-      caption = "Table: Effect size for *No Interaction*") %>%
+ES_model.NoInteraction <- r.squaredGLMM(model.NoInteraction)
+
+ES_model.NoInteraction %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 
 ```
@@ -567,21 +575,26 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent 
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
 
-comparision.results <- anova(model.null, 
+comparision_results <- anova(model.null, 
                              model.All, 
                              model.NoInteraction, 
                              model.NoInteraction.NoTarget,
                              model.NoInteraction.NoSession)
-knitr::kable(comparision.results)
+
+comparision_results %>%
+  kable() %>%
+  kable_styling()
 
 # Effect size (R^2)
+ES_model.NoInteraction.NoTarget <-r.squaredGLMM(model.NoInteraction.NoTarget)
 
-kable(r.squaredGLMM(model.NoInteraction.NoTarget),
-      caption = "Table: Effect size for *No Interaction and No Target*") %>%
+ES_model.NoInteraction.NoTarget %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
-kable(r.squaredGLMM(model.NoInteraction),
-      caption = "Table: Effect size for *No Interaction*") %>%
+ES_model.NoInteraction <- r.squaredGLMM(model.NoInteraction)
+ES_model.NoInteraction %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 ```
 
@@ -615,6 +628,8 @@ The purpose of this question is to see what we can learn from these models. Befo
 * A fitted-value plot should show an almost constant width when viewed from left to right
 * The points on a normal plot should lie on an almost straight line from the bottom left to the top right
 
+Some of the assumptions may be violated. According to @Field2017, the best way to examine the influence of assumption violations is to compare a robust model to a standard model. When the assumptions are violatd, I will compare a robust model to a classic model. If there is a noticable different between the two models (i.e., if the estimated coefficence are notciably different) then I will use a step on the power ladder to trasform, or re-express, the data to address the assumption violation @Tukey1977.
+
 #### Team
 
 ```{r}
@@ -630,7 +645,6 @@ data_modified_team <- team_data %>%
 response_variable <- "timeRemaining_team"
 data_focus_team <- data_modified_team
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 
 # Histogram of Residuals - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .resid)) +
@@ -650,9 +664,24 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) 
+   theme(plot.title = element_text(hjust = 0.5))
+```
 
+Visually, it looks like assumptions are violated in the QQ plot and in the fitted-value plot. This means that I will need to trasnform the data.
 
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         timeRemaining_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 
 # Histogram of Residuals - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
@@ -674,16 +703,17 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) 
-
 ```
+Visually, it looks like assumptions are violated in the QQ plot and in the fitted-value plot. This means that I will need to trasnform the data.
 
-It looks like there is some assumption violation for both models. 
+*Reflection:* It looks like there may be some assumption violation for both models. 
 
 For the model.NoInteraction it looks like there may be a violation of constant error in the fitted-value plot. The QQ plot also shows a slight violation on the tail ends of the plots. 
 
 For the model.NoInteraction.NoTarget it looks like there may be a violation of constant error in the fitted-value plot. The QQ plot also shows a slight violation on the tail ends of the plots. 
 
 I need to determine if this violation influences the model overall.
+
 
 ##### Q: Does the violation influence the linear model estimation?
 
@@ -706,8 +736,11 @@ data_focus_team <- data_modified_team
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
 
-kable(compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE),
-      caption = "model.NoInteraction")
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
 
 ```
 
@@ -730,9 +763,11 @@ data_focus_team <- data_modified_team
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
 
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
 
-kable(compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE), 
-      caption = "model.NoInteraction.NoTarget")
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
 ```
 
 The robust model.NoInteraction.NoTarget model is noticeably different when compared to the non-robust model.NoInteraction.NoTarget This suggests that the data should be transformed to satisfy the residual assumptions
@@ -1041,8 +1076,11 @@ data_focus_ind <- data_modified_ind
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
 
-kable(compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE),
-      caption = "model.NoInteraction")
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
 ```
 
 There is a noticeable difference between the non-robust model and the robust model. This indicates that the data should be transformed to attempt to satisfy the assumptions.
@@ -1061,8 +1099,11 @@ response_variable <- "timeRemaining_ind"
 data_focus_ind <- data_modified_ind
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
 
-kable(compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE),
-      caption = "model.NoInteraction.NoTarget")
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget")%>%
+  kable_styling()
 ```
 There is a noticable difference between the non-robust model and the robust model. This indicates that the data should be transformed to attempt to satisfy the assumptions.
 
@@ -1237,7 +1278,79 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent 
 
 emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
 ```
-The results show a significant difference between the Int_Team and Team level of feedback. The difference indicates that the amount of time remaining in the Team feedback condition results in higher time remaining. 
+The results show a *significant difference* between the Ind_Team and Team level of feedback. The difference indicates that the amount of time remaining in the Team feedback condition results in higher time remaining (transformed using 1/2 power). 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(timeRemaining_ind,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+response_variable <- "sqrt.value"
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+There is a significant different between each of the sessions. This means that the square root of the time remaining at the end of the session was increasing over time. This means that the teams were moving through the session faster the more they completed the task (Note: This is when the data is transformed using the 1/2 power).
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(timeRemaining_ind,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+response_variable <- "sqrt.value"
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+With reference to session 2, there is a significant effect from session 3 and 4. This suggests that the amount of time (sqaure root) remaining increase when going from session 2 to session 3 and from session 2 to session 4. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(timeRemaining_ind,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+response_variable <- "sqrt.value"
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+There is a significant difference between each of the sessions. This means that the amount of time (square root) remaining increased over time. 
+
+##### Summary / Reflection
+
+There was a significant difference between the Ind_Team and Team level feedback condition in the *model.NoInteraction*. The significant difference indicates that the amount of time remaining at the end of the session in the Team feedback condition is higher than the amount of time remaining in the Ind_Team condition. 
+
+According to the data, groups should be given feedback that has team content if the goal is to encourage the team to move through the task faster. This does not tell me if the groups in the team condition are accurate as fast or if the groups are simply moving through the session quicker in the Team condition. 
+
+The next step is to explore how groups collected items. In other words, I want to determine if the teams were collecting correct items quicker. 
+
 
 
 
