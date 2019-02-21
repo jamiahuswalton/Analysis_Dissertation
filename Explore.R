@@ -468,3 +468,32 @@ test2 <- ggplot(data = plot_data_team,
   guides(fill = FALSE)
 
 multiplot(test, test2, cols = 2)
+
+
+
+
+
+dependent_response_team <- "timeRemaining_team"
+y_label_team <- "Count"
+x_label_team <- "Target"
+title_response_team <- "Distrabution of Time Remaining (Team)"
+plot_name <- "Histogram_TimeRemaining_ByTarget_Team.png"
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(dependent_response_team, Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 25) +
+  facet_grid(. ~ Target) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(Target) %>%
+  summarise(N = length(.data[[dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
