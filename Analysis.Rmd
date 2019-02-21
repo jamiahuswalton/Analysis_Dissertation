@@ -188,7 +188,9 @@ In this section, I seek to discover answers, visually, that answer the research 
 dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Count"
 x_label_team <- "Time Remaining"
-title_response_team <- "Distrabution of Time Remaining (Team)"
+title_response_team <- "Distribution of Time Remaining (Team)"
+plot_name <- "Histogram_TimeRemaining_Team.png"
+setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(dependent_response_team, Target)
@@ -482,7 +484,7 @@ I am interested in determining if a model of the data should include an interact
 
 There are a few steps I will take before testing the assumptions. First, I fit the model the data using multiple models. Second, I will compare those models to the null model. Second, I will pick the models that are worth exploring further. Third, I will evaluate the effect size ($R^2$) of the fixed effect and random effect variables using a method by Nakagawa and Schielzeth (@Nakagawa2013). Lastly, I will analyze the assumptions for the residuals. 
 
-A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R^2$) ($R_{m}^2$) and conditional ($R^2$) ($R_{c}^2$). The $R_{m}^2$ describes how the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ describes how both the variance is described by both the fixed and random effect variables
+A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R^2$) ($R_{m}^2$) and conditional ($R^2$) ($R_{c}^2$). The $R_{m}^2$ describes how the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ describes how both the fixed and random effect variables describe the variece
 
 #### Full Models Used for Team and Individual
 
