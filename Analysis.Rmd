@@ -206,7 +206,7 @@ Overall, the distribution of the time remaining is skewed to the left. This skew
 dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Count"
 x_label_team <- "Target"
-title_response_team <- "Distrabution of Time Remaining (Team)"
+title_response_team <- "Distribution of Time Remaining (Team)"
 
 plot_data_team <- team_data %>%
   select(dependent_response_team, Target)
@@ -227,7 +227,7 @@ The skewed to the left pattern continues when grouping the time remaining by the
 dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Count"
 x_label_ind <- "Time Remaining"
-title_response_ind <- "Distrabution of Time Remaining (Individual)"
+title_response_ind <- "Distribution of Time Remaining (Individual)"
 
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind, Target)
@@ -243,7 +243,7 @@ Overall, the time remaining at the individual level is skewed to the left. This 
 dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Count"
 x_label_ind <- "Time Remaining"
-title_response_ind <- "Distrabution of Time Remaining (Individual)"
+title_response_ind <- "Distribution of Time Remaining (Individual)"
 
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind, Target)
@@ -272,7 +272,7 @@ Overall, the data skewed to the left. According to the count at the individual a
 dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Count"
 x_label_team <- "Time Remaining"
-title_response_team <- "Distrabution of Time Remaining (Team)"
+title_response_team <- "Distribution of Time Remaining (Team)"
 
 plot_data_team <- team_data %>%
   select(dependent_response_team, Target, SessionOrder)
@@ -298,7 +298,7 @@ It looks like the distribution of the amount of time remaining at the end of the
 dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Count"
 x_label_ind <- "Time Remaining"
-title_response_ind <- "Distrabution of Time Remaining (Individual)"
+title_response_ind <- "Distribution of Time Remaining (Individual)"
 
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind, Target, SessionOrder)
