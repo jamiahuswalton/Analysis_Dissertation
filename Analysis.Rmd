@@ -108,7 +108,9 @@ model_data_Target_Session <- function(df, dependent, model.type, is.team, is.rob
 }
 
 #Folder locations ----
+figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
 main_work_directory_name <- main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+
 database_folder_name <- "Database"
 file_name_output <- "team_player_aggragate_stats.csv"
 folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
@@ -151,11 +153,12 @@ The purpose of this document is to record the data analysis for my Dissertation.
 
 ## Experimental Design
 
-This experiment is a within-subject experimental design. The primary variable was the feedback condition (i.e., Target). There were four feedback conditions; None, Individual, Team, and Indvidiaul_Team. Each team experienced each condition. The first condition for each group was the none condition. The remaining three conditions were counterbalanced. For example, the condition order for team 7 is the following: None, Ind, Team, Ind_Team. The condition order for group 8 is the following: None, Team, Individual, Individual_Team. 
+This experiment is a within-subject experimental design. The primary variable was the feedback condition (i.e., Target). There were four feedback conditions; None, Individual, Team, and Ind_Team Each team experienced each condition. The first condition for each group was the None condition. The remaining three conditions were counterbalanced. For example, the condition order for team 7 is the following: None, Ind, Team, Ind_Team. The condition order for group 8 is the following: None, Team, Individual, Ind_Team. 
 
 ## Data Description
 
 I collected data from **`r N_ind`** participants that formed **`r N_teams`** teams. Below is a sample of the data for the main metrics
+
 ```{r main_metrics_table, echo=FALSE}
 dt <- clean_aggregate_data_stats[1:5,c("TeamScore", 
                            "IndividualScore", 
@@ -174,13 +177,13 @@ dt %>%
 
 ## Research Question
 
-This research attempts to answer the following question: How will teams' performance change if given feedback that displays indicators based on individual performance, team performance, or both?
+This research attempts to answer the following question: *How will teams' performance change if given feedback that displays indicators based on individual performance, team performance, or both?*
 
 ## Exploratory Data Analysis
 
-In this section, I seek to discover answers, visually, that answer the research question mentioned above.
+In this section, I seek to visually discover answers to the research question mentioned above.
 
-### Q: Is there exciting variation among the *time remaining* that will help me understand the influence of the feedback condition?
+### Q: Is there exciting variation among the *time remaining* metric that will help me understand the influence of the feedback condition?
 
 #### Team
 
@@ -197,7 +200,8 @@ plot_data_team <- team_data %>%
 
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
-  labs(title = title_response_team, x = x_label_team, y = y_label_team)
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
 ```
 
 Overall, the distribution of the time remaining is skewed to the left. This skew tells me that most of the teams had around 50 seconds left, or less, at the end of each session. 
@@ -207,6 +211,8 @@ dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Count"
 x_label_team <- "Target"
 title_response_team <- "Distribution of Time Remaining (Team)"
+plot_name <- "Histogram_TimeRemaining_ByTarget_Team.png"
+setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(dependent_response_team, Target)
@@ -214,12 +220,22 @@ plot_data_team <- team_data %>%
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 25) +
   facet_grid(. ~ Target) +
-  labs(title = title_response_team, x = x_label_team, y = y_label_team)
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(Target) %>%
+  summarise(N = length(.data[[dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
-The skewed to the left pattern continues when grouping the time remaining by the feedback conditions. Most of the teams seem to have about 50 seconds remaining when they completed the tast. 
+The skewed to the left pattern continues when grouping the time remaining by the feedback conditions. Most of the teams seem to have about 50 seconds remaining when they completed the task 
 
-*Reflection:* The skewness in the time remaining data at the team level(Something missing here). This skewness suggests that most of the teams had about the same amount of time remaining at the end of the session (50 or 40 seconds). 
+*Reflection:* The skewness in the time remaining data at the team level centers around 50 seconds or so. This skewness suggests that most of the teams had about the same amount of time remaining at the end of the session (50 or 40 seconds). In other words, there is no obvious pattern visually. 
 
 #### Individual
 
@@ -228,22 +244,27 @@ dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Count"
 x_label_ind <- "Time Remaining"
 title_response_ind <- "Distribution of Time Remaining (Individual)"
+plot_name <- "Histogram_TimeRemaining_Ind.png"
+setwd(figure_directory)
 
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind, Target)
 
 ggplot(data = plot_data_ind) + 
   geom_histogram(aes_string(x = dependent_response_ind), bins = 40) +
-  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
 ```
 
-Overall, the time remaining at the individual level is skewed to the left. This skewness tells me that most of the participants had 50 seconds or left at the end of the sessions. I also notice that there are a number of data points distributed from about 60 to 350. Are there similar characteristics among the teams that have more than 50 seconds remaining at the end of the sessions?
+Overall, the time remaining at the individual level is skewed to the left. This skewness tells me that most of the participants had 40 to 50 seconds remaining at the end of the sessions. I also notice that there are a number of data points distributed from about 60 to 350. Are there similar characteristics among the teams that have more than 50 seconds remaining at the end of the sessions?
 
 ```{r}
 dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Count"
 x_label_ind <- "Time Remaining"
 title_response_ind <- "Distribution of Time Remaining (Individual)"
+plot_name <- "Histogram_TimeRemaining_ByTarget_Ind.png"
+setwd(figure_directory)
 
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind, Target)
@@ -251,18 +272,29 @@ plot_data_ind <- ind_data %>%
 ggplot(data = plot_data_ind) + 
   geom_histogram(aes_string(x = dependent_response_ind), bins = 30) +
   facet_grid(. ~ Target) +
-  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
-  
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- ind_data %>%
+  group_by(Target) %>%
+  summarise(N = length(.data[[dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
-The distribution for each condition is similar to the overall condition. This similarity tells me that most individuals finished with about 50 seconds or so left at the end of each session. It seems as though we can say the high performing individuals finished with over 50 seconds or so left at the end of the session. Do high performing individuals have similar characteristics?
+The distribution for each condition is similar to the overall data distribution. This similarity tells me that most individuals finished with about 50 seconds or so left at the end of each session. 
 
-*Reflection:* The distribution is similar to the distribution of the time remaining at the team level. The distribution skewed to the left and most of the time remaining at the end of the session was about 50 or 60 seconds  
+*Reflection:* It seems as though we can say the high performing individuals finished with over 50 seconds or so left at the end of the session. Do high performing individuals have similar characteristics? How should we define a "high performing" individual? Overall, the distribution at the team level is similar to the distribution at the team level. 
   
   
 #### Summary / Reflection
 
-Overall, the data skewed to the left. According to the count at the individual and team level, the teams and players that finished with more than 50 seconds or so left at the end of the session were high performing teams. There did not seem to be any obvious pattern when grouping the data by Feedback conditions. Maybe the feedback conditions influenced the amount of time remaining depending on their experience (i.e., session order)? 
+Overall, the data skewed to the left. According to the count at the individual and team level, there were fewer teams and fewer players that finished with more than 50 seconds or so left at the end of the session. We could say that the players and the teams that finished above this 50 seconds (or so) threshold were high performing / faster teams. A question that could be asked is do these "quick / high performing" teams have similar characteristics? 
+
+There did not seem to be any obvious pattern when grouping the data by Feedback conditions. Maybe the feedback conditions influenced the amount of time remaining depending on their experience (i.e., session order)? 
 
 ### Q: Is there exciting variation among the *time remaining* that explains how the feedback conditions influence the time remaining when session order is taken into consideration?
 
@@ -273,6 +305,8 @@ dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Count"
 x_label_team <- "Time Remaining"
 title_response_team <- "Distribution of Time Remaining (Team)"
+plot_name <- "Histogram_TimeRemaining_ByTarget_BySessionOrder_Team.png"
+setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(dependent_response_team, Target, SessionOrder)
@@ -280,17 +314,29 @@ plot_data_team <- team_data %>%
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
   labs(title = title_response_team, x = x_label_team, y = y_label_team) +
-  facet_grid( SessionOrder ~ Target)
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  select(dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
-It looks like the time remaining for teams in the individual feedback condition did not change the amount of time remaining at the end of the session. The lack of change is unusual because I would expect the distribution to spread over time because teams would get better and they would complete the task quicker.   
+It looks like the distribution for time remaining for teams in the individual feedback condition did not change with more experience. The lack of change is unsual because I would expect the distrabution to move the right (i.e., increase with more experience). 
   
-It looks like the time remaining for the individual_team condition seems to spread over time, which means that the teams were completing the task faster the more times they completed the task. I would not be surprised if the Individual_Team condition were trending to significant.  
+It looks like the distribution for time remaining for the Ind_Team condition seems to spread (or flatten) over time, which means that the teams were completing the task faster with more experience.
   
-  
-It looks like the distribution of the amount of time remaining at the end of the session in the team feedback condition starts to spread over time. This distribution is what I would expect to see.
+It looks like the distribution of the amount of time remaining at the end of the session in the team feedback condition starts to spread over time.
 
-*Reflection:* I would expect to see the distribution of time remaining spread over time because the teams would learn the task and get better at the task. This pattern is not followed in the individual condition. The distribution of the time remaining in the individual condition does not seem to spread over time. The amount of time remaining is consistent no matter what session order (i.e., 2,3, or 4) they are in. This consistency would suggest that giving individual performance metrics does not influence the amount of time remaining at the end of the session for a team. 
+*Reflection:* I would expect to see the distribution of time remaining to move to the right over time because the teams would will have more experience with the task and get better at the task. This pattern is not followed in the individual condition. The distribution of the time remaining in the individual condition does not seem to improve over time. The amount of time remaining seems to be consistent no matter what session order (i.e., 2,3, or 4) they are in. This consistency would suggest that giving individual performance metrics does not influence the amount of time remaining at the end of the session for a team. 
+
+The distribution for the Ind_Team and Team condition seem to spread (i.e., flatten) over time instead of moving from let to right. To me, this suggest that there are some time that get better with time in these conditions and there are other teams that do no get better with time. 
 
 #### Individual
 
@@ -299,6 +345,8 @@ dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Count"
 x_label_ind <- "Time Remaining"
 title_response_ind <- "Distribution of Time Remaining (Individual)"
+plot_name <- "Histogram_TimeRemaining_ByTarget_BySessionOrder_Ind.png"
+setwd(figure_directory)
 
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind, Target, SessionOrder)
@@ -306,21 +354,32 @@ plot_data_ind <- ind_data %>%
 ggplot(data = plot_data_ind) + 
   geom_histogram(aes_string(x = dependent_response_ind), bins = 30) +
   facet_grid(SessionOrder ~ Target) +
-  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- ind_data %>%
+  select(dependent_response_ind, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
-It looks like the distribution of the time remaining in the individual condition does not spread over time. This lack of spread tells me that the individuals were not getting faster over time in the individual feedback condition. It looks like the spread of the time remaining in the Indivdual_team condition does spread over time. There is a more obvious spread from session 3 to session 4. It looks like the time remaining in the team condition does spread over time. This is what I would expect. 
+It looks like the distribution of the time remaining in the individual condition does not spread over time. This lack of spread tells me that the individuals were not getting faster over time in the individual feedback condition. It looks like the spread of the time remaining in the Ind_Team condition does spread over time. There is a more obvious spread from session 3 to session 4. It looks like the time remaining in the team condition does spread over time.
 
-*Reflection:* I am getting the sense that the individual condition did not influence how quickly the participants completed the session. In other words, giving the individual feedback on performance metrics did not encourage the participants to move faster through the session. However, it looks like the spread over the time remaining increases when given team or ind_team feedback. This tells me that teams are more likely to move through the task quicker if given individual_team or team feedback, not individual feedback. 
+*Reflection:* I am getting the sense that the individual condition did not influence how quickly the participants completed the session. In other words, giving the individual feedback on performance metrics did not encourage the participants to move faster through the session. However, it looks like the distrabution of the time remaining flattens when groups are given Team or Ind_Team feedback. This tells me that teams are more likely to move through the task quicker if given Ind_Team or Team feedback, not individual feedback. 
 
 
 #### Summary / Reflection
 
-Overall, the distribution is telling me that over time, teams move through the task quicker when given team or ind_team feedback but not individual feedback. This suggests that if I looked at the fourth session and group the data by the feedback conditions, I would see that the time remaining in the individual_team and Team condition would be significantly different from the time remaining in the individual condition.
+Overall, the distribution is telling me that over time, teams move through the task quicker when given Team or Ind_Team feedback but not individual feedback. This suggests that if I looked at the fourth session and group the data by the feedback conditions, I would see that the time remaining in the Ind_Team and Team condition would be different from the time remaining in the individual condition.
 
 ### Q: Is there an *interaction* between the Target and Session Order for the *time remaining*?
 
-I am interested in this question for modeling purposes. Right now I want to know if I need to include the interaction between Target and Session Order. 
+I am interested in this question for modeling purposes. I want to know if I need to include the interaction between Target and Session Order. 
 
 #### Team
 
@@ -343,16 +402,18 @@ ggplot(data = plot_data_team,
                   y = .data[[dependent_response_team]], 
                   fill = Team, group = rank_order,
                   label = names )) +
-  geom_text(position = position_dodge(1), vjust = 0, aes(y = .data[[dependent_response_team]] + 10), check_overlap = FALSE) +
+  geom_text(position = position_dodge(1), vjust = 0, aes(y = .data[[dependent_response_team]] + 15), check_overlap = FALSE) +
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(. ~ Target) + 
   guides(fill = FALSE) +
+  coord_flip()+
+  xlim("4", "3", "2") +
   labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
 ```
 
-Visually, the first thing that jumps out to me that there seem to be a few outliers that may be influencing the results. The teams that are labeled had more than 120 seconds (2 minutes) remaining at the end of the session. Let's call a "fast" a team that has more than 120 seconds left at the end of the session. The groups that are labeled in all the conditions (Target levels) are team 26, 45, 13 (there may be more I am missing). Some of these teams data may be outliers. 
+Visually, the first thing that jumps out to me that there seem to be a few outliers that may be influencing the results. Let's call a group "fast" if that group has more than `r value_threshold` seconds left at the end of the session. The teams that are labeled had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining at the end of the session.  The groups that are labeled in all the conditions (Target levels) are team 26, 45, 13. Some of these teams data may be outliers. 
 
-*Reflection:* This figure tells me that I may need to consider removing these teams because they may be outliers. 
+*Reflection:* This figure tells me that I may need to consider removing these teams because they may be outliers. However, I do not have a good reason to remove the values. 
 
 
 ```{r}
@@ -404,11 +465,11 @@ There appears to be an interaction between the Target and Session Order variable
   
 The individual session steadily improves over time. 
 
-The Indivdual_Team session has a small improvement from session 2 to session 3, but there is a substantial increase from session 3 to session 4. This tells me that for some reason there was little change between session 2 and session 3, but something happened that caused a major improvement from session 3 to session 4. 
+The Individual_Team session has a small improvement from session 2 to session 3, but there is a substantial increase from session 3 to session 4. This tells me that for some reason there was little change between session 2 and session 3, but something happened that caused a major improvement from session 3 to session 4. 
 
 The team session showed a substantial increase from session 2 to 3 but a small improvement from session 3 to session 4. This suggests that for some reason there was a major improvement between session 2 and session 3, but then there was little gain between session 3 and session 4. This could mean that the feedback was no longer useful between 3 and 4 or that the teams reached their highest performance. 
 
-*Reflection:* I am getting the session that the team condition encourage teams to move quicker through the session. There was a substantial increase in the amount of time remaining at the end of the session in the team condition when moving from session 2 to session 3. I am also getting the sense that the individual_team feedback condition may be encouraging a team to move quicker through the task as well. However, it looks like the effect of the inddividual_team feedback takes longer to take effect. Even so, there amount of time remaining at the end of the session ended up being about the same after four sessions in the individual_team and the team condition. 
+*Reflection:* I am getting the session that the team condition encourage teams to move quicker through the session. There was a substantial increase in the amount of time remaining at the end of the session in the team condition when moving from session 2 to session 3. I am also getting the sense that the Ind_Team feedback condition may be encouraging a team to move quicker through the task as well. However, it looks like the effect of the individual_team feedback takes longer to take effect. Even so, there amount of time remaining at the end of the session ended up being about the same after four sessions in the Ind_Team and the team condition. 
 
 
 #### Individual
@@ -434,9 +495,9 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
 ```
 
-There appears to be an interaction between Target and Session Order. Overall, the amount of time at the end of the session increases over time. It looks like there is a considerable increase in the amount of time remaining in the Team condition. This substantial increase suggests that giving team feedback results in teams moving faster. It looks like there is something exciting happening in the team and individual_team condition. In the individual condition, there is a steady increase in the amount of time remaining. In the Individual_Team condition, there was little to no change in the time remaining between session 2 and 3. 
+There appears to be an interaction between Target and Session Order. Overall, the amount of time at the end of the session increases over time. It looks like there is a considerable increase in the amount of time remaining in the Team condition. This substantial increase suggests that giving team feedback results in teams moving faster. It looks like there is something exciting happening in the team and Ind_Team condition. In the individual condition, there is a steady increase in the amount of time remaining. In the Ind_Team condition, there was little to no change in the time remaining between session 2 and 3. 
 
-*Reflection:* I am getting the sense that something is happening with the individual_team and the team condition. For some reason, there are these large increases in the time remaining. 
+*Reflection:* I am getting the sense that something is happening with the Ind_Team and the team condition. For some reason, there are these large increases in the time remaining. 
 
 ```{r}
 dependent_response_ind <- "timeRemaining_ind"
@@ -461,17 +522,17 @@ ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, 
 
 There seems to be an interaction between the session order and the target variable. 
 
-In the individual condition, there is a steading increase in the time remaining at the individual level. 
+In the individual condition, there is a steadying increase in the time remaining at the individual level. 
 
 In the team condition, there is a large improvement from session 2 to session 3 but little to no improvement from session 3 to session 4. 
 
-In the individual_team condition, there is little to no improvement from session 2 to session 3 but a large improvement from session 3 to session 4. 
+In the Ind_Team condition, there is little to no improvement from session 2 to session 3 but a large improvement from session 3 to session 4. 
 
-*Reflection:* There is a session that something interesting is going on with the individual_team and team conditions. It seems as though the effect of the team condition happen quicker than the impact of the individual_team condition
+*Reflection:* There is a session that something interesting is going on with the Ind_Team and team conditions. It seems as though the effect of the team condition happen quicker than the impact of the Ind_Team condition
 
 #### Summary / Reflection
 
-I am getting the sense that there is something interesting happening with the individual_team condition and team condition. For some reason, the positive effect (i.e., the large increase in the time remaining at the end of the session) happens quicker than the positive effect from the individual_team condition. More exploration is needed to understand why this apparent effect is happening. Some statical analysis is necessary to determine the strength of this effect if it exists.
+I am getting the sense that there is something interesting happening with the Ind_Team condition and team condition. For some reason, the positive effect (i.e., the large increase in the time remaining at the end of the session) happens quicker than the positive effect from the Ind_Team condition. More exploration is needed to understand why this apparent effect is happening. Some statistical analysis is necessary to determine the strength of this effect if it exists.
 
 
 ### Q: Is there an interaction between the Target and Session Order for the *time remaining* that is statistically significant?
@@ -484,7 +545,7 @@ I am interested in determining if a model of the data should include an interact
 
 There are a few steps I will take before testing the assumptions. First, I fit the model the data using multiple models. Second, I will compare those models to the null model. Second, I will pick the models that are worth exploring further. Third, I will evaluate the effect size ($R^2$) of the fixed effect and random effect variables using a method by Nakagawa and Schielzeth (@Nakagawa2013). Lastly, I will analyze the assumptions for the residuals. 
 
-A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R^2$) ($R_{m}^2$) and conditional ($R^2$) ($R_{c}^2$). The $R_{m}^2$ describes how the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ describes how both the fixed and random effect variables describe the variece
+A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R^2$) ($R_{m}^2$) and conditional ($R^2$) ($R_{c}^2$). The $R_{m}^2$ describes how the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ describes how both the fixed and random effect variables describe the variance
 
 #### Full Models Used for Team and Individual
 
@@ -630,7 +691,7 @@ The purpose of this question is to see what we can learn from these models. Befo
 * A fitted-value plot should show an almost constant width when viewed from left to right
 * The points on a normal plot should lie on an almost straight line from the bottom left to the top right
 
-Some of the assumptions may be violated. According to @Field2017, the best way to examine the influence of assumption violations is to compare a robust model to a standard model. When the assumptions are violatd, I will compare a robust model to a classic model. If there is a noticable different between the two models (i.e., if the estimated coefficence are notciably different) then I will use a step on the power ladder to trasform, or re-express, the data to address the assumption violation @Tukey1977.
+Some of the assumptions may be violated. According to @Field2017, the best way to examine the influence of assumption violations is to compare a robust model to a standard model. When the assumptions are violated, I will compare a robust model to a classic model. If there is a noticeable different between the two models (i.e., if the estimated coefficient are noticeably different) then I will use a step on the power ladder to transform, or re-express, the data to address the assumption violation @Tukey1977.
 
 #### Team
 
@@ -669,7 +730,7 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
    theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Visually, it looks like assumptions are violated in the QQ plot and in the fitted-value plot. This means that I will need to trasnform the data.
+Visually, it looks like assumptions are violated in the QQ plot and in the fitted-value plot. This means that I will need to transform the data.
 
 ```{r}
 # Data to fit
@@ -706,7 +767,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) 
 ```
-Visually, it looks like assumptions are violated in the QQ plot and in the fitted-value plot. This means that I will need to trasnform the data.
+Visually, it looks like assumptions are violated in the QQ plot and in the fitted-value plot. This means that I will need to transform the data.
 
 *Reflection:* It looks like there may be some assumption violation for both models. 
 
@@ -746,7 +807,7 @@ comparision_results %>%
 
 ```
 
-The robust model.NoInteration model is noticeably different when compared to the non-robust model.NoInteration. This suggests that the data should be transformed to satisfy the residual assumptions
+The robust model.NoInteraction model is noticeably different when compared to the non-robust model.NoInteraction. This suggests that the data should be transformed to satisfy the residual assumptions
 
 
 ```{r}
@@ -1107,7 +1168,7 @@ comparision_results %>%
   kable(caption = "model.NoInteraction.NoTarget")%>%
   kable_styling()
 ```
-There is a noticable difference between the non-robust model and the robust model. This indicates that the data should be transformed to attempt to satisfy the assumptions.
+There is a noticeable difference between the non-robust model and the robust model. This indicates that the data should be transformed to attempt to satisfy the assumptions.
 
 *Reflection:* Overall, I need to transform the data because there is a very noticeable difference between the robust model and the non-robust model.
 
@@ -1322,7 +1383,7 @@ model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, d
 summary(model.NoInteraction.NoTarget)
 ```
 
-With reference to session 2, there is a significant effect from session 3 and 4. This suggests that the amount of time (sqaure root) remaining increase when going from session 2 to session 3 and from session 2 to session 4. 
+With reference to session 2, there is a significant effect from session 3 and 4. This suggests that the amount of time (square root) remaining increase when going from session 2 to session 3 and from session 2 to session 4. 
 
 ```{r}
 # Data to model
