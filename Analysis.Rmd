@@ -395,13 +395,15 @@ y_label_team <- "Time Remaining"
 x_label_team <- "Target"
 title_response_team <- "Time Remaining (Team) Vs. Target"
 value_threshold <- 120
+plot_name <- "Bar_TimeRemaining_ByTarget_BySessionOrder_Team.png"
+setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, dependent_response_team, Team) %>%
   mutate(rank_order = -rank(team_data[[dependent_response_team]])) %>%
   mutate(above_value_threshold = .data[[dependent_response_team]] > value_threshold)
 
-names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[,"Team"]), "")
+names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[["Team"]]), "")
 
 ggplot(data = plot_data_team, 
        aes(x = factor(SessionOrder), 
@@ -414,7 +416,8 @@ ggplot(data = plot_data_team,
   guides(fill = FALSE) +
   coord_flip()+
   xlim("4", "3", "2") +
-  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") +
+  ggsave(filename = plot_name)
 ```
 
 Visually, the first thing that jumps out to me that there seem to be a few outliers that may be influencing the results. Let's call a group "fast" if that group has more than `r value_threshold` seconds left at the end of the session. The teams that are labeled had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining at the end of the session.  The groups that are labeled in all the conditions (Target levels) are team 26, 45, 13. Some of these teams data may be outliers. 
@@ -427,6 +430,8 @@ dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Time Remaining"
 x_label_team <- "Target"
 title_response_team <- "Time Remaining (Team) Vs. Target"
+plot_name <- "InteractionPlot_TimeRemaining_ByTarget_BySessionOrder_Team.png"
+setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, timeRemaining_team) %>%
@@ -439,7 +444,9 @@ ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, col
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
-  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
+  ggsave(filename = plot_name)
+
 ```
 
 Visually, there appears to be some level of interaction between Target and SessionOrder for the time remaining. The interaction does not seem like a strong interaction. The graph suggests that the average time remaining at the end of the session increases over time. The increase is particularly noticeable in the Ind_Team condition going from session 3 to session 4.  In other words, when given team feedback, the amount of time remaining at the end of each session increases faster. 
@@ -451,6 +458,8 @@ dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Time Remaining"
 x_label_team <- "Target"
 title_response_team <- "Time Remaining (Team) Vs. Session Order"
+plot_name <- "InteractionPlot_TimeRemaining_BySessionOrder_ByTarget_Team.png"
+setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, timeRemaining_team) %>%
@@ -463,7 +472,8 @@ ggplot(data = plot_data_team, aes(x = SessionOrder , y = timeRemaining_teamAvera
   geom_point(size = 3) +
   geom_line(aes(group=Target, color = Target)) + 
   geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
-  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
+  ggsave(filename = plot_name)
 ```
 
 There appears to be an interaction between the Target and Session Order variable. This figure tells me that over time the amount of time remaining at the end of each session increases over time. This figure tells me that in the different session orders, the amount of time remaining at the end of each session is roughly the same. However, over time, the amount of time remaining at the end of the session changes differently depending on the session. 
@@ -485,6 +495,8 @@ dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Time Remaining"
 x_label_ind <- "Target"
 title_response_ind <- "Time Remaining (Individual) Vs. Target"
+plot_name <- "Bar_TimeRemaining_ByTarget_BySessionOrder_Ind.png"
+setwd(figure_directory)
 
 plot_data_ind <- ind_data %>%
   select(Target, SessionOrder, dependent_response_ind) %>%
@@ -498,7 +510,8 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
-  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") + 
+  ggsave(filename = plot_name)
 ```
 
 There appears to be an interaction between Target and Session Order. Overall, the amount of time at the end of the session increases over time. It looks like there is a considerable increase in the amount of time remaining in the Team condition. This substantial increase suggests that giving team feedback results in teams moving faster. It looks like there is something exciting happening in the team and Ind_Team condition. In the individual condition, there is a steady increase in the amount of time remaining. In the Ind_Team condition, there was little to no change in the time remaining between session 2 and 3. 
@@ -510,6 +523,8 @@ dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Time Remaining"
 x_label_ind <- "Target"
 title_response_ind <- "Time Remaining (Individual) Vs. Target"
+plot_name <- "InteractionPlot_TimeRemaining_BySessionOrder_ByTarget_Ind.png"
+setwd(figure_directory)
 
 plot_data_ind <- ind_data %>%
   select(Target, SessionOrder, dependent_response_ind) %>%
@@ -523,7 +538,8 @@ ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, 
   geom_point(size = 3) +
   geom_line(aes(group=Target, color = Target)) + 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
-  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = plot_name)
 ```
 
 There seems to be an interaction between the session order and the target variable. 
