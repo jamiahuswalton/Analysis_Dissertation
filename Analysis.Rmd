@@ -557,6 +557,9 @@ sumCountFastParticipants <- plot_data_ind %>%
 sumCountFastParticipants %>%
   kable() %>%
   kable_styling()
+
+```
+```{r}
 dependent_response_ind <- "timeRemaining_ind"
 y_label_ind <- "Time Remaining"
 x_label_ind <- "Target"
@@ -693,6 +696,7 @@ anova(model.null,
   kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
   kable_styling()
 
+```
 
 
 
@@ -717,18 +721,14 @@ anova(model.NoInteraction,
 ```
 ```{r}
 # Effect size (R^2)
-ES_model.NoInteraction.NoTarget <- r.squaredGLMM(model.NoInteraction.NoTarget)
 
-ES_model.NoInteraction.NoTarget %>%
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
   kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
    kable_styling(full_width = F)
 
-ES_model.NoInteraction <- r.squaredGLMM(model.NoInteraction)
-
-ES_model.NoInteraction %>%
+r.squaredGLMM(model.NoInteraction) %>%
   kable(caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
-
 ```
 
 The following models were significantly different from the null model: model.NoInteraction.NoTarget, model.NoInteraction. 
@@ -822,7 +822,17 @@ anova(model.NoInteraction.NoTarget,
 ```
 
 The Target effect sees to be somewhat important when considered with session order (i.e., model.NoInteraction). Though it is not significant when considered by itself. 
+```{r}
+# Effect size (R^2)
 
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.All) %>%
+  kable(caption = "Table: Effect size for *All*") %>%
+   kable_styling(full_width = F)
+```
 
 #### Summary / Reflection
 
