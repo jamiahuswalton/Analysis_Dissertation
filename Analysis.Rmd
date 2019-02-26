@@ -418,6 +418,14 @@ ggplot(data = plot_data_team,
   xlim("4", "3", "2") +
   labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") +
   ggsave(filename = plot_name)
+
+sumDataCount <- plot_data_team %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[dependent_response_team]]))
+
+sumDataCount %>%
+  kable() %>%
+  kable_styling()
 ```
 
 Visually, the first thing that jumps out to me that there seem to be a few outliers that may be influencing the results. Let's call a group "fast" if that group has more than `r value_threshold` seconds left at the end of the session. The teams that are labeled had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining at the end of the session.  The groups that are labeled in all the conditions (Target levels) are team 26, 45, 13. Some of these teams data may be outliers. 
