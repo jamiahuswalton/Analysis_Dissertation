@@ -8,6 +8,8 @@ output:
   word_document: 
 csl: apa.csl
 Date: '2019-02-01'
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
