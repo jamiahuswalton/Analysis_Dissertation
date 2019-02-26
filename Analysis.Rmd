@@ -506,6 +506,22 @@ title_response_ind <- "Time Remaining (Individual) Vs. Target"
 plot_name <- "Bar_TimeRemaining_ByTarget_BySessionOrder_Ind.png"
 setwd(figure_directory)
 
+sumDataCount <- plot_data_ind %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[dependent_response_ind]]))
+
+sumDataCount %>%
+  kable() %>%
+  kable_styling()
+
+sumCountFastParticipants <- plot_data_ind %>%
+  filter(above_value_threshold) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N_fast = length(.data[[dependent_response_ind]])) 
+
+sumCountFastParticipants %>%
+  kable() %>%
+  kable_styling()
 plot_data_ind <- ind_data %>%
   select(Target, SessionOrder, dependent_response_ind) %>%
   group_by(SessionOrder, Target) %>%
