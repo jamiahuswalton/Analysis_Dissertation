@@ -672,16 +672,50 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
 
-comparision_results <- anova(model.null, 
-                             model.All, 
-                             model.NoInteraction,
-                             model.NoInteraction.NoTarget,
-                             model.NoInteraction.NoSession)
-
-comparision_results %>%
-  kable() %>%
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: Null and All") %>%
   kable_styling()
 
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: Null and No.Interaction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Target") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
+  kable_styling()
+
+
+
+
+
+
+
+```{r}
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: All and No.Interaction") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+```{r}
 # Effect size (R^2)
 ES_model.NoInteraction.NoTarget <- r.squaredGLMM(model.NoInteraction.NoTarget)
 
@@ -727,27 +761,27 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent 
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
 model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
 
-comparision_results <- anova(model.null, 
-                             model.All, 
-                             model.NoInteraction, 
-                             model.NoInteraction.NoTarget,
-                             model.NoInteraction.NoSession)
-
-comparision_results %>%
-  kable() %>%
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: Null and All") %>%
   kable_styling()
 
-# Effect size (R^2)
-ES_model.NoInteraction.NoTarget <-r.squaredGLMM(model.NoInteraction.NoTarget)
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: Null and No.Interaction") %>%
+  kable_styling()
 
-ES_model.NoInteraction.NoTarget %>%
-  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
-   kable_styling(full_width = F)
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Target") %>%
+  kable_styling()
 
-ES_model.NoInteraction <- r.squaredGLMM(model.NoInteraction)
-ES_model.NoInteraction %>%
-  kable(caption = "Table: Effect size for *No Interaction*") %>%
-   kable_styling(full_width = F)
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
+  kable_styling()
+
 ```
 
 The following models were significantly different from the null model: model.NoInteraction.NoTarget, model.NoInteraction.
@@ -755,8 +789,37 @@ The following models were significantly different from the null model: model.NoI
 model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
 
 model.NoInteraction: Session order and target are the fixed effects in this model.
+```{r}
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: All and No.Interaction") %>%
+  kable_styling()
 
-*Reflection:* In both of the models that are significantly different from the null model do not include the interaction effect.
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: All and NoInteraction.NoSession") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoSession") %>%
+  kable_styling()
+
+anova(model.NoInteraction.NoTarget,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: NoInteraction.NoTarget and NoInteraction.NoSession") %>%
+  kable_styling()
+```
 
 The Target effect sees to be somewhat important when considered with session order (i.e., model.NoInteraction). Though it is not significant when considered by itself. 
 
