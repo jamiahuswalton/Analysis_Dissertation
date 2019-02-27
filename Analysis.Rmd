@@ -1379,27 +1379,9 @@ response_variable <- "sqrt.value"
 data_focus_ind <- data_modified_ind
 
 # Generate models with variable response
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
-# Histogram of Residuals - model.NoInteraction
-ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
-  geom_histogram(bins = 30) + 
-  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-# Fitted values - model.NoInteraction
-ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
-  geom_point() + 
-  geom_hline(yintercept = 0)+
-  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) 
-
-# QQ plots - model.NoInteraction
-ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
-  stat_qq() +
-  stat_qq_line()+
-  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5))  
+summary(model.NoInteraction)
 ```
 
 The results showed a significant effect from session 3 and 4 when compared to session 2. This significant effect is expected. The results showed no significant impact from Target levels when compared to the Ind level. However, it is important to note that the effect from the Team Target level is approaching significance (p = .0779). This suggests that more data is needed to reach significance. 
@@ -1440,105 +1422,113 @@ data_focus_ind <- data_modified_ind
 # Generate models with variable response
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
-summary(model.NoInteraction)
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
 ```
 
 There is a significant difference between each of the sessions. This result means that the time remaining at the end of the session was increasing over time. This increase in time remaining suggests that the teams were moving through the session faster the more times they completed the task (Note: This is when the data is transformed using the 1/2 power).
 
 ##### Summary / Reflection
-         SessionOrder, 
-         Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
 
-response_variable <- "sqrt.value"
-data_focus_ind <- data_modified_ind
+There was a significant difference between the Ind_Team and Team level feedback condition in __model.NoInteraction__. The significant difference indicates that the amount of time remaining at the end of the session in the Team feedback condition is higher than the amount of time remaining in the Ind_Team condition. 
 
-# Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+According to the data, giving groups feedback that contains team performance metrics will encourage them to move through the task faster. The amount of time remaining at the end of the session does not tell me if the groups in the Team condition are accurate (i.e., able to collected correct items quicker) as they are completing the task. A plausible conclusion could be that the groups in the Team condition are merely moving through the session quicker than those in the Ind_Team condition. 
 
-emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
-```
-The results show a *significant difference* between the Ind_Team and Team level of feedback. The difference indicates that the amount of time remaining in the Team feedback condition results in higher time remaining (transformed using 1/2 power). 
+My next step is to explore how well the groups collected items. I want to determine if the groups needed less time to collect correct items in the different conditions (particularly the team condition).
 
-```{r}
-# Data to model
-data_modified_ind <- ind_data %>%
-  select(timeRemaining_ind,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+### Q: Is there exciting variation among the *Collection_rate_correct_item* that will help me understand the influence of the feedback condition?
 
-response_variable <- "sqrt.value"
-data_focus_ind <- data_modified_ind
+I want to examine the distribution of collection rates. 
 
-# Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+$$ Collection Rate for Correct Items (Team) = \frac{duration_{Team}}{total.correct.items.collected_{Team}}$$
 
-emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
-```
+Where $duration_{Team}$ is the amount of time the group spent completing the task and $total.correct.items.collected_{Team}$ is the total number correct items (individual or team items) collected by the group. 
 
-There is a significant different between each of the sessions. This means that the square root of the time remaining at the end of the session was increasing over time. This means that the teams were moving through the session faster the more they completed the task (Note: This is when the data is transformed using the 1/2 power).
+$$ Collection Rate for Correct Items (Individual) = \frac{duration_{Individual}}{total.correct.items.collected_{Individual}}$$
 
+Where $duration_{Individual}$ is the amount of time the indvidiaul spent completing the task and $total.correct.items.collected_{Individual}$ is the total number correct items (individual or team items) collected by the individual. 
+
+I divided the duration by the number of items to collect because dividing the total correct items collected by the duration has hard to interpret. 
 
 Note: It is important to remember that a high performing team would have a lower collection rate.
 
 #### Team
 
 ```{r}
-# Data to model
-data_modified_ind <- ind_data %>%
-  select(timeRemaining_ind,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+dependent_response_team <- "Collection_rate_correct_item_team"
+y_label_team <- "Count"
+x_label_team <- "Correct Item Collection Rate"
+title_response_team <- "Distribution of Correct Item Collectione Rate (Team)"
 
-response_variable <- "sqrt.value"
-data_focus_ind <- data_modified_ind
+plot_data_team <- team_data %>%
+  select(dependent_response_team)
 
-# Generate models with variable response
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
-
-summary(model.NoInteraction.NoTarget)
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team)
 ```
 
 The distribution tells me that most groups had a correct item collection rate of about 20 sec per correct item. In other words, group generally needed about 20 secs to collect a correct items. 
 
 ```{r}
-# Data to model
-data_modified_ind <- ind_data %>%
-  select(timeRemaining_ind,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+dependent_response_team <- "Collection_rate_correct_item_team"
+y_label_team <- "Count"
+x_label_team <- "Correct Item Collection Rate"
+title_response_team <- "Distribution of Correct Item Collectione Rate (Team)"
 
-response_variable <- "sqrt.value"
-data_focus_ind <- data_modified_ind
+plot_data_team <- team_data %>%
+  select(dependent_response_team, Target)
 
-# Generate models with variable response
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
+  facet_grid(. ~ Target) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team)
 
-emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(Target) %>%
+  summarise(N = length(.data[[dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
-There is a significant difference between each of the sessions. This means that the amount of time (square root) remaining increased over time. 
+The plot tells me that the distribution in the feedback conditions is similar to the distribution overall. However, it does look like the correct item collection rate is slightly higher in the Team condition when compared to the Ind condition. The slight increase in the center (i.e., average) tells me that the groups needed more time to collect the correct items in the Team condition.
 
-##### Summary / Reflection
+#### Individual
 
-There was a significant difference between the Ind_Team and Team level feedback condition in the *model.NoInteraction*. The significant difference indicates that the amount of time remaining at the end of the session in the Team feedback condition is higher than the amount of time remaining in the Ind_Team condition. 
+```{r}
+dependent_response_ind <- "Collection_rate_correct_item_ind"
+y_label_ind <- "Count"
+x_label_ind <- "Correct Item Collection Rate"
+title_response_ind <- "Distribution of Correct Item Collectione Rate (Individual)"
 
-According to the data, groups should be given feedback that has team content if the goal is to encourage the team to move through the task faster. This does not tell me if the groups in the team condition are accurate as fast or if the groups are simply moving through the session quicker in the Team condition. 
+plot_data_ind <- ind_data %>%
+  select(dependent_response_ind)
 
-The next step is to explore how groups collected items. In other words, I want to determine if the teams were collecting correct items quicker. 
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = dependent_response_ind), bins = 30) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
+```
 
+The distribution plot tells me that the collection rate for most individuals is around 50 second per correct item collected. This collection rate is higher than the collection rate of the team as a whole. This higher collection rate tells me that individuals needed more time to collect correct items. The collection rate at the individual level is higher than the team level makes sense because at the team level there are more people collecting items.
 
+```{r}
+dependent_response_ind <- "Collection_rate_correct_item_ind"
+y_label_ind <- "Count"
+x_label_ind <- "Correct Item Collection Rate"
+title_response_ind <- "Distribution of Correct Item Collectione Rate (Individual)"
 
+plot_data_ind <- ind_data %>%
+  select(Target, dependent_response_ind)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = dependent_response_ind), bins = 30) +
+  facet_grid(. ~ Target) + 
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
+```
+
+The distrabution plot is similar to the the overall distrabution plot. However, the majority of participants in the Team condition seem to need around 50 seconds to collect a correct item while participants in the Ind condition needed 60 or 70 seconds. 
 
 
 # References
