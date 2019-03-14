@@ -1,5 +1,5 @@
 # Tidy data ----
-
+#Test Change CKE 3/14
 # clean_aggregate_data_stats <- my_aggregate_data
 clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
 
