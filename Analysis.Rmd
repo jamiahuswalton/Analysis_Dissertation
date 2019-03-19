@@ -740,9 +740,9 @@ anova(model.NoInteraction,
   kable_styling()
 ```
 
-The results show that the model with the interaction (i.e., Model.All) was not significantly better at describing the data than the other two models (i.e.,model.NoInteraction.NoTarget and model.NoInteraction). According to this result, we can confidently remove the interaction effect from the model.
+The results show that the model with the interaction (i.e., Model.All) was not significantly better at describing the data than the other two models (i.e.,model.NoInteraction.NoTarget and model.NoInteraction). According to this result, we can remove the interaction effect of the model. It is important to note that some models, compared to model.All, have a small difference in AIC values. However, there is a noticeable difference in BIC values. 
 
-The results also show that the model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. This lack of significance suggests that the model.NoInteraction.NoTarget describes the data best. I notice there is a small difference in the AIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","AIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","AIC"]`) and the BIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","BIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","BIC"]`) criteria values. I am not comfitent 
+The results also show that the model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. This lack of significance suggests that the model.NoInteraction.NoTarget describes the data best. I notice there is a small difference in the AIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","AIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","AIC"]`) and the BIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","BIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","BIC"]`) criteria values. Due to the small AIC and BIC difference between the two models, I cannot confidently say one model is clearly better than the other model.
 
 I want to calculate the effect size of both models to see if there is a noticeable difference between the effect sizes.
 
@@ -768,7 +768,7 @@ r.squaredGLMM(model.NoInteraction) %>%
    kable_styling(full_width = F)
 ```
 
-There is little difference between the effect sizes for both models. The results show that model.NoInteraction has a slightly better effect size. However, the difference is not noticeably different. 
+There is little difference between the effect sizes for both models. The results show that model.NoInteraction has a slightly better effect size, but the difference is not noticeably different. 
 
 
 *Reflection:* The models that are significantly different from the null model are model.All, model.NoInteraction, model.NoInteraction.NoTarget. Comparing these three models showed that the model.All was not significantly better than model.NoInteraction or model.NoInteraction.NoTarget. Comparing model.NoInteraction and model.NoInteraction.NoTarget showed no significant difference between the models (i.e., model.NoInteraction did not explain the data better than model.NoInteraction.NoTarget), suggesting that adding the Target variable did not significantly improve the model. However, I noted that the AIC and BIC values were similar. The effect size for both models was examined to determine if one model had a noticeably higher effect size than the other model. There was no noticeable difference in effect size, but the results indicated that model.NoInteraction had a slightly higher effect size. Model.NoInteraction is the model that I am interested in but I cannot I cannot confidently ignore the model of least interest (i.e., model.NoInteraction.NoTarget). Therefore, I will include model.NoInteraction.NoTarget in further analysis.
@@ -899,7 +899,7 @@ The models may violate some of the assumptions. According to @Field2017, the bes
 
 #### Team
 
-We learned that __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describe the team level data at the team level (see previous analysis)
+We learned that __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describe the team level data at the team level (see previous analysis). The model __model.NoInteraction__ is the model of interest but I cannot ignore __model.NoInteraction.NoTarget__.
 
 ```{r}
 # Data to fit
