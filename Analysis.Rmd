@@ -714,19 +714,29 @@ model.NoInteraction.NoTarget: Session order is the only fixed effect in this mod
 
 
 ```{r}
+# Generate models with variable response
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust =FALSE)
+model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
+
+# Compare all of the models
 anova(model.All,
       model.NoInteraction) %>%
-  kable(caption = "ANOVA: All and No.Interaction") %>%
+  kable(caption = "ANOVA: model.All and model.NoInteraction") %>%
   kable_styling()
 
 anova(model.All,
       model.NoInteraction.NoTarget) %>%
-  kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
+  kable(caption = "ANOVA: model.All and model.NoInteraction.NoTarget") %>%
   kable_styling()
 
 anova(model.NoInteraction,
       model.NoInteraction.NoTarget) %>%
-  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
+  kable(caption = "ANOVA: model.NoInteraction and model.NoInteraction.NoTarget") %>%
   kable_styling()
 ```
 
@@ -738,6 +748,15 @@ I want to calculate the effect size of both models to see if there is a noticeab
 
 
 ```{r}
+# Generate models with variable response
+response_variable <- "timeRemaining_team"
+data_focus_team <- data_modified_team
+model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust =FALSE)
+model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
+
 # Effect size (R^2)
 
 r.squaredGLMM(model.NoInteraction.NoTarget) %>%
@@ -778,22 +797,22 @@ model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, 
 # There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
 anova(model.null,
       model.All) %>%
-  kable(caption = "ANOVA: Null and All") %>%
+  kable(caption = "ANOVA: model.null and model.All") %>%
   kable_styling()
 
 anova(model.null,
       model.NoInteraction) %>%
-  kable(caption = "ANOVA: Null and No.Interaction") %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction") %>%
   kable_styling()
 
 anova(model.null,
       model.NoInteraction.NoTarget) %>%
-  kable(caption = "ANOVA: Null and No.Interaction.No.Target") %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoTarget") %>%
   kable_styling()
 
 anova(model.null,
       model.NoInteraction.NoSession) %>%
-  kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoSession") %>%
   kable_styling()
 
 ```
