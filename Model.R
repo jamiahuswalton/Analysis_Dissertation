@@ -86,7 +86,8 @@ data_modified_ind_GT <- ind_data %>%
          Target, 
          SessionOrder, 
          Team, 
-         Player_ID)
+         Player_ID,
+         Dominate.Strategy)
 
 data_modified_ind_GA <- ind_data %>%
   filter(Dominate.Strategy == "Go Alone") %>%
@@ -167,8 +168,8 @@ emmeans(selected.model.ind, list(pairwise ~ SessionOrder), adjust = "tukey")
 
 
 # Test
-test_Data <- data_focus_team %>%
-  mutate(sqrt.val = sqrt(.data[["timeRemaining_team"]]))
+test_Data <- data_modified_ind_GT %>%
+  mutate(sqrt.val = sqrt(.data[["Collection_rate_correct_item_ind"]]))
 response_variable <- "sqrt.val"
 
 model.null <- model_data_Target_Session(df = test_Data, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust = FALSE)
@@ -183,9 +184,11 @@ comparision.results <- anova(model.null,
                              model.NoInteraction.NoSession)
 comparision.results
 
-r.squaredGLMM(model)
+r.squaredGLMM(model.NoInteraction)
 
-summary(model)
+summary(model.NoInteraction)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
 
 summary(a.mes(m.1.adj = 58.0, m.2.adj = 66.6, sd.adj = 6.91, R = 1, n.1 =  117, n.2 = 117, q = 2))
 
