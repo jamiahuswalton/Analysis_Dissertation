@@ -1067,6 +1067,9 @@ data_modified_team <- team_data %>%
 response_variable <- "sqrt.value"
 data_focus_team <- data_modified_team
 
+#Plot location
+setwd(figure_directory)
+
 # Generate non-robust models - NoInteraction
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 
@@ -1074,21 +1077,24 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent
 ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("Histogram_Residuals_TimeRemaining_sqrt_NoInteraction_Team.png")
 
 # Fitted values - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("FitteValue_Residuals_TimeRemaining_sqrt_NoInteraction_Team.png")
 
 # QQ plots - model.NoInteraction
 ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5))
+   theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave("QQ_Residuals_TimeRemaining_sqrt_NoInteraction_Team.png")
 ```
 
 The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction.
@@ -1108,26 +1114,31 @@ data_focus_team <- data_modified_team
 
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 
+# Plot location 
+setwd(figure_directory)
+
 # Histogram of Residuals - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5))
-
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("Histogram_Residuals_TimeRemaining_sqrt_NoInteraction.NoTarget_Team.png")
 
 # Fitted values - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("FittedValue_Residuals_TimeRemaining_sqrt_NoInteraction.NoTarget_Team.png")
 
 # QQ plots - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) 
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("QQ_Residuals_TimeRemaining_sqrt_NoInteraction.NoTarget_Team.png")
 ```
 
 The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction.NoTarget.
@@ -1265,6 +1276,9 @@ data_modified_ind <- ind_data %>%
          Team, 
          Player_ID)
 
+# Plot location
+setwd(figure_directory)
+
 # Generate models with variable response
 response_variable <- "timeRemaining_ind"
 data_focus_ind <- data_modified_ind
@@ -1274,21 +1288,24 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent 
 ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("Histogram_Residuals_TimeRemaining_NoInteraction_Ind.png")
 
 # Fitted values - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("FittedValue_Residuals_TimeRemaining_NoInteraction_Ind.png")
 
 # QQ plots - model.NoInteraction
 ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) 
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("QQ_Residuals_TimeRemaining_NoInteraction_Ind.png")
 ```
 
 model.NoInteraction: Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
@@ -1337,7 +1354,10 @@ data_modified_ind <- ind_data %>%
          SessionOrder, 
          Team, 
          Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+  mutate(sqrt.value = sqrt(ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Plot location
+setwd(figure_directory)
 
 response_variable <- "sqrt.value"
 data_focus_ind <- data_modified_ind
@@ -1349,21 +1369,24 @@ model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent 
 ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave("Histogram_Residuals_TimeRemaining_sqrt_NoInteraction_Ind.png")
 
 # Fitted values - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("FittedValue_Residuals_TimeRemaining_sqrt_NoInteraction_Ind.png")
 
 # QQ plots - model.NoInteraction
 ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave("QQ_Residuals_TimeRemaining_sqrt_NoInteraction_Ind.png")
 ```
 
 There still appears to be a normality violation in the QQ plot. So, I need to compare the robust and non-robust models to make sure I do not need to worry about this violation.
