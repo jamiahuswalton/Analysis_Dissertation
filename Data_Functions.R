@@ -22,7 +22,7 @@ clean_inventory_data_by_removing_game_enteries <- function(inventory_data, colum
   return(inventory_data[-inventory_entries_to_remove,])
 }
 
-# Function to count the total number of errors commited by a team (regarless of if this rule was broken before) ----
+# Count the total number of errors commited by a team (regarless of if this rule was broken before) ----
 total_number_of_errors_team <- function(data_errors, teamNum, condition){
   team_errors_data <- data_errors %>% 
     filter(teamnumber == teamNum & expcondition == condition)
@@ -48,7 +48,7 @@ error_rate_team <- function(data_position, data_errors, teamNum, condition){
   }
 }
 
-# Function to count the total number of errors commited by a player (regarless of if this rule was broken before) ----
+# Count the total number of errors commited by a player (regarless of if this rule was broken before) ----
 total_number_of_errors_individual <- function(data_errors, teamNum, player, condition){
   ind_errors_data <- data_errors %>% 
     filter(teamnumber == teamNum & playernum == player & expcondition == condition)
@@ -75,7 +75,7 @@ error_rate_ind <- function(data_position, data_errors, teamNum, playerNum, condi
   }
 }
 
-# Function to factor the columns ----
+# Factor the columns ----
 re_factor_columns <- function(userData, columnNames){
   factorData <- userData
   for(column in columnNames){
@@ -90,7 +90,7 @@ list_of_team_numbers <- function(data, team_number_col_name){
   return(as.numeric(levels(factor(as.vector(data[,team_number_col_name])))))
 }
 
-# Function to count the number of times a game strategy was used ----
+# Count the number of times a game strategy was used ----
 strategy_count_vector<- function(position_data, experimentalcondition, teamnumber_current, playernumber_one, playernumber_two, playernumber_three, strategy_barrier_distance){
   
   #Need to get the position Data for all players (3 players)
@@ -161,7 +161,7 @@ strategy_count_vector<- function(position_data, experimentalcondition, teamnumbe
   return(c(count_go_together, count_go_alone, count_mix))
 }
 
-# Function that counts the number of utterences for a player in a given condition ----
+# Counts the number of utterences for a player in a given condition ----
 utterance_count_for_a_player<- function(positionData, condition, team_number, player_num){
   #Get players table data
   is_player_1 <- as.vector(positionData$expcondition == condition & positionData$teamnumber == team_number & 
@@ -243,7 +243,7 @@ utterance_count_for_a_player<- function(positionData, condition, team_number, pl
   
 }
 
-# Function to generate the IDs for a player on a given team (Assuming there are 3 members per team)----
+# Generate the IDs for a player on a given team (Assuming there are 3 members per team)----
 generate_player_id <- function(playernum, teamnum){
   
   # This function assumes that player IDs are assigned in sequential order.
@@ -307,7 +307,7 @@ post_session_survey_value<- function(data_post_session, team, player, condition,
   return(player_data[[survey_value]])
 }
 
-# Function to find session order ----
+# Find session order ----
 session_order_number <- function(teamNum, counter_balance_set_dataframe, condition){
   set_index <- teamNum %% length(counter_balance_set_dataframe) #If this equal 0 then that means this team used the last set
   
@@ -366,7 +366,7 @@ total_items_collected_in_session_by_individual <- function(inventory_data, team_
   return(length(inventory_data_filtered[,1]))
 }
 
-# Function to calculate the Collection Rate (i.e., duration / total items collected): Sec / Error.
+# Function to calculate the Collection Rate (i.e., duration / total items collected): Sec / Error. ----
 # Duration is retruned if error count is 0.
 collection_rate_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
@@ -388,14 +388,14 @@ collection_rate_ind <- function(data_position, data_inventory, teamnum, playernu
   }
 }
 
-# Total correct items (team and individual items) collected by a player in a given session
+# Total correct items (team and individual items) collected by a player in a given session ----
 total_correct_items_collected_in_session_by_individual <- function(inventory_data, team_num, player_num, condition_name){
   inventory_data_filtered <- inventory_data %>%
     filter(playernum == player_num & teamnumber == team_num & expcondition == condition_name & itemid != -1 & boughtcorrectly == 1)
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error.
+# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error.----
 # Duration is retruned if error count is 0.
 collection_rate_correct_items_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
@@ -417,7 +417,7 @@ collection_rate_correct_items_ind <- function(data_position, data_inventory, tea
   }
 }
 
-# Total items (correct and incorrect)(team and individual) collected by a team in a given session
+# Total items (correct and incorrect)(team and individual) collected by a team in a given session ----
 total_items_collected_in_session_by_team <- function(data_inventory, team_num, condition_name){
   inventory_data_filtered <- data_inventory %>%
     filter(teamnumber == team_num & expcondition == condition_name & itemid != -1)
@@ -425,7 +425,7 @@ total_items_collected_in_session_by_team <- function(data_inventory, team_num, c
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Function to calculate the Collection Rate (i.e., duration / total items collected): Sec / Error.
+# Function to calculate the Collection Rate (i.e., duration / total items collected): Sec / Error. ----
 # Duration is retruned if error count is 0.
 collection_rate_team <-  function(data_position, data_inventory, teamnum, condition){
   # This is the item collection rate for a team
@@ -447,7 +447,7 @@ collection_rate_team <-  function(data_position, data_inventory, teamnum, condit
   }
 }
 
-# Total correct items (team and individual items) collected by a team in a given session
+# Total correct items (team and individual items) collected by a team in a given session ----
 total_correct_items_collected_in_session_by_team <- function(data_inventory, team_num, condition_name){
   inventory_data_filtered <- data_inventory %>%
     filter(teamnumber == team_num & expcondition == condition_name & itemid != -1 & boughtcorrectly == 1)
@@ -455,7 +455,7 @@ total_correct_items_collected_in_session_by_team <- function(data_inventory, tea
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error.
+# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error. ----
 # Duration is retruned if error count is 0.
 collection_rate_correct_items_team <- function(data_position, data_inventory, teamnum, condition){
   # This is the item collection rate for a team
@@ -528,7 +528,7 @@ is_TLX_survey_correct <- function(data_tlx, rand_num_list){
   return(is_valid)
 }
 
-# Function to Check to make sure each rand number in the post survey responses are the same for each player in each team ( for all of the conditions) ----
+# Check to make sure each rand number in the post survey responses are the same for each player in each team ( for all of the conditions) ----
 is_post_session_data_correct <- function(post_session_data, team_number_column_name, player_num_col_name, rand_num_col_name){
   is_correct <- T
   team_list <- as.integer(levels(factor(post_session_data[,team_number_column_name]))) # The teams that are in the data set
