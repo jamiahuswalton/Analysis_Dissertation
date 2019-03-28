@@ -469,3 +469,108 @@ plot_data_ind %>%
   summarise(N_fast = length(.data[[dependent_response_ind]])) 
 
 view(plot_data_ind)
+
+## Carter Engen looking at collection_rate comparisons
+dependent_response_ind <- "Collection_rate_ind"
+y_label_ind <- "Collection Rate"
+x_label_ind <- "Target"
+title_response_ind <- "Rate Vs. Target"
+
+# What is the distrabution of the data ----
+plot_data_ind <- ind_data %>%
+  select(dependent_response_ind, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = dependent_response_ind), bins = 10) +
+  facet_grid(. ~ Target)
+
+# What does the raw data look like? ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Player_ID) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_ind]]))
+
+ggplot(data = plot_data_ind, aes_string(x = "Target", y = dependent_response_ind, fill = "Player_ID", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+
+# By Streategy ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Player_ID, Dominate.Strategy) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_ind]]))
+
+ggplot(data = plot_data_ind, aes_string(x = "Target", y = dependent_response_ind, fill = "Player_ID", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  facet_grid(. ~ Dominate.Strategy) + 
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+
+plot_data_ind <- ind_data %>%
+  select(Target, Dominate.Strategy, dependent_response_ind) %>%
+  group_by(Dominate.Strategy, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strategy, shape=Dominate.Strategy)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Dominate.Strategy, color = Dominate.Strategy)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  facet_grid(. ~ Dominate.Strategy)
+
+
+# Is there an interaction between the session order and the Target levels? ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+
+# By strategy ----
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind, Dominate.Strategy) %>%
+  group_by(SessionOrder, Target, Dominate.Strategy) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  facet_grid(. ~ Dominate.Strategy)
+
+plot_data_ind <- ind_data %>%
+  select(Target, dependent_response_ind, Dominate.Strategy) %>%
+  group_by(Target, Dominate.Strategy) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strategy, shape=Dominate.Strategy)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Dominate.Strategy, color = Dominate.Strategy)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  facet_grid(. ~ Dominate.Strategy)
