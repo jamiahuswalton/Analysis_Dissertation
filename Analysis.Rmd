@@ -1513,12 +1513,16 @@ y_label_team <- "Count"
 x_label_team <- "Correct Item Collection Rate"
 title_response_team <- "Distribution of Correct Item Collectione Rate (Team)"
 
+# Plot location
+setwd(figure_directory)
+
 plot_data_team <- team_data %>%
   select(dependent_response_team)
 
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
-  labs(title = title_response_team, x = x_label_team, y = y_label_team)
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave("Histogram_CollectionRateCorrect_Team.png")
 ```
 
 The distribution tells me that most groups had a correct item collection rate of about 20 sec per correct item. In other words, group generally needed about 20 secs to collect a correct items. 
@@ -1529,13 +1533,17 @@ y_label_team <- "Count"
 x_label_team <- "Correct Item Collection Rate"
 title_response_team <- "Distribution of Correct Item Collectione Rate (Team)"
 
+# Plot Location
+setwd(figure_directory)
+
 plot_data_team <- team_data %>%
   select(dependent_response_team, Target)
 
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
   facet_grid(. ~ Target) +
-  labs(title = title_response_team, x = x_label_team, y = y_label_team)
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) + 
+  ggsave("Histogram_CollectionRateCorrect_ByTarget_Team.png")
 
 # Information about the N values in each condition
 tableData <- team_data %>%
@@ -1557,12 +1565,16 @@ y_label_ind <- "Count"
 x_label_ind <- "Correct Item Collection Rate"
 title_response_ind <- "Distribution of Correct Item Collectione Rate (Individual)"
 
+# Plot Location
+setwd(figure_directory)
+
 plot_data_ind <- ind_data %>%
   select(dependent_response_ind)
 
 ggplot(data = plot_data_ind) + 
   geom_histogram(aes_string(x = dependent_response_ind), bins = 30) +
-  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave("Histogram_CollectionRateCorrect_Ind.png")
 ```
 
 The distribution plot tells me that the collection rate for most individuals is around 50 second per correct item collected. This collection rate is higher than the collection rate of the team as a whole. This higher collection rate tells me that individuals needed more time to collect correct items. The collection rate at the individual level is higher than the team level makes sense because at the team level there are more people collecting items.
@@ -1573,13 +1585,17 @@ y_label_ind <- "Count"
 x_label_ind <- "Correct Item Collection Rate"
 title_response_ind <- "Distribution of Correct Item Collectione Rate (Individual)"
 
+# Plot Location
+setwd(figure_directory)
+
 plot_data_ind <- ind_data %>%
   select(Target, dependent_response_ind)
 
 ggplot(data = plot_data_ind) + 
   geom_histogram(aes_string(x = dependent_response_ind), bins = 30) +
   facet_grid(. ~ Target) + 
-  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind)
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave("Histogram_CollectionRateCorrect_ByTarget_Ind.png")
 
 # Information about the N values in each condition
 tableData <- ind_data %>%
@@ -1592,6 +1608,19 @@ tableData %>%
 ```
 
 The distrabution plot is similar to the the overall distrabution plot. However, the majority of participants in the Team condition seem to need around 50 seconds to collect a correct item while participants in the Ind condition needed 60 or 70 seconds.
+
+#### Summary / Reflection
+
+At the team level, most teams needed about 20 seconds on average to collect a correct team item. The center of the distrabutions when seperated by Target are roughly similar. The centers were also hovering around 20 for each distribution.
+
+At the individual level, most participants needed about 50 seconds to collect a correct item. When I group the data by Target levels, the distribution is similar to the overall distrubution. 
+
+How does the session order influence the collection rate distibution?
+
+The next step is to see how the distrabutions look when the data is group by Target and Session Order. 
+
+### Q: Is there exciting variation among the *Collection_rate_correct_item* that explains how the feedback conditions influence the time remaining when session order is taken into consideration?
+
 
 ```{r}
 
