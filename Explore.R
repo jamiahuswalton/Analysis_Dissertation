@@ -470,9 +470,9 @@ plot_data_ind %>%
 
 view(plot_data_ind)
 
-##CKE looking at collection_rate comparisons
-dependent_response_ind <- "Collection_rate_correct_item_ind"
-y_label_ind <- "Correct Item Collection Rate"
+## CKE looking at collection_rate comparisons
+dependent_response_ind <- "Collection_rate_ind"
+y_label_ind <- "Collection Rate"
 x_label_ind <- "Target"
 title_response_ind <- "Rate Vs. Target"
 
