@@ -1,0 +1,24 @@
+The data show a slightly normal distribution throughout, which most distributions centered around a rate of 55-65.
+Ind_Team and Ind show more similar distributions, whereas Team shows a slightly more flattened distribution.
+
+Collection Rate v. Target by Strategy Plot:
+It is interesting that the Go Alone strategy seems to give a lower collection rate than Go Together, in general. The exception
+to this is the similarity between Ind/Alone and Team/Together strategies, which seem to have the lowest collection rates of
+all strategies (and are nearly identical in rate).
+
+Collection Rate v. SessionOrder by Target:
+This graph is interesting because of the large decrease in colletion rate in Ind_Team targets between session orders 3 and 4.
+The other two (Ind & Team) Targets also show decreases in rates b/t sessions 3 & 4, but not as drastic as Ind_Team does.
+Additionally, Ind_Team decreases in Collection Rate an almost identical rate as the other two Targets b/t sessions 2 & 3; however,
+the other two Targets start out with lower collection rates to begin with, with all of them ending near 45-50.
+(I believe the x-axis on this graph is meant to read "SessionOrder.")
+
+Collection Rate v. Target by Strategy & Session Order Plot:
+This plot matches most plot trends that I've seen so far in this code; however one thing that stands out is the increase
+in collection rate from Ind to Team at the 4th Session Order when looking at the Go Alone strategy.  Most other plots have shown
+a general decrease in collection rate between Ind & Team target levels, whereas this one shows an increase in rate. I would
+be interested in exploring this further to see what is creating that rise in rate b/t the two target levels. (Especially since 
+this rise was not shown well in the plot that had onlly Rate v. Target level grouped by strategy)
+
+In general, the Individual condition seems to show a lower (better) collection rate, with Ind_Team usually landing in the middle and 
+the Ind Condition showing the highest (worst) collection rates.
