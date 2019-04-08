@@ -483,6 +483,8 @@ plot_data_ind <- ind_data %>%
 ggplot(data = plot_data_ind) + 
   geom_histogram(aes_string(x = dependent_response_ind), bins = 10) +
   facet_grid(. ~ Target)
+# The data show a slightly normal distribution throughout, which most distributions centered around a rate of 55-65.
+# Ind_Team and Ind show more similar distributions, whereas Team shows a slightly more flattened distribution.
 
 # What does the raw data look like? ----
 plot_data_ind <- ind_data %>%
@@ -522,6 +524,9 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strat
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
   facet_grid(. ~ Dominate.Strategy)
 
+# It is interesting that the Go Alone strategy seems to give a lower collection rate than Go Together, in general. 
+# The exception to this is the similarity between Ind/Alone and Team/Together strategies, which seem to have the lowest collection rates of
+# all strategies (and are nearly identical in rate).
 
 # Is there an interaction between the session order and the Target levels? ----
 plot_data_ind <- ind_data %>%
@@ -543,6 +548,10 @@ ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, 
   geom_line(aes(group=Target, color = Target)) + 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players")
+# This graph is interesting because of the large decrease in colletion rate in Ind_Team targets between session orders 3 and 4.
+# The other two (Ind & Team) Targets also show decreases in rates b/t sessions 3 & 4, but not as drastic as Ind_Team does.
+# Additionally, Ind_Team decreases in Collection Rate an almost identical rate as the other two Targets b/t sessions 2 & 3; however,
+# the other two Targets start out with lower collection rates to begin with, with all of them ending near 45-50.
 
 # By strategy ----
 plot_data_ind <- ind_data %>%
@@ -559,6 +568,11 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
   facet_grid(. ~ Dominate.Strategy)
+# This plot matches most plot trends that I've seen so far in this code; however one thing that stands out is the increase
+# in collection rate from Ind to Team at the 4th Session Order when looking at the Go Alone strategy.  Most other plots have shown
+# a general decrease in collection rate between Ind & Team target levels, whereas this one shows an increase in rate. I would
+# be interested in exploring this further to see what is creating that rise in rate b/t the two target levels. (Especially since 
+# this rise was not shown well in the plot that had onlly Rate v. Target level grouped by strategy)
 
 plot_data_ind <- ind_data %>%
   select(Target, dependent_response_ind, Dominate.Strategy) %>%
@@ -574,3 +588,5 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strat
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
   facet_grid(. ~ Dominate.Strategy)
+
+# In general, the Individual condition seems to show a lower (better) collection rate, with Ind_Team usually landing in the middle and the Ind Condition showing the highest (worst) collection rates.
