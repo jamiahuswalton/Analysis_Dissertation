@@ -470,7 +470,7 @@ plot_data_ind %>%
 
 view(plot_data_ind)
 
-## Carter Engen looking at collection_rate comparisons
+## Carter Engen looking at individual collection_rate comparisons
 dependent_response_ind <- "Collection_rate_ind"
 y_label_ind <- "Collection Rate"
 x_label_ind <- "Target"
@@ -590,3 +590,81 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strat
   facet_grid(. ~ Dominate.Strategy)
 
 # In general, the Individual condition seems to show a lower (better) collection rate, with Ind_Team usually landing in the middle and the Ind Condition showing the highest (worst) collection rates.
+
+## Carter Engen looking at team collection_rate comparisons
+
+dependent_response_team <- "Collection_rate_team"
+y_label_team <- "Count"
+x_label_team <- "Target"
+title_response_team <- "Collection Rate Vs. Target"
+
+# What is the distrabution of the data ----
+plot_data_team <- team_data %>%
+  select(dependent_response_team, Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 10) +
+  facet_grid(. ~ Target)
+# The data follow a generally normal distribution, with each having a similar center.
+
+ggplot(data = )
+
+# What does the raw data look like split up by session and Target? ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team, Team) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_team]]))
+
+ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_team, fill = "Team", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams")
+
+# By Strategy ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team, Team, Dominate.Strategy) %>%
+  mutate(rank_order = -rank(.data[[dependent_response_team]]))
+
+ggplot(data = plot_data_team, aes_string(x = "Target", y = dependent_response_team, fill = "Team", group = "rank_order")) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ SessionOrder) + 
+  guides(fill = FALSE) +
+  facet_grid(. ~ Dominate.Strategy) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") 
+
+
+# Is there an interaction between the session order and the Target levels? -----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), 
+            n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
+
+ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
+# Ind_Team collection rate seems higher than other Target levels, except when ordered in the 4th Session.
+# Ind_Team rate spreads out when compared to Ind or Team, seems like an odd patern
+
+# By Streategy ----
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team, Dominate.Strategy) %>%
+  group_by(SessionOrder, Target, Dominate.Strategy) %>%
+  summarise(Average = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), 
+            n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
+
+ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  facet_grid(. ~ Dominate.Strategy) + 
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
+# Team lower rate on Go Together than Go Alone, interesting that Team/Together and Ind/Alone are both lowest collection rates.
+# Team & Go Alone higher in 4th session than compared to other Target levels, seems interesting since team was lower collection rate in other comparisons.
+# 2nd & 3rd sessions of Go Alone match oddly well regardless of Target
