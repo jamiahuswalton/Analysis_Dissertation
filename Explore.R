@@ -595,8 +595,11 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Dominate.Strat
 
 dependent_response_team <- "Collection_rate_team"
 y_label_team <- "Count"
+y_label_rate_team <- "Team Collection Rate"
 x_label_team <- "Target"
-title_response_team <- "Collection Rate Vs. Target"
+x_label_teamOrder <- "Session Order"
+title_response_team <- "Team Collection Rate Vs. Target"
+title_response_team_rate_order <- "Team Collection Rate vs. Session Order"
 
 # What is the distrabution of the data ----
 plot_data_team <- team_data %>%
@@ -605,9 +608,7 @@ plot_data_team <- team_data %>%
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 10) +
   facet_grid(. ~ Target)
-# The data follow a generally normal distribution, with each having a similar center.
-
-ggplot(data = )
+# Histogram showing that the data follow a generally normal distribution, with each having a similar center.
 
 # What does the raw data look like split up by session and Target? ----
 plot_data_team <- team_data %>%
@@ -649,6 +650,34 @@ ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder,
   labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session")
 # Ind_Team collection rate seems higher than other Target levels, except when ordered in the 4th Session.
 # Ind_Team rate spreads out when compared to Ind or Team, seems like an odd patern
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), 
+            n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_rate_team, x = x_label_team, title = title_response_team, fill = "Players")
+# Interaction plot showing team collection rate v. target by session order. It is interesting that sessions
+# 2 and 3 show a similar pattern of collection rate between targets. This may be a fact of the teams still
+# facing a learning curve. 
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_rate_team, x = x_label_teamOrder, title = title_response_team_rate_order, fill = "Players")
+# Interaction plot shoing team collection rate v. session order by Target. This shows how each target responded
+# to the different orders. The decreasing trend on all targets hints at the teams' skill increasing as they gain more experience.
+# Between all sessions, team target had the lowest collection rate of all the target levels.
+# It's interesting to see the difference in decrease between sessions 3 and 4 between all the target rates.
+# While Ind did not change very much, Ind_Team saw a large decrease, and Team saw a moderate decrease.
 
 # By Streategy ----
 plot_data_team <- team_data %>%
