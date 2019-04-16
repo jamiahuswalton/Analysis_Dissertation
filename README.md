@@ -14,6 +14,7 @@ First you need run the following scripts:
 6. Generate_Data: Run the whole script
 
 File 2: These are the location for the data on my system. This file may look different depending on where the files are located. 
+**Note:** ***You will need to change the file locations to fit your machine. Use the comments to understand the purpose of the variable.*** 
 
 File 4: Problems may arise here if you significantly modify the values in the Folder_File_Location script
 
