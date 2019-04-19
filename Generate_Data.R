@@ -1,7 +1,7 @@
 # Generate aggergate data
 
 #These are the teams that should be removed from analysis (i.e., removed from the raw data)
-#These teams ran through the study with a different interface version (i.e., the periodic report). Team 9 had technical difficulties
+#Teams 1 - 6 ran through the study with a different interface version (i.e., the periodic report). Team 9 had technical difficulties
 team_to_remove_from_raw_data <- c(1:6, 9)
 
 # Clean data (i.e., remove teams and unwanted data (or data used for the game)) ----
