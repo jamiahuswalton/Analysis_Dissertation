@@ -12,7 +12,12 @@ ui <- fluidPage(
     sidebarPanel(
       selectInput(inputId = "DependentVariables", 
                   label = "Select the dependent variable you want to view", 
-                  choices = c("Time Remaining", "Total Errors"))
+                  choices = c("Time Remaining", 
+                              "Total Errors", 
+                              "Correct Items Collected",
+                              "Incorrect Items Collected",
+                              "Collection Rate",
+                              "Collection Rate - Correct Items"))
       ),
     
     mainPanel(plotOutput("distrabution"))
@@ -40,7 +45,7 @@ server <- function(input, output) {
       return(factorData)
     }
     
-    # Clean data
+    # Clean data ----
     clean_aggregate <- remove_measures_with_given_value(data_set =  aggregate_data, col_name = "Condition", value = "A") # without none condition
     
     # Re factor the columns
@@ -55,30 +60,33 @@ server <- function(input, output) {
     clean_aggregate_data_stats <- re_factor_columns(clean_aggregate, columns_to_refactor)
     
     
-    # Team data set ----
+    # Team and Individual data set ----
     team_data <- clean_aggregate %>%
       filter(Player == 1)
+
+    ind_data <- clean_aggregate
     
     # Dependent variable
     dependent_response_team <- switch (input$DependentVariables,
       "Time Remaining" = "timeRemaining_team",
-      "Total Errors" = "ERROR_team_total"
+      "Total Errors" = "ERROR_team_total",
+      "Correct Items Collected" = "CI_team",
+      "Incorrect Items Collected" = "II_team",
+      "Collection Rate" = "Collection_rate_team",
+      "Collection Rate - Correct Items" = "Collection_rate_correct_item_team"
     )
     
     #dependent_response_team <- "timeRemaining_team"
     y_label_team <- "Count"
     x_label_team <- input$DependentVariables
-    title_response_team <- "Distribution of Time Remaining (Team)"
-    plot_name <- "Histogram_TimeRemaining_Team.png"
-    #setwd(figure_directory)
+    title_response_team <- paste("Distribution of", x_label_team, "(Team)")
     
     plot_data_team <- team_data %>%
       select(dependent_response_team, Target)
     
     ggplot(data = plot_data_team) + 
       geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
-      labs(title = title_response_team, x = x_label_team, y = y_label_team) 
-    
+      labs(title = title_response_team, x = x_label_team, y = y_label_team)
   })
 }
 
