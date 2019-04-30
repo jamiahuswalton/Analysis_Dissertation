@@ -1485,7 +1485,7 @@ There is a significant difference between each of the sessions. This result mean
 
 ##### Summary / Reflection
 
-There was a significant difference between the Ind_Team and Team level feedback condition in __model.NoInteraction__. The significant difference indicates that the amount of time remaining at the end of the session in the Team feedback condition is higher than the amount of time remaining in the Ind_Team condition. 
+There was a __significant difference__ between the Ind_Team and Team level feedback condition in __model.NoInteraction__. The significant difference indicates that the amount of time remaining at the end of the session in the Team feedback condition is higher than the amount of time remaining in the Ind_Team condition. 
 
 According to the data, giving groups feedback that contains team performance metrics will encourage them to move through the task faster. The amount of time remaining at the end of the session does not tell me if the groups in the Team condition are accurate (i.e., able to collected correct items quicker) as they are completing the task. A plausible conclusion could be that the groups in the Team condition are merely moving through the session quicker than those in the Ind_Team condition. 
 
@@ -1493,7 +1493,7 @@ My next step is to explore how well the groups collected items. I want to determ
 
 ### Q: Is there exciting variation among the *Collection_rate_correct_item* that will help me understand the influence of the feedback condition?
 
-I want to examine the distribution of collection rates. 
+I want to examine the distribution of the collection rate for correct at the individual and team level. 
 
 $$ Collection Rate for Correct Items (Team) = \frac{duration_{Team}}{total.correct.items.collected_{Team}}$$
 
@@ -1501,11 +1501,11 @@ Where $duration_{Team}$ is the amount of time the group spent completing the tas
 
 $$ Collection Rate for Correct Items (Individual) = \frac{duration_{Individual}}{total.correct.items.collected_{Individual}}$$
 
-Where $duration_{Individual}$ is the amount of time the indvidiaul spent completing the task and $total.correct.items.collected_{Individual}$ is the total number correct items (individual or team items) collected by the individual. 
+Where $duration_{Individual}$ is the amount of time the individual spent completing the task and $total.correct.items.collected_{Individual}$ is the total number correct items (individual or team items) collected by the individual. 
 
-I divided the duration by the number of items to collect because dividing the total correct items collected by the duration has hard to interpret. 
+I divided the duration by the number of items to collect because dividing the total correct items collected by the duration was hard to interpret. 
 
-Note: It is important to remember that a high performing team would have a lower collection rate.
+_Note_: It is important to remember that a high performing team would have a lower collection rate. Low values mean that they need less time to collect correct items.
 
 #### Team
 
@@ -1514,6 +1514,7 @@ dependent_response_team <- "Collection_rate_correct_item_team"
 y_label_team <- "Count"
 x_label_team <- "Correct Item Collection Rate"
 title_response_team <- "Distribution of Correct Item Collectione Rate (Team)"
+plot_name <- "Histogram_CollectionRateCorrect_Team.png"
 
 # Plot location
 setwd(figure_directory)
@@ -1524,10 +1525,10 @@ plot_data_team <- team_data %>%
 ggplot(data = plot_data_team) + 
   geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
   labs(title = title_response_team, x = x_label_team, y = y_label_team) +
-  ggsave("Histogram_CollectionRateCorrect_Team.png")
+  ggsave(plot_name)
 ```
 
-The distribution tells me that most groups had a correct item collection rate of about 20 sec per correct item. In other words, group generally needed about 20 secs to collect a correct items. 
+The distribution tells me that most groups had a correct item collection rate of about 18 sec per correct item. In other words, groups generally needed about 18 secs to collect a correct item.
 
 ```{r}
 dependent_response_team <- "Collection_rate_correct_item_team"
@@ -1609,66 +1610,59 @@ tableData %>%
   kable_styling()
 ```
 
-The distrabution plot is similar to the the overall distrabution plot. However, the majority of participants in the Team condition seem to need around 50 seconds to collect a correct item while participants in the Ind condition needed 60 or 70 seconds.
+The distribution plot is similar to the overall distribution plot. However, the majority of participants in the Team condition seem to need around 50 seconds to collect a correct item while participants in the Ind condition required 60 or 70 seconds.
 
 #### Summary / Reflection
 
-At the team level, most teams needed about 20 seconds on average to collect a correct team item. The center of the distrabutions when seperated by Target are roughly similar. The centers were also hovering around 20 for each distribution.
+At the team level, most groups needed about 20 seconds on average to collect a correct team item. The center of the distributions, when separated by Target, are roughly similar. The centers were also hovering around 20 for each distribution.
 
-At the individual level, most participants needed about 50 seconds to collect a correct item. When I group the data by Target levels, the distribution is similar to the overall distrubution. 
+At the individual level, most participants needed about 50 seconds to collect a correct item. When I group the data by Target levels, the distribution is similar to the overall distribution. 
 
-How does the session order influence the collection rate distibution?
+How does the session order influence the collection rate distribution?
 
-The next step is to see how the distrabutions look when the data is group by Target and Session Order. 
+The next step is to see how the distributions look when I group the data by Target and Session Order. 
 
-## The section below is for the collection rate for correct items. Still nees work XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-### Q: Is there exciting variation among the *Collection_rate_correct_item* that explains how the feedback conditions influence the time remaining when session order is taken into consideration?
+### Q: Is there exciting variation among the *Collection_rate_correct_item* that explains how the feedback conditions influence the collection rate of correct items when session order is taken into consideration?
 
-
+#### Team
 ```{r}
-# Data to model
-data_modified_ind <- ind_data %>%
-  select(Collection_rate_correct_item_ind,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID, 
-         Dominate.Strategy) %>%
-  filter(Dominate.Strategy == "Go Together")
-
-# Plot location
+dependent_response_team <- "Collection_rate_correct_item_ind"
+y_label_team <- "Count"
+x_label_team <- "Correct Item Collection Rate"
+title_response_team <- "Distribution of Correct Item Collectione Rate (Team)"
+plot_name <- "Histogram_CollectionRateCorrect_ByTarget_BySessionOrder_Team.png"
 setwd(figure_directory)
 
-# Generate models with variable response
-response_variable <- "Collection_rate_correct_item_ind"
-data_focus_ind <- data_modified_ind
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+plot_data_team <- team_data %>%
+  select(dependent_response_team, Target, SessionOrder)
 
-# Histogram of Residuals - model.NoInteraction
-ggplot(model.NoInteraction, aes(x = .resid)) +
-  geom_histogram(bins = 30) + 
-  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave("Histogram_Residuals_TimeRemaining_NoInteraction_Ind.png")
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = dependent_response_team), bins = 30) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = plot_name)
 
-# Fitted values - model.NoInteraction
-ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
-  geom_point() + 
-  geom_hline(yintercept = 0)+
-  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave("FittedValue_Residuals_TimeRemaining_NoInteraction_Ind.png")
+# Information about the N values in each condition
+tableData <- team_data %>%
+  select(dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[dependent_response_team]]))
 
-# QQ plots - model.NoInteraction
-ggplot(model.NoInteraction, aes(sample = .resid)) +
-  stat_qq() +
-  stat_qq_line()+
-  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave("QQ_Residuals_TimeRemaining_NoInteraction_Ind.png")
-
-summary(model.NoInteraction)
-emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
+
+Overall, there seems to be no pattern with the distrabution of the data over time. For each condition, it looks as though teams needed less and less time to collect correct items. It looks as though the biggest imporvement (i.e., comparing the 2nd session to the 4th session) occurs in the team condition. Groups in this condition seem to have the biggest imporvement from session 2 to session 4. There are improvements in the Ind and Ind_Team condition but the most obvious improvement is in the Team condition. 
+
+_Reflection:_ When veiwing this chart I expected to see improvement over time. In other words, I expected to see a shift in overall distrabution to the left. Each condition had some amount of shift but the most obvious shift comes from Team condtion.
+
+#### Individual 
+
+#### Summary / Reflection
+
+
+
+
 
 # References
