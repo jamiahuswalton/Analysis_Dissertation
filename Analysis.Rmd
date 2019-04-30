@@ -41,7 +41,7 @@ library(ggrepel)
 library(knitr)
 library(kableExtra)
 
-# Functions used is documents ----
+# Functions used in documents ----
 remove_measures_with_given_value <- function(data_set, col_name, value){
   rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
   
@@ -193,7 +193,7 @@ In this section, I seek to visually discover answers to the research question me
 
 #### Team
 
-```{r}
+```{r hist_CountVSTimeRemaining}
 dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Count"
 x_label_team <- "Time Remaining"
@@ -712,6 +712,8 @@ model.NoInteraction: Session order and target are the fixed effects in this mode
 
 model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
 
+I want to compare the models that are significanntly different from the null model (i.e., the models mentioned above) and compare them with one another. The goal is to see if the extra terms improve the model. 
+
 
 ```{r}
 # Generate models with variable response
@@ -740,9 +742,9 @@ anova(model.NoInteraction,
   kable_styling()
 ```
 
-The results show that the model with the interaction (i.e., Model.All) was not significantly better at describing the data than the other two models (i.e.,model.NoInteraction.NoTarget and model.NoInteraction). According to this result, we can remove the interaction effect of the model. It is important to note that some models, compared to model.All, have a small difference in AIC values. However, there is a noticeable difference in BIC values. 
+The results show that the model with the interaction (i.e., Model.All) was not significantly better at describing the data than the other two models (*i.e.,model.NoInteraction.NoTarget and model.NoInteraction*). According to this result, we can remove the interaction effect of the model. It is important to note that some models, compared to model.All, have a small difference in AIC values. However, there is a noticeable difference in BIC values. 
 
-The results also show that the model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. This lack of significance suggests that the model.NoInteraction.NoTarget describes the data best. I notice there is a small difference in the AIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","AIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","AIC"]`) and the BIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","BIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","BIC"]`) criteria values. Due to the small AIC and BIC difference between the two models, I cannot confidently say one model is clearly better than the other model.
+The results also show that the model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. This lack of significance suggests that the model.NoInteraction.NoTarget describes the data best. I notice there is a small difference in the AIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","AIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","AIC"]`) and the BIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","BIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","BIC"]`) criteria values. Due to the small AIC and BIC difference between the two models, I cannot confidently say one model is clearly better than the other model, though the model.NoInteraction.NoTarget is a slightly better model.
 
 I want to calculate the effect size of both models to see if there is a noticeable difference between the effect sizes.
 
