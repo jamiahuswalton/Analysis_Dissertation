@@ -241,7 +241,7 @@ tableData %>%
 
 The skewed to the left pattern continues when grouping the time remaining by the feedback conditions. Most of the teams seem to have about 50 seconds remaining when they completed the task 
 
-*Reflection:* The skewness in the time remaining data at the team level centers around 50 seconds or so. This skewness suggests that most of the teams had about the same amount of time remaining at the end of the session (50 or 40 seconds). In other words, there is no obvious pattern visually. 
+__Reflection:__ The skewness in the time remaining data at the team level centers around 50 seconds or so. This skewness suggests that most of the teams had about the same amount of time remaining at the end of the session (50 or 40 seconds). In other words, there is no obvious pattern visually. 
 
 #### Individual
 
@@ -293,7 +293,7 @@ tableData %>%
 
 The distribution for each condition is similar to the overall data distribution. This similarity tells me that most individuals finished with about 50 seconds or so left at the end of each session. 
 
-*Reflection:* It seems as though we can say the high performing individuals finished with over 50 seconds or so left at the end of the session. Do high performing individuals have similar characteristics? How should we define a "high performing" individual? Overall, the distribution at the team level is similar to the distribution at the team level. 
+__Reflection:__ It seems as though we can say the high performing individuals finished with over 50 seconds or so left at the end of the session. Do high performing individuals have similar characteristics? How should we define a "high performing" individual? Overall, the distribution at the team level is similar to the distribution at the team level. 
   
   
 #### Summary / Reflection
@@ -340,7 +340,7 @@ It looks like the distribution for time remaining for the Ind_Team condition see
   
 It looks like the distribution of the amount of time remaining at the end of the session in the team feedback condition starts to spread over time.
 
-*Reflection:* I would expect to see the distribution of time remaining to move to the right over time because the teams would will have more experience with the task and get better at the task. This pattern is not followed in the individual condition. The distribution of the time remaining in the individual condition does not seem to improve over time. The amount of time remaining seems to be consistent no matter what session order (i.e., 2,3, or 4) they are in. This consistency would suggest that giving individual performance metrics does not influence the amount of time remaining at the end of the session for a team. 
+__Reflection:__ I would expect to see the distribution of time remaining to move to the right over time because the teams would will have more experience with the task and get better at the task. This pattern is not followed in the individual condition. The distribution of the time remaining in the individual condition does not seem to improve over time. The amount of time remaining seems to be consistent no matter what session order (i.e., 2,3, or 4) they are in. This consistency would suggest that giving individual performance metrics does not influence the amount of time remaining at the end of the session for a team. 
 
 The distribution for the Ind_Team and Team condition seem to spread (i.e., flatten) over time instead of moving from let to right. To me, this suggest that there are some time that get better with time in these conditions and there are other teams that do no get better with time. 
 
@@ -376,7 +376,7 @@ tableData %>%
 
 It looks like the distribution of the time remaining in the individual condition does not spread over time. This lack of spread tells me that the individuals were not getting faster over time in the individual feedback condition. It looks like the spread of the time remaining in the Ind_Team condition does spread over time. There is a more obvious spread from session 3 to session 4. It looks like the time remaining in the team condition does spread over time.
 
-*Reflection:* I am getting the sense that the individual condition did not influence how quickly the participants completed the session. In other words, giving the individual feedback on performance metrics did not encourage the participants to move faster through the session. However, it looks like the distrabution of the time remaining flattens when groups are given Team or Ind_Team feedback. This tells me that teams are more likely to move through the task quicker if given Ind_Team or Team feedback, not individual feedback. 
+__Reflection:__ I am getting the sense that the individual condition did not influence how quickly the participants completed the session. In other words, giving the individual feedback on performance metrics did not encourage the participants to move faster through the session. However, it looks like the distrabution of the time remaining flattens when groups are given Team or Ind_Team feedback. This tells me that teams are more likely to move through the task quicker if given Ind_Team or Team feedback, not individual feedback. 
 
 
 #### Summary / Reflection
@@ -392,7 +392,7 @@ I am interested in this question for modeling purposes. I want to know if I need
 ```{r fig.width= 10}
 dependent_response_team <- "timeRemaining_team"
 y_label_team <- "Time Remaining"
-x_label_team <- "Target"
+x_label_team <- "Session Order"
 title_response_team <- "Time Remaining (Team) Vs. Target"
 value_threshold <- 120
 plot_name <- "Bar_TimeRemaining_ByTarget_BySessionOrder_Team.png"
@@ -400,7 +400,7 @@ setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, dependent_response_team, Team) %>%
-  mutate(rank_order = -rank(team_data[[dependent_response_team]])) %>%
+  mutate(rank_order = -rank(team_data[[dependent_response_team]], ties.method = "first")) %>%
   mutate(above_value_threshold = .data[[dependent_response_team]] > value_threshold)
 
 names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[["Team"]]), "")
@@ -408,7 +408,8 @@ names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_dat
 ggplot(data = plot_data_team, 
        aes(x = factor(SessionOrder), 
                   y = .data[[dependent_response_team]], 
-                  fill = Team, group = rank_order,
+                  fill = Team, 
+                  group = rank_order,
                   label = names )) +
   geom_text(position = position_dodge(1), vjust = 0, aes(y = .data[[dependent_response_team]] + 15), check_overlap = FALSE) +
   geom_bar(stat = "identity", position = "dodge") + 
@@ -434,7 +435,7 @@ Let's call a group "fast" if that group has more than `r value_threshold` second
 
 The groups that are labeled in all the conditions (Target levels) are team 26, 45, 13. Some of these teams data may be outliers. 
 
-*Reflection:* This figure tells me that I may need to consider removing these teams because they may be outliers. However, I do not have a good reason to remove the values. Instead, I considered teams, that seemed to be outliers, fast teams. These are the teams that had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining. If I want to look at the characterisitics of fast groups, I could use teams 13, 26, and 45 as fast moving teams. 
+__Reflection:__ This figure tells me that I may need to consider removing these teams because they may be outliers. However, I do not have a good reason to remove the values. Instead, I considered teams, that seemed to be outliers, fast teams. These are the teams that had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining. If I want to look at the characterisitics of fast groups, I could use teams 13, 26, and 45 as fast moving teams. 
 
 
 ```{r}
@@ -446,16 +447,16 @@ plot_name <- "InteractionPlot_TimeRemaining_ByTarget_BySessionOrder_Team.png"
 setwd(figure_directory)
 
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, timeRemaining_team) %>%
+  select(Target, SessionOrder, dependent_response_team) %>%
   group_by(SessionOrder, Target) %>%
-  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
-            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
-            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+  summarise(dependentAverage = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
 
-ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, color = SessionOrder, shape = SessionOrder)) +
+ggplot(data = plot_data_team, aes(x = Target, y = dependentAverage, color = SessionOrder, shape = SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
-  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  geom_errorbar(aes(ymin = dependentAverage - StEr, ymax = dependentAverage + StEr), width = 0.2) +
   labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
   ggsave(filename = plot_name)
 
@@ -463,7 +464,7 @@ ggplot(data = plot_data_team, aes(x = Target, y = timeRemaining_teamAverage, col
 
 Visually, there appears to be some level of interaction between Target and SessionOrder for the time remaining. The interaction does not seem to be strong. The graph suggests that the average time remaining at the end of the session increases over time. The increase is particularly noticeable in the Ind_Team condition going from session 3 to session 4.  In other words, when given Ind_Team feedback, the amount of time remaining at the end of each session increases faster. 
 
-*Reflection:* There seems to be some level of interaction but I am getting the sense that it is not a strong interaction. I'll have to run statistical tests to examine the strength of the effect to determine if there is an interaction effect. 
+__Reflection:__ There seems to be some level of interaction but I am getting the sense that it is not a strong interaction. I'll have to run statistical tests to examine the strength of the effect to determine if there is an interaction effect. 
 
 ```{r}
 dependent_response_team <- "timeRemaining_team"
@@ -474,16 +475,16 @@ plot_name <- "InteractionPlot_TimeRemaining_BySessionOrder_ByTarget_Team.png"
 setwd(figure_directory)
 
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, timeRemaining_team) %>%
+  select(Target, SessionOrder, dependent_response_team) %>%
   group_by(SessionOrder, Target) %>%
-  summarise(timeRemaining_teamAverage = mean(timeRemaining_team), 
-            Stdv =sd(timeRemaining_team), n = length(timeRemaining_team), 
-            StEr = sd(timeRemaining_team) / sqrt(length(timeRemaining_team)))
+  summarise(DependentAverage = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
 
-ggplot(data = plot_data_team, aes(x = SessionOrder , y = timeRemaining_teamAverage, color = Target, shape = Target)) +
+ggplot(data = plot_data_team, aes(x = SessionOrder , y = DependentAverage, color = Target, shape = Target)) +
   geom_point(size = 3) +
   geom_line(aes(group=Target, color = Target)) + 
-  geom_errorbar(aes(ymin = timeRemaining_teamAverage - StEr, ymax = timeRemaining_teamAverage + StEr), width = 0.2) +
+  geom_errorbar(aes(ymin = DependentAverage - StEr, ymax = DependentAverage + StEr), width = 0.2) +
   labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
   ggsave(filename = plot_name)
 ```
@@ -496,7 +497,7 @@ The Individual_Team session has a small improvement from session 2 to session 3,
 
 The team session showed a substantial increase from session 2 to 3 but a small improvement from session 3 to session 4. This suggests that for some reason there was a major improvement between session 2 and session 3, but there was little gain between session 3 and session 4. This could mean that the feedback was no longer useful between 3 and 4 or that the teams reached their highest performance. 
 
-*Reflection:* I am getting the session that the team condition encouraged teams to move quicker through the session. There was a substantial increase in the amount of time remaining at the end of the session in the Team condition when moving from session 2 to session 3. I am also getting the sense that the Ind_Team feedback condition may be encouraging a team to move quicker through the task as well. However, it looks like the effect of the Ind_Team feedback takes longer to take effect. Even so, the amount of time remaining at the end of the session ended up being about the same after four sessions in the Ind_Team and the Team condition.
+__Reflection:__ I am getting the session that the team condition encouraged teams to move quicker through the session. There was a substantial increase in the amount of time remaining at the end of the session in the Team condition when moving from session 2 to session 3. I am also getting the sense that the Ind_Team feedback condition may be encouraging a team to move quicker through the task as well. However, it looks like the effect of the Ind_Team feedback takes longer to take effect. Even so, the amount of time remaining at the end of the session ended up being about the same after four sessions in the Ind_Team and the Team condition.
 
 
 #### Individual
@@ -565,7 +566,7 @@ sumCountFastParticipants %>%
 
 Visually, it looks like some participants moved quickly through the task (i.e., possible outliers). It seems like there are more "fast" participants in session for in the Team condition. 
 
-*Reflection:* It looks like pariticipants were moving slower in the Ind condition when compared to the Ind_Team and Team condition. I'm getting the sense that for some reason the individuals were moving fast in the Team condition. Or, participants were getting faster quicker in the Team condition.
+__Reflection:__ It looks like pariticipants were moving slower in the Ind condition when compared to the Ind_Team and Team condition. I'm getting the sense that for some reason the individuals were moving fast in the Team condition. Or, participants were getting faster quicker in the Team condition.
 
 
 ```{r}
@@ -595,7 +596,7 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
 
 There appears to be an interaction between Target and Session Order. Overall, the amount of time at the end of the session increases over time. It looks like there is a considerable increase in the amount of time remaining in the Team condition from Session 2 to session 3. This substantial increase suggests that giving team feedback resulted in individuals moving faster. It looks like something is happening in the Team and Ind_Team condition. In the Ind condition, there is a steady increase in the amount of time remaining. In the Ind_Team condition, there was little to no change in the time remaining between session 2 and 3 but a big change from session 3 to 4. 
 
-*Reflection:* I am getting the sense that something is happening with the Ind_Team and the Team condition. For some reason, there are these large increases in the time remaining. 
+__Reflection:__ I am getting the sense that something is happening with the Ind_Team and the Team condition. For some reason, there are these large increases in the time remaining. 
 
 ```{r}
 dependent_response_ind <- "timeRemaining_ind"
@@ -629,7 +630,7 @@ In the Team condition, there is a large improvement from session 2 to session 3 
 
 In the Ind_Team condition, there is little to no improvement from session 2 to session 3 but a large improvement from session 3 to session 4. 
 
-*Reflection:* I get the sense that something interesting is going on with the Ind_Team and Team conditions. The figure suggests that both sessions have a positive influence (i.e., increase the amount of time remaining) on how fast participants move through the session. It seems as though the positive effect of the Team condition happens quicker than the impact of the Ind_Team condition.
+__Reflection:__ I get the sense that something interesting is going on with the Ind_Team and Team conditions. The figure suggests that both sessions have a positive influence (i.e., increase the amount of time remaining) on how fast participants move through the session. It seems as though the positive effect of the Team condition happens quicker than the impact of the Ind_Team condition.
 
 #### Summary / Reflection
 
@@ -773,7 +774,7 @@ r.squaredGLMM(model.NoInteraction) %>%
 There is little difference between the effect sizes for both models. The results show that model.NoInteraction has a slightly better effect size, but the difference is not noticeably different. 
 
 
-*Reflection:* The models that are significantly different from the null model are model.All, model.NoInteraction, model.NoInteraction.NoTarget. Comparing these three models showed that the model.All was not significantly better than model.NoInteraction or model.NoInteraction.NoTarget. Comparing model.NoInteraction and model.NoInteraction.NoTarget showed no significant difference between the models (i.e., model.NoInteraction did not explain the data better than model.NoInteraction.NoTarget), suggesting that adding the Target variable did not significantly improve the model. However, I noted that the AIC and BIC values were similar. The effect size for both models was examined to determine if one model had a noticeably higher effect size than the other model. There was no noticeable difference in effect size, but the results indicated that model.NoInteraction had a slightly higher effect size. Model.NoInteraction is the model that I am interested in but I cannot I cannot confidently ignore the model of least interest (i.e., model.NoInteraction.NoTarget). Therefore, I will include model.NoInteraction.NoTarget in further analysis.
+__Reflection:__ The models that are significantly different from the null model are model.All, model.NoInteraction, model.NoInteraction.NoTarget. Comparing these three models showed that the model.All was not significantly better than model.NoInteraction or model.NoInteraction.NoTarget. Comparing model.NoInteraction and model.NoInteraction.NoTarget showed no significant difference between the models (i.e., model.NoInteraction did not explain the data better than model.NoInteraction.NoTarget), suggesting that adding the Target variable did not significantly improve the model. However, I noted that the AIC and BIC values were similar. The effect size for both models was examined to determine if one model had a noticeably higher effect size than the other model. There was no noticeable difference in effect size, but the results indicated that model.NoInteraction had a slightly higher effect size. Model.NoInteraction is the model that I am interested in but I cannot I cannot confidently ignore the model of least interest (i.e., model.NoInteraction.NoTarget). Therefore, I will include model.NoInteraction.NoTarget in further analysis.
 
 
 
@@ -877,7 +878,7 @@ r.squaredGLMM(model.All) %>%
 ```
 
 
-*Reflection:* Ultimately, the data suggests that the model.NoInteraction is the best model to use. It is significantly different from the mode.Null but model.All (i.e., including the interaction effect) does significantly improve the model.
+__Reflection:__ Ultimately, the data suggests that the model.NoInteraction is the best model to use. It is significantly different from the mode.Null but model.All (i.e., including the interaction effect) does significantly improve the model.
 
 
 #### Summary / Reflection
@@ -991,7 +992,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
 
 model.NoInteraction.NoTarget: Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
 
-*Reflection:* It looks both models violated assumptions 2 and 3. In other words,  there may be a constant error violation (i.e., the fitted value plot is not consistent from left to right) and the QQ plot shows an assumption violation. I need to determine if this violation influences the model overall.
+__Reflection:__ It looks both models violated assumptions 2 and 3. In other words,  there may be a constant error violation (i.e., the fitted value plot is not consistent from left to right) and the QQ plot shows an assumption violation. I need to determine if this violation influences the model overall.
 
 
 ##### Q: Does the violation influence the linear model estimation?
@@ -1050,7 +1051,7 @@ comparision_results %>%
 
 The robust model.NoInteraction.NoTarget model is noticeably different from the non-robust model.NoInteraction.NoTarget This suggests that the data should be transformed to satisfy the residual assumptions.
 
-*Reflection:* Comparing the normal estimation to the robust models indicates that the data should be transformed because the estimates are noticeably different.
+__Reflection:__ Comparing the normal estimation to the robust models indicates that the data should be transformed because the estimates are noticeably different.
 
 ##### Q: Does data transformation satisfy the assumptions of the residuals?
 
@@ -1145,7 +1146,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
 
 The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction.NoTarget.
 
-*Reflection:* The plots suggest that the data transformation resolved the residual assumption violations for both models. I will use a step on Tukey's ladder to transform the data.
+__Reflection:__ The plots suggest that the data transformation resolved the residual assumption violations for both models. I will use a step on Tukey's ladder to transform the data.
 
 ##### Q: Are there any effects that are significant?
 
@@ -1213,7 +1214,7 @@ emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
 
 The estimated marginal means show a significant difference between all of the sessions. This significance suggests that the amount of time remaining at the end of the session increased over time. In other words, the teams were getting faster over time.
 
-*Reflection:* The *model.NoInteraction:* model shows no significant effect from the Target levels, but it does show a significant effect from the session order. Specifically, all of the session orders were significantly different from one another. The significance among the session orders means that the amount of time remaining at the end of each session increased over time. 
+__Reflection:__ The *model.NoInteraction:* model shows no significant effect from the Target levels, but it does show a significant effect from the session order. Specifically, all of the session orders were significantly different from one another. The significance among the session orders means that the amount of time remaining at the end of each session increased over time. 
 
 ```{r}
 # Data to fit
@@ -1257,7 +1258,7 @@ emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "t
 
 The results show a significant difference between each session. 
 
-*Refecltion:* As expected, the results show a significant difference among the session order. In other words, the amount of time remaining at the end of each session increased over time. 
+__Reflection:__ As expected, the results show a significant difference among the session order. In other words, the amount of time remaining at the end of each session increased over time. 
 
 ##### Summary / Reflection
 
@@ -1312,7 +1313,7 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
 
 model.NoInteraction: Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
 
-*Reflection:* Overall, it looks like I need to compare the model to the robust models to see if the violation has any influence on the model estimation.
+__Reflection:__ Overall, it looks like I need to compare the model to the robust models to see if the violation has any influence on the model estimation.
 
 ##### Q: Does the violation influence the model estimation?
 
@@ -1342,7 +1343,7 @@ comparision_results %>%
 
 There is a noticeable difference between the non-robust model and the robust model. This noticeable difference indicates that the data should be transformed to attempt to satisfy the assumptions.
 
-*Reflection:* I need to transform the data because there is a very noticeable difference between the robust model and the non-robust model.
+__Reflection:__ I need to transform the data because there is a very noticeable difference between the robust model and the non-robust model.
 
 ##### Q: Does data transformation satisfy the assumptions of the residuals?
 
@@ -1417,7 +1418,7 @@ compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE) %
 
 Comparing the robust and non-robust model does not reveal any concerning difference in estimated value.
 
-*Reflection:* After the transformation, there still appeared to be a violation in the QQ plot but comparing the robust model to the non-robust model showed no concerning differences.
+__Reflection:__ After the transformation, there still appeared to be a violation in the QQ plot but comparing the robust model to the non-robust model showed no concerning differences.
 
 ##### Q: Are there any effects that are significant?
 
@@ -1543,7 +1544,7 @@ tableData %>%
 
 Overall, it looks like the data shows a similar distribution when grouped by Target. The data skews to the right. It is interesting to note that the team condition has a slightly larger skew to the right.
 
-_Reflection:_ Overall, the main distribution of the data is similar to the distribution of the data when broken to the different target groups. The interesting note is that the Team condition seems to have a greater skew to the right. This indicates that groups in the Team condition were able to collect more of the correct team items.
+__Reflection:__ Overall, the main distribution of the data is similar to the distribution of the data when broken to the different target groups. The interesting note is that the Team condition seems to have a greater skew to the right. This indicates that groups in the Team condition were able to collect more of the correct team items.
 
 #### Individual
 
@@ -1595,7 +1596,7 @@ tableData %>%
 
 Overall, it seems as though the distrabution of the data grouped by the target level is similar to the overall distrabution. It is interesting to note that the Ind and Team condition seem to have similar distrabutions. Specifically, most participants were able to collected at least 3 or 4 individual items. In the Ind_Team condition, it seems as though about 30 or 40 participants were were only abel to collect 2 to 4 individual items, while the rest were able to collect about 5 or 6 items. 
 
-_Reflection:_ Overall, it looks like the data distrabution when grouped by Target is similar to the overall distrabution of the data. An interesting note is that the distrabution of the data in the Team and Ind condition are similar. In the Ind_Team condition it seems as though participants were able to collect either 2-4 items or 5 - 6 items. 
+__Reflection:__ Overall, it looks like the data distrabution when grouped by Target is similar to the overall distrabution of the data. An interesting note is that the distrabution of the data in the Team and Ind condition are similar. In the Ind_Team condition it seems as though participants were able to collect either 2-4 items or 5 - 6 items. 
 
 #### Summary / Reflection
 
@@ -1676,15 +1677,15 @@ tableData %>%
 
 Overall, it looks like the data distribution skews to the right over time. 
 
-In the Ind condition there seems to be little change in distribution of the data. 
+In the Ind condition, there seems to be little change in the distribution of the data. 
 
-In the Ind_Team condition, session 2 and 3 seems to have similar distibutions. Session 4 distribution seems to move more to right. 
+In the Ind_Team condition, session 2 and 3 seem to have similar distributions. Session 4 distribution appears to move more to the right. 
 
-In the Team condition, distribution in session 2 and 3 are similar but session 4 has more of skew to the right. 
+In the Team condition, distribution in session 2 and 3 are similar, but session 4 has more of skew to the right. 
 
-In session 4, it seems as though the Ind and Ind_Team condition have similar distribution and the distibution in the Team condition. 
+In session 4, it seems as though the Ind condition and Ind_Team condition have a similar distribution and the distribution in the Team condition. 
 
-_Reflection:_ Overall, there appears to be no obvious patter. It is worth noting that the distribution in the Ind conditions seems to go unchanged from session to session. This could mean that the invention had no effect of had a negative impact on participants collecting correct individuals items. In the Ind_Team and Teamcondition, it looks like a major improvement (i.e., a more obvious skew to the right) happens when moving from session 3 to session 4. This indicates that something happens between sessions 3 and 4 to increase performance. It seems as though the skew in the Team condition in session 4 is greater than the skew in the Ind and Ind_Team conditon.
+__Reflection:__ Overall, there appears to be no obvious pattern. It is worth noting that the distribution in the Ind conditions seems to go unchanged from session to session. This could mean that the intervention had no effect or had a negative impact on participants collecting correct individuals items. In the Ind_Team and Team condition, it looks like a major improvement (i.e., a more obvious skew to the right) happens when moving from session 3 to session 4. This indicates that something happens between sessions 3 and 4 to increase performance. It seems as though the skew in the Team condition in session 4 is greater than the skew in the Ind and Ind_Team conditions.
 
 #### Summary / Reflection
 
@@ -1697,48 +1698,146 @@ At the individual and team level, the Ind condition seemed to have either no inf
 I am interested in this question for modeling purposes. I want to know if I need to include the interaction between Target and Session Order. 
 
 #### Team
-```{r fig.width= 10}
+```{r}
 dependent_response_team <- "CI_team"
 y_label_team <- "Correct items collected"
 x_label_team <- "Target"
 title_response_team <- "Correct items collected (Team) Vs. Target"
-value_threshold <- 120
-plot_name <- "Bar_CI_ByTarget_BySessionOrder_Team.png"
+plot_name <- "InteractionPlot_CI_ByTarget_BySessionOrder_Team.png"
 setwd(figure_directory)
 
 plot_data_team <- team_data %>%
-  select(Target, SessionOrder, dependent_response_team, Team) %>%
-  mutate(rank_order = -rank(team_data[[dependent_response_team]])) %>%
-  mutate(above_value_threshold = .data[[dependent_response_team]] > value_threshold)
+  select(Target, SessionOrder, dependent_response_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(dependentAverage = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
 
-names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[["Team"]]), "")
-
-ggplot(data = plot_data_team, 
-       aes(x = factor(SessionOrder), 
-                  y = .data[[dependent_response_team]], 
-                  fill = Team, group = rank_order,
-                  label = names )) +
-  geom_text(position = position_dodge(1), vjust = 0, aes(y = .data[[dependent_response_team]] + 15), check_overlap = FALSE) +
-  geom_bar(stat = "identity", position = "dodge") + 
-  facet_grid(. ~ Target) + 
-  guides(fill = FALSE) +
-  coord_flip()+
-  xlim("4", "3", "2") +
-  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") +
+ggplot(data = plot_data_team, aes(x = Target, y = dependentAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = dependentAverage - StEr, ymax = dependentAverage + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
   ggsave(filename = plot_name)
 
-sumDataCount <- plot_data_team %>%
-  group_by(Target, SessionOrder) %>%
-  summarise(N = length(.data[[dependent_response_team]]))
-
-sumDataCount %>%
+plot_data_team %>%
   kable() %>%
   kable_styling()
 ```
 
+Overall, there seems to be something interesting happening among the conditions. Specifically, there appears to be a slow improvement over time in the Ind condition. There appears to be a steady improvement over time in the Ind_Team condition. There appears to be a quick improvement over time in the Team condition when compared to the Ind_Team and Ind condition.
+
+Also, it appears that the highest average for session 2 occurs in the Team condition. This suggests that teams collected more correct items in session 2 when put in the Team condition.
+
+__Reflection:__ There seems to be a trend in the conditions. In each condition, the groups improve their ability to collect correct team items over time. However, the rate in which they improve seems to be different depending on the condition. If this trend is accurate, then groups in the Ind condition improved slowly over time, groups in the Ind_Team condition improve steadily over time, and groups in the Team condition seem to improve quickly over time. 
+
+Overall, there does not seem to be any interaction occurring.
+
+```{r}
+dependent_response_team <- "CI_team"
+y_label_team <- "Correct items collected"
+x_label_team <- "Target"
+title_response_team <- "Correct items collected (Team) Vs. Session Order"
+plot_name <- "InteractionPlot_CI_BySessionOrder_ByTarget_Team.png"
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, dependent_response_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(DependentAverage = mean(.data[[dependent_response_team]]), 
+            Stdv =sd(.data[[dependent_response_team]]), n = length(.data[[dependent_response_team]]), 
+            StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
+
+ggplot(data = plot_data_team, aes(x = SessionOrder , y = DependentAverage, color = Target, shape = Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = DependentAverage - StEr, ymax = DependentAverage + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
+  ggsave(filename = plot_name)
+```
+Overall, there seems to be an interaction between Session Order and Target. 
+
+The Ind condition seems to improve from session 2 to 3 but stays the same from session 3 to 4. 
+
+The Ind_Team condition steadily improves over time. 
+
+The Team condition improves a little from session 2 to 3 but has a bigger improvement from session 3 to 4. 
+
+__Reflection:__ Overall, there seems to be a pattern to how well the amount of correct items collected increases over time. Generally, the Ind condition appears to improve the least, the Ind_Team condition improves steadily over time, and the Team condition improves the quickest. Overall, it looks like there may be some interaction between the two variables. 
+
 #### Individual
 
+```{r}
+dependent_response_ind <- "CI_ind"
+y_label_ind <- "Correct items collected"
+x_label_ind <- "Target"
+title_response_ind <- "Correct items collected (Individual) Vs. Target"
+plot_name <- "InteractionPlot_CI_ByTarget_BySessionOrder_Ind.png"
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") + 
+  ggsave(filename = plot_name)
+
+plot_data_ind %>%
+  kable() %>%
+  kable_styling()
+```
+
+Overall, there appears to be an interaction occurring between the Session Order and Target variable. In the Team condition, the number of correct items collected seems to improve over time. In the Ind_Team condition going from session 2 to session 3, the number of correct items decreases. In the Ind condition going from session 3 to 4, the number of correct items collected drops. 
+
+__Reflection:__ There does seem to be interaction occurring in this plot, but it does not appear to be a strong interaction.
+
+```{r}
+dependent_response_ind <- "CI_ind"
+y_label_ind <- "Correct items collected"
+x_label_ind <- "Target"
+title_response_ind <- "Correct items collected (Individual) Vs. Target"
+plot_name <- "InteractionPlot_CI_BySessionOrder_ByTarget_Ind.png"
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[dependent_response_ind]]), 
+            Stdv =sd(.data[[dependent_response_ind]]), 
+            n = length(.data[[dependent_response_ind]]), 
+            StEr = sd(.data[[dependent_response_ind]]) / sqrt(length(.data[[dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = plot_name)
+```
+
+Overall, there seems to be some interaction with the data. 
+
+In session 2, there seems to be little difference between the conditions.
+
+In session 3, the Ind_Team condition is the lowest. The Team and Ind condition are similar. 
+
+In session 4, the Team condition has the highest average correct items collected.  
+
+__Reflection:__ There seems to be an interaction between the Target and the Session Order. There also seems to be a slight drop in correct items collected (i.e., performance) for the Ind_Team and Ind condition. The Team condition is the only condition that seems to steadly increas over time. This suggests that the Team condtion prodcued the most realiable amount of correct items collected at the individual level. 
+
+
 #### Summary /Reflection
+
+Overall, there some seems to be some interaction occuring within the data. It seems as though the team condition produces the highest value of correct items collected. The team condtion also appears to realiably increase over time, while other conditions seem to decrease a little between sessions. The next step is to determine if any of these interactions are statistically significant.
+
 
 
 <!-- ### Q: Is there exciting variation among the *Collection_rate_correct_item* that will help me understand the influence of the feedback condition? -->
