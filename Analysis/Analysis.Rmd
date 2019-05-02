@@ -4,12 +4,10 @@ author: "Jamiahus Walton"
 bibliography: bibliography.bib
 output:
   html_document: default
-  pdf_document: 
-  word_document: 
+editor_options:
+  chunk_output_type: inline
 csl: apa.csl
 Date: '2019-02-01'
-editor_options: 
-  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -115,7 +113,7 @@ model_data_Target_Session <- function(df, dependent, model.type, is.team, is.rob
 
 #Folder locations ----
 figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
-main_work_directory_name <- main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
 
 database_folder_name <- "Database"
 file_name_output <- "team_player_aggragate_stats.csv"
@@ -665,16 +663,18 @@ Where $y_{ijtp}$ is the response variable (e.g., individual score), $\mu$ is the
 #### Team
 
 ```{r message=FALSE}
+# Response variable
+response_variable <- "timeRemaining_team"
+
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
-         timeRemaining_team,
+         response_variable,
          Target, 
          SessionOrder, 
          Team)
 
 # Generate models with variable response
-response_variable <- "timeRemaining_team"
 data_focus_team <- data_modified_team
 model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust =FALSE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
@@ -717,8 +717,18 @@ I want to compare the models that are significanntly different from the null mod
 
 
 ```{r}
-# Generate models with variable response
+# Response variable
 response_variable <- "timeRemaining_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
 data_focus_team <- data_modified_team
 model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust =FALSE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
@@ -781,15 +791,18 @@ __Reflection:__ The models that are significantly different from the null model 
 #### Individual
 
 ```{r, message=FALSE}
+# Response Variable
+
+response_variable <- "timeRemaining_ind"
+
 # Data to model
 data_modified_ind <- ind_data %>%
-  select(timeRemaining_ind,
+  select(response_variable,
          Target, 
          SessionOrder, 
          Team, 
          Player_ID)
 
-response_variable <- "timeRemaining_ind"
 data_focus_ind <- data_modified_ind
 model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE, is.robust = FALSE)
 model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE, is.robust = FALSE)
@@ -831,6 +844,24 @@ model.NoInteraction.NoTarget: Session order is the only fixed effect in this mod
 model.NoInteraction.NoSession: Target is the only fixed effect in this model. 
 
 ```{r}
+# Response Variable
+
+response_variable <- "timeRemaining_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
+
 anova(model.All,
       model.NoInteraction) %>%
   kable(caption = "ANOVA: All and No.Interaction") %>%
@@ -866,6 +897,22 @@ The results show that model.NoInteraction is significantly different from model.
 
 
 ```{r}
+# Response Variable
+
+response_variable <- "timeRemaining_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
 # Effect size (R^2)
 
 r.squaredGLMM(model.NoInteraction) %>%
@@ -1838,6 +1885,277 @@ __Reflection:__ There seems to be an interaction between the Target and the Sess
 
 Overall, there some seems to be some interaction occuring within the data. It seems as though the team condition produces the highest value of correct items collected. The team condtion also appears to realiably increase over time, while other conditions seem to decrease a little between sessions. The next step is to determine if any of these interactions are statistically significant.
 
+### Q: Is there an interaction between the Target and Session Order for the __correct items collected__ that is statistically significant?
+
+I am interested in determining if a linear mixed effect model should include the interaction effect between the Target and Session Order variable.
+
+There are a few steps I will take. First, I will fit the multiple models using the data provided. Second, I will compare those models to the null model. Third, I will pick the models that are worth exploring further (e.g., models that are significantly different from the null model). Fourth, I will evaluate the effect size ($R^2$) of the fixed effect and random effect variables using a method by [@Nakagawa2013, @Johnson2014]. Lastly, I will analyze the assumptions for the residuals. 
+
+A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R_{m}^2$) and conditional ($R_{c}^2$) effect size. The $R_{m}^2$ calculates how much of the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ calculates how much of the variance is described by both the fixed and random effect variables.
+
+#### Full Models Used for Team and Individual
+
+The next two sections below describe the full model for team and individual level analysis. Five models were fitted and then compared. One model was the null model, one model was the full model, and the last three are a subset of the full model.
+
+##### Team Full Model
+
+$$ y_{ijt} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} +   \epsilon_{ijt}$$ 
+
+Where $y_{ijt}$ is the response variable (e.g., team score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^(th)$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^(th)$ session order, $\gamma_{t}$ is the random effect for the $t^(th)$ team, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijt}$ is the residual for the model. 
+
+##### Individual Team Full Model
+
+$$ y_{ijtp} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} + \theta_{p} + \epsilon_{ijtp}$$ 
+
+Where $y_{ijtp}$ is the response variable (e.g., individual score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^(th)$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^(th)$ session order, $\gamma_{t}$ is the random effect for the $t^(th)$ team, $\theta_{p}$ is the random effect for the $p^(th)$ individual, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijtp}$ is the residual for the model.
+
+##### Team
+
+```{r message=FALSE}
+# Response variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+data_focus_team <- data_modified_team
+model.null <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "null", is.team = TRUE, is.robust =FALSE)
+model.All <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
+
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: Null and All") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: Null and No.Interaction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Target") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
+  kable_styling()
+
+```
+
+The folowing models are significantly different from the null model: model.NoInteraction, model. NoInteraction.NoTarget.
+
+model.NoInteraction: Session order and target are the fixed effects in this model.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+I noticed that both models do not include the Interaction betweent the terms.
+
+I want to compare the models that are significanntly different from the null model (i.e., the models mentioned above) and compare them with one another. The goal is to see if the extra terms improve the model. 
+
+```{r}
+# Response variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+data_focus_team <- data_modified_team
+
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Compare all of the models
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.NoInteraction and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+The results show that the model.NoInteraction model was not significantly better at describing the data than the model.NoIteraction.NoTarget. In other words, the results show that the model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. This lack of significance suggests that the model.NoInteraction.NoTarget describes the data best. I noticed there is a small difference in the AIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","AIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","AIC"]`) and the BIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","BIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","BIC"]`) criteria values. Due to the small AIC and BIC difference between the two models, I cannot confidently say one model is clearly better than the other model, though the model.NoInteraction.NoTarget is a slightly better model.
+
+I want to calculate the effect size of both models to see if there is a noticeable difference between the effect sizes.
+
+```{r}
+# Response variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+data_focus_team <- data_modified_team
+
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Effect size (R^2)
+
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+```
+
+There is little difference between the effect sizes for both models. The results show that model.NoInteraction has a slightly better effect size, but the difference is not noticeably different. 
+
+__Reflection:__ Overall, the data suggests no strong interaction between Target and Session Order variables. Two models were significantly different from the model.null: __model.NoInteraction__ and __model.NoInteraction.NoTarget__. In the __model.NoInteraction__, the Target and Session Order variable are present. In the __model.NoInteraction.NoTarget__, only the Session Order variable is present. This suggests that the session order variable is the best predictor of the data. However, after more examination of both models (i.e., __model.NoInteraction.NoTarget__ and __model.NoInteraction__), I was not confident in ignoring the __model.NoInteraction__ for two reasons. First, there was a small difference between the AIC and BIC values. The "better" model has a lower BIC or AIC value. The __model.NoInteraction.NoTarget__ had a slightly better BIC and AIC value, meaning that the model is "better" than the __model.NoInteraction.NoTarget__. Second, the effect sizes for both models were very similar. The similar effect sizes indicate that the models have a similar capability in describing the data. 
+
+As a result, I cannot confidently ignore __model.NoInteraction__ (the model I am most interested in). Therefore, I will include model.NoInteraction.NoTarget in further analysis.
+
+
+##### Individual
+
+```{r}
+# Response Variable
+
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+model.null <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "null", is.team = FALSE, is.robust = FALSE)
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
+
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: model.null and model.All") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoSession") %>%
+  kable_styling()
+
+```
+
+The following models were significantly better than the null model: model.All, model.NoInteraction, and model.NoInteraction.NoTarget.
+
+model.All: Session Order, Target, and the interaction are included in this model.
+
+model.NoInteraction: Session order and target are the fixed effects in this model.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+```{r}
+# Response Variable
+
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: All and No.Interaction") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+The restuls show that the __model.All__ was not significanntly different from the __model.NoInteraction__. The AIC values are similar but BIC values are noticably different. This specific results suggests that we should use the simliar model, which in this case is the __model.NoInteraction__. However, __model.NoInteraction__ is not significantly different from __model.NoInteraction.NoTarget__ but is it approaching significence (p = `r view(anova(model.NoInteraction, model.NoInteraction.NoTarget))['model.NoInteraction','Pr(>Chisq)']`), which suggest that more data is needed to reach significance. I also notice that the model with the lowest AIC or BIC value is not consistant. The __model.NoInteraction__ has the lowest AIC value and __model.NoInteraction.NoTarget__ has the lowest BIC value. 
+
+I want to look at the effect size of each model (i.e., __model.NoInteraction__ and __model.NoInteraction.NoTarget__) see if one model has a noticeably larger effect size when compared with the other model.
+
+```{r}
+# Response Variable
+
+response_variable <- "timeRemaining_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+# Effect size (R^2)
+
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
+   kable_styling(full_width = F)
+```
+
+__Reflection:__ Overall, suggest that __model.NoInteraction__ and __model.NoInteraction.NoTarget__ are the best models to describe the data. However, the data is not clear on which model is better at describing the data. As a result, I will include __model.NoInteraction__ and __model.NoInteraction.NoTarget__ in further analysis. 
+
+
+##### Summary / Reflection
+
+Overall, none of the models that described the data best included the interaction term. None of the models that were better at describing the data included the interaction term. At the team and individual level, two models did the best job of describing the data: __model.NoInteraction.NoTarget__ and __model.NoInteraction__. At the team level, the __model.NoInteraction.NoTarget__ had a slight advantage over __model.NoInteraction__ but ultimately, I was not confident in ignoring either model. At the individual level, neither model seemed to have an advantage over the other model. In further analysis, I will include __model.NoInteraction.NoTarget__ and __model.NoInteraction__. 
+
+My next step is to examine the models and see what I can learn from these models. Are any of the effects in these models significantly different from zero?
 
 
 <!-- ### Q: Is there exciting variation among the *Collection_rate_correct_item* that will help me understand the influence of the feedback condition? -->
