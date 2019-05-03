@@ -2157,6 +2157,352 @@ Overall, none of the models that described the data best included the interactio
 
 My next step is to examine the models and see what I can learn from these models. Are any of the effects in these models significantly different from zero?
 
+### Q: Are any of the effects in the models statistically different from zero?
+
+The purpose of this question is to see what we can learn from these models. Before I examine the model by generating diagnostic plots for the models. The assumptions are as follows [@Galwey2014]:
+
+1. The residuals should have an approximately normal distribution (i.e., a bell curve) when plotted on a histogram.
+2. A fitted-value plot should show an almost constant width when viewed from left to right.
+3. The points on a normal plot should lie on an almost straight line from the bottom left to the top right.
+
+The models may violate some of the assumptions. According to @Field2017, the best way to examine the influence of assumption violations is to compare a robust model to a standard model. When models violate assumptions, I will compare a robust model to a classic model. If there is a noticeable difference between the two models (i.e., if the estimated coefficient are noticeably different) then I will use a step on the power ladder to transform (@Tukey1977), or re-express, the data to address the assumption violation.
+
+#### Team
+
+We learned that __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describe the team level data at the team level (see previous analysis). The model __model.NoInteraction__ is the model of interest but I cannot ignore __model.NoInteraction.NoTarget__.
+
+```{r}
+# Response variable
+response_variable <- "CI_team"
+plot_dependent_variable_name <- "CI"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Plot location
+setwd(figure_directory)
+
+# Generate models with variable response
+data_focus_team <- data_modified_team
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("Histogram_Residuals_", plot_dependent_variable_name, "_NoInteraction_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("FitteValue_Residuals_", plot_dependent_variable_name, "_NoInteraction_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("QQ_Residuals_", plot_dependent_variable_name, "_NoInteraction_Team.png", sep = ""))
+```
+
+__model.NoInteraction__: Visually, it looks like assumptions 2 and 3 are violated in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
+
+```{r}
+# Response variable 
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Plot location
+setwd(figure_directory)
+
+# Generate models with variable response
+
+data_focus_team <- data_modified_team
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("Histogram_Residuals_", plot_dependent_variable_name, "_NoInteraction.NoTarget_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("FitteValue_Residuals_", plot_dependent_variable_name, "_NoInteraction.NoTarget_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("QQ_Residuals_", plot_dependent_variable_name, "_NoInteraction.NoTarget_Team.png", sep = ""))
+```
+
+__model.NoInteraction.NoTarget__: Visually, it looks like assumptions 2 and 3 are violated in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
+
+__Reflection:__ It looks both models violated assumptions 2 and 3. I need to examine how this visual violation influences the model. 
+
+##### Q: Does the violation influence the linear model estimation?
+
+I will use the robust estimation for linear mixed models found in the robustlmm package by @Koller2016. I will then compare the robust model to the non-robust model. If the estimated values are noticeably different, then the data will need to be transformed. 
+
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I do not see a conerning difference between the robust and non-robust __model.NoInteraction__. This suggests that the data does not need to be transformed.
+
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction.NoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I do not see a conerning difference between the robust and non-robust __model.NoInteraction.NoTarget__. This suggests that the data does not need to be transformed.
+
+##### Q: Are there any effects that are significant?
+
+I want to determine if Target has a significant effect. I will examine the model itself, and then I will calculate the estimated marginal means to compare all three levels.
+
+###### Model.NoInteraction
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The two variables are Target ans Session Order. The reference variable is session 2 (not session 1). The data suggest that the Team and Ind_Team level do not have a significant effect in reference to the Ind level. It is also intersting to note tht session 3 does not have a significant effect in reference to session 2. However, session 4 does have a significant effect in reference to session 2.
+
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team) 
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The estimated margnial means shows no significant difference between the any of the conditions (I.e., Ind, Team, Ind_Team).
+
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results show only a significant difference between session 2 and session 4.
+
+__Reflection:__ There is no significant effects from the Target variables. There is also, only a significant difference between sessions 2 and 4. This suugests that there is little difference between session 2 and 3. This suggstion would that teams did not increase the number of correct team items collected when going from session 2 to 3. However, the teams did get significantly better when comparing session 2 to session 4. This would mean that teams got better overall.
+
+###### Model.NoInteraction.NoTarget
+
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction_NoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results suggests that effect of session 3 was not significantly differeny from session 2, though it is approaching significance. The results also suggest that the effect of session 4 is significantly different from session 2.
+
+```{r}
+# Response Variable
+response_variable <- "CI_team"
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         response_variable,
+         Target, 
+         SessionOrder, 
+         Team)
+
+data_focus_team <- data_modified_team
+
+# Generate robust and non-robust models - NoInteraction_NoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results indiciate there is a significant difference between session 2 and 4. 
+
+__Reflection:__ Overall, the only major finding is that there is only a significant difference between sesson 2 and session 4.
+
+##### Summary / Reflection
+
+Overall, neither model showed any unexpected or exciting significance. There was a lack of significance when examining the session order variable but I believe that that is due to the low number of teams. 
+
+
+#### Individual
+
+We learned that __model.NoInteraction__ best describe the individual level data(see previous analysis).
+__[Stopping point!]__
+
+```{r}
+# Response variable
+response_variable <- "CI_ind"
+plot_dependent_variable_name <- "CI"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Plot location
+setwd(figure_directory)
+
+# Generate models with variable response
+
+data_focus_ind <- data_modified_ind
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", plot_dependent_variable_name, "_NoInteraction_Ind.png", sep =""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", plot_dependent_variable_name, "_NoInteraction_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", plot_dependent_variable_name, "_NoInteraction_Ind.png", sep =""))
+```
+
+
+#### Summary and reflection
+
 
 <!-- ### Q: Is there exciting variation among the *Collection_rate_correct_item* that will help me understand the influence of the feedback condition? -->
 
