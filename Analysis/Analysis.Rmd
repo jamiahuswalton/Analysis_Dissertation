@@ -2452,7 +2452,6 @@ Overall, neither model showed any unexpected or exciting significance. There was
 #### Individual
 
 We learned that __model.NoInteraction__ best describe the individual level data(see previous analysis).
-__[Stopping point!]__
 
 ```{r}
 # Response variable
@@ -2500,9 +2499,239 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   ggsave(paste("QQ_Residuals_", plot_dependent_variable_name, "_NoInteraction_Ind.png", sep =""))
 ```
 
+__model.NoInteraction:__ Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
+
+
+```{r}
+# Response variable
+response_variable <- "CI_ind"
+plot_dependent_variable_name <- "CI"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Plot location
+setwd(figure_directory)
+
+# Generate models with variable response
+
+data_focus_ind <- data_modified_ind
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", plot_dependent_variable_name, "_NoInteraction.NoTarget_Ind.png", sep =""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", plot_dependent_variable_name, "_NoInteraction.NoTarget_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", plot_dependent_variable_name, "_NoInteraction.NoTarget_Ind.png", sep =""))
+```
+
+__model.NoInteraction.NoTarget:__ Visually, it looks likes assumptions 2 and 3 are violated. I will need to compare the classical model to the robust model to see how these violations will influence the model. 
+
+__Reflection:__ Overal, it looks like assumption 2 and 3 are violated, and I need to see if these violations influence the model.
+
+##### Q: Does the violation influence the model estimation?
+
+I will use the robust estimation for linear mixed models found in the robustlmm package by @Koller2016. I will then compare the robust model to the non-robust model. If the estimated values are noticeably different, then data will need to be transformed.
+
+###### Model.NoInteraction
+
+```{r}
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+data_focus_ind <- data_modified_ind
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+__model.NoInteraction:__ I do not see a noticeable difference between the two models.
+
+###### model.NoInteraction.NoTarget
+
+```{r}
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+data_focus_ind <- data_modified_ind
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+__model.NoInteraction.NoTarget:__ I see no noticeable difference between the two models.
+
+
+##### Q: Are there any effects that are significant?
+
+###### model.NoInteraction
+
+```{r}
+#Response variable 
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show that only the effects of Team and Ind_Team are not significantly different from the Ind level. The results show the effect of session 3 is not significantly different from session 2, but the results also show that the effect of session 4 is significantly different from session two. 
+
+```{r}
+#Response variable 
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+__Reflection:__ The result showed that the difference between Ind_Team and Team condition is __approaching significance__. This result suggests that more data is needed to reach significance. If this result reaches significance, then it means that the individuals collected more correct individual items in the Team condition when compared to the Ind_Team condition. 
+
+```{r}
+#Response variable 
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+__Reflection:__ The results showed a significant difference between sessions 2 and 4. Meaning that participants in session 4 collected more correct individual items in session 4 when compared to session 2. The difference between session 3 and 4 is approaching significance, which indicates that more data is needed to reach significance. If this result is significant, then participants in session 4 collect more correct individual items than they do in session 3. This is what I would expect to find. 
+
+
+###### model.NoInteraction.NoTarget
+
+```{r}
+#Response variable 
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results show that session 4 has a significant effect when compared to session 2. The results also show that session 3 does not have a significant effect when compared to session 2. 
+
+```{r}
+#Response variable 
+response_variable <- "CI_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(response_variable,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  response_variable, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+__Reflection:__ The results show a significant difference between session 2 and session 4. This means that participants collected more correct individual items in session 4 when compared to session 2. 
+
 
 #### Summary and reflection
 
+Overall, there were no exciting significant findings produced by either of the models. However, I think that it is worth mentioning that at the individual level, the estimated marginal means based on model.NoInteraction showed that the difference between Ind_Team and Team is __approaching significance__ (p = 0.0729). This suggests that more data is needed. If it eventually reaches significance, then the difference indicates that participants collected more correct individual items in the Team condition when compared to the Ind_Team condition. Furthermore, this would mean that Team feedback is needed to increase the number of correct individual items collected by participants.
 
 <!-- ### Q: Is there exciting variation among the *Collection_rate_correct_item* that will help me understand the influence of the feedback condition? -->
 
