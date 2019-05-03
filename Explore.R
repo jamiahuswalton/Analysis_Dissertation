@@ -659,7 +659,7 @@ plot_data_team <- team_data %>%
             n = length(.data[[dependent_response_team]]), 
             StEr = sd(.data[[dependent_response_team]]) / sqrt(length(.data[[dependent_response_team]])))
 
-ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+ggplot(data = plot_data_team, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
   geom_point(size = 3) +
   geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
@@ -668,12 +668,12 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
 # 2 and 3 show a similar pattern of collection rate between targets. This may be a fact of the teams still
 # facing a learning curve. 
 
-ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+ggplot(data = plot_data_team, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
   geom_point(size = 3) +
   geom_line(aes(group=Target, color = Target)) + 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label_rate_team, x = x_label_teamOrder, title = title_response_team_rate_order, fill = "Players")
-# Interaction plot shoing team collection rate v. session order by Target. This shows how each target responded
+# Interaction plot showing team collection rate v. session order by Target. This shows how each target responded
 # to the different orders. The decreasing trend on all targets hints at the teams' skill increasing as they gain more experience.
 # Between all sessions, team target had the lowest collection rate of all the target levels.
 # It's interesting to see the difference in decrease between sessions 3 and 4 between all the target rates.
