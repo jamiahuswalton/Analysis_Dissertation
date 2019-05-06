@@ -1,13 +1,13 @@
 ---
 title: "Dissertation Analysis"
 author: "Jamiahus Walton"
-bibliography: bibliography.bib
+Date: '2019-02-01'
 output:
   html_document: default
 editor_options:
   chunk_output_type: inline
 csl: apa.csl
-Date: '2019-02-01'
+bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
