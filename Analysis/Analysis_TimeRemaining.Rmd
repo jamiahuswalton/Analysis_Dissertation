@@ -656,9 +656,6 @@ Where $y_{ijtp}$ is the response variable (e.g., individual score), $\mu$ is the
 #### Team
 
 ```{r message=FALSE}
-# Response variable
-# response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -710,9 +707,6 @@ I want to compare the models that are significanntly different from the null mod
 
 
 ```{r}
-# Response variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -784,10 +778,6 @@ __Reflection:__ The models that are significantly different from the null model 
 #### Individual
 
 ```{r, message=FALSE}
-# Response Variable
-
-#response_variable <- "timeRemaining_ind"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -837,10 +827,6 @@ model.NoInteraction.NoTarget: Session order is the only fixed effect in this mod
 model.NoInteraction.NoSession: Target is the only fixed effect in this model. 
 
 ```{r}
-# Response Variable
-
-#response_variable <- "timeRemaining_ind"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -890,10 +876,6 @@ The results show that model.NoInteraction is significantly different from model.
 
 
 ```{r}
-# Response Variable
-
-#response_variable <- "timeRemaining_ind"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -945,10 +927,6 @@ The models may violate some of the assumptions. According to @Field2017, the bes
 We learned that __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describe the team level data at the team level (see previous analysis). The model __model.NoInteraction__ is the model of interest but I cannot ignore __model.NoInteraction.NoTarget__.
 
 ```{r}
-# Response variable
-#response_variable <- "timeRemaining_team"
-plot_dependent_variable_name <- "TimeRemaining"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -992,10 +970,6 @@ model.NoInteraction: Visually, it looks like the model violates assumption 2 and
 
 
 ```{r}
-# Response variable 
-#response_variable <- "timeRemaining_team"
-plot_dependent_variable_name <- "TimeRemaining"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1048,9 +1022,6 @@ I will use the robust estimation for linear mixed models found in the robustlmm 
 ###### Model.NoInteraction
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1078,9 +1049,6 @@ The robust model.NoInteraction model is noticeably different from the non-robust
 ###### Model.NoInteraction.NoTarget
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1113,10 +1081,6 @@ I will use the square root transformation method from Tukey's ladder [@Tukey1977
 ###### Model.NoInteraction
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-plot_dependent_variable_name <- "TimeRemaining"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1165,10 +1129,6 @@ The diagnostic plots suggest the transformation has resolved the assumption viol
 ###### Model.NoInteraction.NoTarget
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-plot_dependent_variable_name <- "TimeRemaining"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1221,9 +1181,6 @@ I want to determine if Target has a significant effect. I will examine the model
 ###### Model.NoInteraction
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1245,9 +1202,6 @@ summary(model.NoInteraction)
 The estimations are in reference to the Ind level for the Target variable and session 2 for the session order variable. The results suggest that session 3 and 4 have a significant effect. I expected this effect. The results also indicate that the impact of the Team and Ind_Team levels do not have an effect that is greater than zero, in reference to the Ind level.
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1268,9 +1222,6 @@ emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
 The estimated marginal means show no significant difference among the Target variable. It does look like the different between Ind_Team and Team is approaching significance (p = .168). This approaching significance suggests that more data is needed.
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1296,9 +1247,6 @@ __Reflection:__ The *model.NoInteraction:* model shows no significant effect fro
 ###### Model.NoInteraction.NoTarget
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1320,9 +1268,6 @@ summary(model.NoInteraction.NoTarget)
 The results show that that session 3 and 4 are significantly different from session 2.
 
 ```{r}
-# Response Variable
-#response_variable <- "timeRemaining_team"
-
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -1356,10 +1301,6 @@ Overall, the results show no significant effect from the Target variable, but it
 We learned that __model.NoInteraction__ best describe the individual level data(see previous analysis).
 
 ```{r}
-# Response variable
-#response_variable <- "timeRemaining_ind"
-plot_dependent_variable_name <- "TimeRemaining"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -1411,7 +1352,6 @@ __Reflection:__ Overall, it looks like I need to compare the model to the robust
 I will use the robust estimation for linear mixed models found in the robustlmm package by @Koller2016. I will then compare the robust model to the non-robust model. If the estimated values are noticeably different, then data will need to be transformed. 
 
 ```{r}
-#response_variable <- "timeRemaining_ind"
 
 # Data to model
 data_modified_ind <- ind_data %>%
@@ -1442,10 +1382,6 @@ __Reflection:__ I need to transform the data because there is a very noticeable 
 I will use the square root transformation method from Tukey's ladder [@Tukey1977]. 
 
 ```{r}
-# Response variable
-#response_variable <- "timeRemaining_ind"
-plot_dependent_variable_name <- "TimeRemaining"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -1494,9 +1430,6 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
 There still appears to be a normality violation in the QQ plot. So, I need to compare the robust and non-robust models to make sure I do not need to worry about this violation.
 
 ```{r}
-#Response variable 
-#response_variable <- "timeRemaining_ind"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -1525,9 +1458,6 @@ __Reflection:__ After the transformation, there still appeared to be a violation
 ##### Q: Are there any effects that are significant?
 
 ```{r}
-#Response variable 
-#response_variable <- "timeRemaining_ind"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -1549,9 +1479,6 @@ summary(model.NoInteraction)
 The results showed a significant effect from session 3 and 4 when compared to session 2. This significant effect is expected. The results showed no significant impact from Target levels when compared to the Ind level. However, it is important to note that the effect from the Team Target level is approaching significance (p = .0779). This suggests that more data is needed to reach significance. 
 
 ```{r}
-#Response variable 
-#response_variable <- "timeRemaining_ind"
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -1572,8 +1499,6 @@ emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
 The results show a *significant difference* between the Ind_Team and Team level of feedback. The difference indicates that the amount of time remaining in the Team feedback condition results in higher time remaining (transformed using 1/2 power). 
 
 ```{r}
-#Response variable 
-#response_variable <- "timeRemaining_ind"
 
 # Data to model
 data_modified_ind <- ind_data %>%
