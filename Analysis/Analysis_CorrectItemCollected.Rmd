@@ -9,7 +9,7 @@ csl: apa.csl
 bibliography: bibliography.bib
 params:
   dependent_response_name_WithSpace: "Correct Items"
-  dependent_response_name_NoSpace: "Correct Items"
+  dependent_response_name_NoSpace: "CorrectItems"
   dependent_response_team: "CI_team"
   dependent_response_ind: "CI_ind"
 ---
@@ -1390,3 +1390,5 @@ __Reflection:__ The results show a significant difference between session 2 and 
 #### Summary and reflection
 
 Overall, there were no exciting significant findings produced by either of the models. However, I think that it is worth mentioning that at the individual level, the estimated marginal means based on model.NoInteraction showed that the difference between Ind_Team and Team is __approaching significance__ (p = 0.0729). This suggests that more data is needed. If it eventually reaches significance, then the difference indicates that participants collected more correct individual items in the Team condition when compared to the Ind_Team condition. Furthermore, this would mean that Team feedback is needed to increase the number of correct individual items collected by participants.
+
+# References

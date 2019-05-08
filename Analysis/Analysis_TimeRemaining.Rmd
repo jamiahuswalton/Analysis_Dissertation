@@ -249,7 +249,7 @@ __Reflection:__ The skewness in the time remaining data at the team level center
 ```{r}
 y_label_ind <- "Count"
 x_label_ind <- params$dependent_response_name_WithSpace
-title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)", sep = "")
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
 plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Ind.png", sep = "")
 setwd(figure_directory)
 
@@ -717,11 +717,9 @@ data_modified_team <- team_data %>%
 
 # Generate models with variable response
 data_focus_team <- data_modified_team
-model.null <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "null", is.team = TRUE, is.robust =FALSE)
 model.All <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "All", is.team = TRUE, is.robust = FALSE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
-model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
 
 # Compare all of the models
 anova(model.All,
@@ -1526,4 +1524,4 @@ There was a __significant difference__ between the Ind_Team and Team level feedb
 
 According to the data, giving groups feedback that contains team performance metrics will encourage them to move through the task faster. The amount of time remaining at the end of the session does not tell me if the groups in the Team condition are accurate (i.e., able to collected correct items quicker) as they are completing the task. A plausible conclusion could be that the groups in the Team condition are merely moving through the session quicker than those in the Ind_Team condition. 
 
-My next step is to explore how well the groups collected items. I want to determine if the groups needed less time to collect correct items in the different conditions (particularly the team condition).
+# References
