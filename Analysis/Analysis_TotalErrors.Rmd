@@ -193,8 +193,371 @@ In this section, I seek to visually discover answers to the research question me
 
 ### Q: Is there exciting variation among the _`r params$dependent_response_name_WithSpace`_ metric that will help me understand the influence of the feedback condition?
 
+#### Team
+```{r}
+y_label_team <- "Count"
+x_label_team <- params$dependent_response_name_WithSpace
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+```
+
+The results show the data skewing the left. The center of the large cluster of data points seems to be around 5 or 4 total errrors.
+
+```{r}
+y_label_team <- "Count"
+x_label_team <- "Target"
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 25) +
+  facet_grid(. ~ Target) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(Target) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+The skew in the data continues when the grouped by conditions. The data continues to skew to the left. 
 
 
+#### Individual
+
+```{r}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 40) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+```
+
+The results show the data skewing the left. The center of the large cluster of data points seems to be around 5 or 4 total errrors.
+
+```{r}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(. ~ Target) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- ind_data %>%
+  group_by(Target) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+The distribution of the total errors continues when grouped by condition. The figures shows that most participants committed less that 5 errors. 
+
+
+#### Summary / Reflection
+
+Overall, the data at the individual and team level is skewed to the left. It shows that most of the groups and participants committed 5 or less errors. I see no obvious pattern to note.
+
+There did not seem to be any obvious pattern when grouping the data by Feedback conditions. Maybe the feedback conditions influenced the amount of time remaining depending on their experience (i.e., session order)?
+
+### Q: Is there exciting variation among the _`r params$dependent_response_name_WithSpace`_ that explains how the feedback conditions influence the _`r params$dependent_response_name_WithSpace`_ when session order is taken into consideration?
+
+#### Team
+
+```{r}
+y_label_team <- "Count"
+x_label_team <- params$dependent_response_name_WithSpace
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, Target, SessionOrder)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  select(params$dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+Overall, it looks as though each condition has a similar pattern. In each condition, the skew in the data moves to the left over time. In other words, less and less errors are comitted over time.
+
+
+#### Individual
+
+```{r}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, Target, SessionOrder)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(SessionOrder ~ Target) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- ind_data %>%
+  select(params$dependent_response_ind, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+Overall, the results show that the skew in the data happens over time in each group. I do want to note that in session 4 and in the Team condition, there is a tall bar around the 0 errors, suggsting that individual comitted less error in session 4 when given team feedback. 
+
+
+#### Summary / Reflection
+
+Overall, there are no unexpected treands in the distribution of the data overall and when the data is grouped by condition. There is also no unexpected trend when viewing the data over time (i.e., from session to session). 
+
+### Q: Is there an *interaction* between the Target and Session Order for the _`r params$dependent_response_name_WithSpace`_?
+
+I am interested in this question for modeling purposes. I want to know if I need to include the interaction between Target and Session Order. 
+
+#### Team
+
+```{r}
+y_label_team <- params$dependent_response_name_WithSpace
+x_label_team <- "Session Order"
+title_response_team <- paste(params$dependent_response_name_WithSpace, "(Team) Vs. Target")
+plot_name <- paste("Bar_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, params$dependent_response_team, Team) %>%
+  mutate(rank_order = -rank(team_data[[params$dependent_response_team]], ties.method = "first")) %>%
+  mutate(above_value_threshold = .data[[params$dependent_response_team]] > value_threshold)
+
+ggplot(data = plot_data_team, 
+       aes(x = factor(SessionOrder), 
+                  y = .data[[params$dependent_response_team]], 
+                  fill = Team, 
+                  group = rank_order)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ Target) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") +
+  ggsave(filename = plot_name)
+
+sumDataCount <- plot_data_team %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+sumDataCount %>%
+  kable() %>%
+  kable_styling()
+```
+
+Something that jumps out at me are the bars in sesion 4. It looks as though the bars in session 4 for the Ind_Team condition drop off quicker than the Team and Ind condition. Outside of the that, the trends for each group look similar. 
+
+```{r}
+y_label_team <- params$dependent_response_name_WithSpace
+x_label_team <- "Target"
+title_response_team <- paste(params$dependent_response_name_WithSpace, "(Team) Vs. Target")
+plot_name <- paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, params$dependent_response_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(dependentAverage = mean(.data[[params$dependent_response_team]]), 
+            Stdv =sd(.data[[params$dependent_response_team]]), n = length(.data[[params$dependent_response_team]]), 
+            StEr = sd(.data[[params$dependent_response_team]]) / sqrt(length(.data[[params$dependent_response_team]])))
+
+ggplot(data = plot_data_team, aes(x = Target, y = dependentAverage, color = SessionOrder, shape = SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = dependentAverage - StEr, ymax = dependentAverage + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
+  ggsave(filename = plot_name)
+```
+
+The plot indicates that there may be no interaction between Target and Session Order. 
+
+```{r}
+y_label_team <- params$dependent_response_name_WithSpace
+x_label_team <- "Session"
+title_response_team <- paste(params$dependent_response_name_WithSpace, "(Team) Vs. Session Order")
+plot_name <- paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_BySessionOrder_ByTarget_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(Target, SessionOrder, params$dependent_response_team) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(DependentAverage = mean(.data[[params$dependent_response_team]]), 
+            Stdv =sd(.data[[params$dependent_response_team]]), n = length(.data[[params$dependent_response_team]]), 
+            StEr = sd(.data[[params$dependent_response_team]]) / sqrt(length(.data[[params$dependent_response_team]])))
+
+ggplot(data = plot_data_team, aes(x = SessionOrder , y = DependentAverage, color = Target, shape = Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = DependentAverage - StEr, ymax = DependentAverage + StEr), width = 0.2) +
+  labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Target", shape = "Target") +
+  ggsave(filename = plot_name)
+```
+
+Overall, it looks like there is no interaction between Target and Session Order. I am not expecting to find any significance in later analysis. 
+
+
+
+#### Individual
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+x_label_ind <- "Target"
+title_response_ind <- paste(params$dependent_response_name_WithSpace,"(Individual) Vs. Target")
+plot_name <- paste("Bar_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, params$dependent_response_ind, Player_ID) %>%
+  mutate(rank_order = -rank(.data[[params$dependent_response_ind]])) 
+
+ggplot(data = plot_data_ind, 
+       aes(x = factor(SessionOrder), 
+                  y = .data[[params$dependent_response_ind]], 
+                  fill = Player_ID, group = rank_order )) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  facet_grid(. ~ Target) + 
+  guides(fill = FALSE) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Player_ID") +
+  ggsave(filename = plot_name)
+
+ggplot(data = plot_data_ind, 
+       aes(x = factor(SessionOrder), 
+           y = .data[[params$dependent_response_ind]], 
+           fill = Player_ID, group = rank_order,
+           label = names )) +
+  geom_text_repel(stat = "identity", position = position_jitterdodge(), force = 5) +
+  geom_point(position = position_jitterdodge()) +
+  facet_grid(. ~ Target) + 
+  guides(fill = FALSE) +
+  coord_flip()+
+  xlim("4", "3", "2") +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Player ID") +
+  ggsave(filename = paste("Point_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Ind.png", sep = ""), width = 10)
+
+sumDataCount <- plot_data_ind %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+sumDataCount %>%
+  kable() %>%
+  kable_styling()
+
+```
+
+Overall, there is no noticeable patter that wold lead me to believe there is a strong interaction between the two variables, Target and Session Order. 
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+x_label_ind <- "Target"
+title_response_ind <- paste(params$dependent_response_name_WithSpace, "(Individual) Vs. Target")
+plot_name <- paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, params$dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[params$dependent_response_ind]]), 
+            Stdv =sd(.data[[params$dependent_response_ind]]), 
+            n = length(.data[[params$dependent_response_ind]]), 
+            StEr = sd(.data[[params$dependent_response_ind]]) / sqrt(length(.data[[params$dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, shape=SessionOrder)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=SessionOrder, color = SessionOrder)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") + 
+  ggsave(filename = plot_name)
+```
+
+Visually, there seems to be no interaction between Target and Session Order. 
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+x_label_ind <- "Target"
+title_response_ind <- paste(params$dependent_response_name_WithSpace, "(Individual) Vs. Target") 
+plot_name <- paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_BySessionOrder_ByTarget_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, SessionOrder, params$dependent_response_ind) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[[params$dependent_response_ind]]), 
+            Stdv =sd(.data[[params$dependent_response_ind]]), 
+            n = length(.data[[params$dependent_response_ind]]), 
+            StEr = sd(.data[[params$dependent_response_ind]]) / sqrt(length(.data[[params$dependent_response_ind]])))
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target)) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") +
+  ggsave(filename = plot_name)
+```
+
+Visually, there seems to be no interaction between Target and Session Order. 
+
+
+#### Summary / Reflection
+
+Overall, there seems to be no interaction between Target and Session Order at the individual or team level. The patterns and averages all seem to be similar and I am expecting further analysis to show no significany findings. 
 
 
 
