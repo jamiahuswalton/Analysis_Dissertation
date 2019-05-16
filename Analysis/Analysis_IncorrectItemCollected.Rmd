@@ -1213,4 +1213,6 @@ The results show no significant difference between the session levels.
 
 ##### Summary / Reflection
 
-Overall, the model showed no unexpected or exciting significance. There was a lack of significance when examining the session order variable. 
+Overall, the model showed no unexpected or exciting significance. There was a lack of significance when examining the session order variable.
+
+# References

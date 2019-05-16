@@ -1,17 +1,17 @@
 ---
-title: 'Dissertation Analysis: Time Remaining'
+title: 'Dissertation Analysis: Scores'
 author: "Jamiahus Walton"
-date: "5/6/2019"
+date: "5/15/2019"
 output: html_document
 editor_options:
   chunk_output_type: inline
 csl: apa.csl
 bibliography: bibliography.bib
 params:
-  dependent_response_name_WithSpace: "Time Remaining"
-  dependent_response_name_NoSpace: "TimeRemaining"
-  dependent_response_team: "timeRemaining_team"
-  dependent_response_ind: "timeRemaining_ind"
+  dependent_response_name_WithSpace: "Score"
+  dependent_response_name_NoSpace: "Score"
+  dependent_response_team: "TeamScore"
+  dependent_response_ind: "IndividualScore"
 ---
 
 ```{r setup, include=FALSE}
@@ -211,7 +211,8 @@ ggplot(data = plot_data_team) +
   ggsave(filename = plot_name)
 ```
 
-Overall, the distribution of the time remaining is skewed to the left. This skew tells me that most of the teams had around 50 seconds left, or less, at the end of each session. 
+The distribution of the data is slightly skewed to the left with a center around 57 or so. 
+
 
 ```{r}
 y_label_team <- "Count"
@@ -239,9 +240,8 @@ tableData %>%
   kable_styling()
 ```
 
-The skewed to the left pattern continues when grouping the time remaining by the feedback conditions. Most of the teams seem to have about 50 seconds remaining when they completed the task 
+The distribution in the Ind and Team condition seem to be similar to the overal distribution (i.e., skwed to the left). The Ind_Team condition seems to have a flater distribution. 
 
-__Reflection:__ The skewness in the time remaining data at the team level centers around 50 seconds or so. This skewness suggests that most of the teams had about the same amount of time remaining at the end of the session (50 or 40 seconds). In other words, there is no obvious pattern visually. 
 
 
 #### Individual
@@ -262,7 +262,8 @@ ggplot(data = plot_data_ind) +
   ggsave(filename = plot_name)
 ```
 
-Overall, the time remaining at the individual level is skewed to the left. This skewness tells me that most of the participants had 40 to 50 seconds remaining at the end of the sessions. I also notice that there are a number of data points distributed from about 60 to 350. Are there similar characteristics among the teams that have more than 50 seconds remaining at the end of the sessions?
+The data seems to have a realtively normal distribution centered around 67-68. 
+
 
 ```{r}
 y_label_ind <- "Count"
@@ -290,16 +291,18 @@ tableData %>%
   kable_styling()
 ```
 
-The distribution for each condition is similar to the overall data distribution. This similarity tells me that most individuals finished with about 50 seconds or so left at the end of each session. 
-
-__Reflection:__ It seems as though we can say the high performing individuals finished with over 50 seconds or so left at the end of the session. Do high performing individuals have similar characteristics? How should we define a "high performing" individual? Overall, the distribution at the team level is similar to the distribution at the team level. 
+The distribution of the Target groups seemt to have a distribution that is similar to the overall distribution. They seem to be normally distributed and centered around 67-68. 
+ 
   
   
 #### Summary / Reflection
 
-Overall, the data skewed to the left. According to the count at the individual and team level, there were fewer teams and fewer players that finished with more than 50 seconds or so left at the end of the session. We could say that the players and the teams that finished above this 50 seconds (or so) threshold were high performing / faster teams. A question that could be asked is do these "quick / high performing" teams have similar characteristics? 
+Overall, I did not observe any obvious patterns in the distributions. 
 
-There did not seem to be any obvious pattern when grouping the data by Feedback conditions. Maybe the feedback conditions influenced the amount of time remaining depending on their experience (i.e., session order)? 
+At the team level, distribution of the Ind_Team condition seemed flatter than that of the Ind and Team condition. 
+
+At the individual, the distributions of the different Target groups appeared to be similar to the overal distribution of the data.
+
 
 ### Q: Is there exciting variation among the _`r params$dependent_response_name_WithSpace`_ that explains how the feedback conditions influence the _`r params$dependent_response_name_WithSpace`_ when session order is taken into consideration?
 
@@ -332,15 +335,8 @@ tableData %>%
   kable_styling()
 ```
 
-It looks like the distribution for time remaining for teams in the individual feedback condition did not change with more experience. The lack of change is unsual because I would expect the distrabution to move the right (i.e., increase with more experience). 
-  
-It looks like the distribution for time remaining for the Ind_Team condition seems to spread (or flatten) over time, which means that the teams were completing the task faster with more experience.
-  
-It looks like the distribution of the amount of time remaining at the end of the session in the team feedback condition starts to spread over time.
+Overall, it looks as though the distribution of the data over time is similar in each group.
 
-__Reflection:__ I would expect to see the distribution of time remaining to move to the right over time because the teams would will have more experience with the task and get better at the task. This pattern is not followed in the individual condition. The distribution of the time remaining in the individual condition does not seem to improve over time. The amount of time remaining seems to be consistent no matter what session order (i.e., 2,3, or 4) they are in. This consistency would suggest that giving individual performance metrics does not influence the amount of time remaining at the end of the session for a team. 
-
-The distribution for the Ind_Team and Team condition seem to spread (i.e., flatten) over time instead of moving from let to right. To me, this suggest that there are some time that get better with time in these conditions and there are other teams that do no get better with time. 
 
 #### Individual
 
@@ -371,14 +367,13 @@ tableData %>%
   kable_styling()
 ```
 
-It looks like the distribution of the time remaining in the individual condition does not spread over time. This lack of spread tells me that the individuals were not getting faster over time in the individual feedback condition. It looks like the spread of the time remaining in the Ind_Team condition does spread over time. There is a more obvious spread from session 3 to session 4. It looks like the time remaining in the team condition does spread over time.
+Overall, it looks as though the distribution of the data over time is similar in each group. However, it looks as though more there are more individuals with scores above 70 in the Team condition than in the Ind and Ind_Team condition. 
 
-__Reflection:__ I am getting the sense that the individual condition did not influence how quickly the participants completed the session. In other words, giving the individual feedback on performance metrics did not encourage the participants to move faster through the session. However, it looks like the distrabution of the time remaining flattens when groups are given Team or Ind_Team feedback. This tells me that teams are more likely to move through the task quicker if given Ind_Team or Team feedback, not individual feedback. 
 
 
 #### Summary / Reflection
 
-Overall, the distribution is telling me that over time, teams move through the task quicker when given Team or Ind_Team feedback but not individual feedback. This suggests that if I looked at the fourth session and group the data by the feedback conditions, I would see that the time remaining in the Ind_Team and Team condition would be different from the time remaining in the individual condition.
+Overall, there were no obvious patterns that I noticed at the Ind or Team level. The data, over time, did what I would expect it to do. In other words, the data shifted from left to right, indicating that the score increased over time.
 
 ### Q: Is there an *interaction* between the Target and Session Order for the _`r params$dependent_response_name_WithSpace`_?
 
@@ -386,11 +381,10 @@ I am interested in this question for modeling purposes. I want to know if I need
 
 #### Team
 
-```{r fig.width= 10}
+```{r}
 y_label_team <- params$dependent_response_name_WithSpace
 x_label_team <- "Session Order"
 title_response_team <- paste(params$dependent_response_name_WithSpace, "(Team) Vs. Target")
-value_threshold <- 120
 plot_name <- paste("Bar_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Team.png", sep = "")
 setwd(figure_directory)
 
@@ -399,20 +393,14 @@ plot_data_team <- team_data %>%
   mutate(rank_order = -rank(team_data[[params$dependent_response_team]], ties.method = "first")) %>%
   mutate(above_value_threshold = .data[[params$dependent_response_team]] > value_threshold)
 
-names <- ifelse(plot_data_team[,"above_value_threshold"], as.character( plot_data_team[["Team"]]), "")
-
 ggplot(data = plot_data_team, 
        aes(x = factor(SessionOrder), 
                   y = .data[[params$dependent_response_team]], 
                   fill = Team, 
-                  group = rank_order,
-                  label = names )) +
-  geom_text(position = position_dodge(1), vjust = 0, aes(y = .data[[params$dependent_response_team]] + 15), check_overlap = FALSE) +
+                  group = rank_order)) +
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(. ~ Target) + 
   guides(fill = FALSE) +
-  coord_flip()+
-  xlim("4", "3", "2") +
   labs(y = y_label_team, x = x_label_team, title = title_response_team, fill = "Teams") +
   ggsave(filename = plot_name)
 
@@ -425,13 +413,7 @@ sumDataCount %>%
   kable_styling()
 ```
 
-Visually, the first thing that jumps out to me that there seem to be a few outliers that may be influencing the results. 
-
-Let's call a group "fast" if that group has more than `r value_threshold` seconds left at the end of the session. The teams that are labeled had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining at the end of the session. This value is an arbitrary value.
-
-The groups that are labeled in all the conditions (Target levels) are team 26, 45, 13. Some of these teams data may be outliers. 
-
-__Reflection:__ This figure tells me that I may need to consider removing these teams because they may be outliers. However, I do not have a good reason to remove the values. Instead, I considered teams, that seemed to be outliers, fast teams. These are the teams that had more than `r value_threshold` seconds (`r value_threshold / 60` minutes) remaining. If I want to look at the characterisitics of fast groups, I could use teams 13, 26, and 45 as fast moving teams. 
+The figure shows a that in each group there is a gradual increase in score over time. There is no obvious difference or pattern among the groups but it does seems as though the Team condition has higher scores. 
 
 
 ```{r}
@@ -454,12 +436,10 @@ ggplot(data = plot_data_team, aes(x = Target, y = dependentAverage, color = Sess
   geom_errorbar(aes(ymin = dependentAverage - StEr, ymax = dependentAverage + StEr), width = 0.2) +
   labs(y = y_label_team, x = x_label_team, title = title_response_team, color = "Session", shape = "Session") +
   ggsave(filename = plot_name)
-
 ```
 
-Visually, there appears to be some level of interaction between Target and SessionOrder for the time remaining. The interaction does not seem to be strong. The graph suggests that the average time remaining at the end of the session increases over time. The increase is particularly noticeable in the Ind_Team condition going from session 3 to session 4.  In other words, when given Ind_Team feedback, the amount of time remaining at the end of each session increases faster. 
+The interaction plot shows no obvious interaction between Target and Session Order. The plot suggests that we can ignore the interaction term in the analysis. 
 
-__Reflection:__ There seems to be some level of interaction but I am getting the sense that it is not a strong interaction. I'll have to run statistical tests to examine the strength of the effect to determine if there is an interaction effect. 
 
 ```{r}
 y_label_team <- params$dependent_response_name_WithSpace
@@ -483,15 +463,7 @@ ggplot(data = plot_data_team, aes(x = SessionOrder , y = DependentAverage, color
   ggsave(filename = plot_name)
 ```
 
-There appears to be an interaction between the Target and Session Order variable. This figure tells me that over time the amount of time remaining at the end of each session increases over time. This figure tells me that in the different session orders, the amount of time remaining is roughly the same in after 4 sessions. However, over time, the amount of time remaining at the end of the session changes differently depending on the feedback condition. 
-  
-The individual session steadily improves over time. 
-
-The Individual_Team session has a small improvement from session 2 to session 3, but there is a substantial increase from session 3 to session 4. This tells me that for some reason there was little change between session 2 and session 3, but something happened that caused a major improvement from session 3 to session 4. 
-
-The team session showed a substantial increase from session 2 to 3 but a small improvement from session 3 to session 4. This suggests that for some reason there was a major improvement between session 2 and session 3, but there was little gain between session 3 and session 4. This could mean that the feedback was no longer useful between 3 and 4 or that the teams reached their highest performance. 
-
-__Reflection:__ I am getting the session that the team condition encouraged teams to move quicker through the session. There was a substantial increase in the amount of time remaining at the end of the session in the Team condition when moving from session 2 to session 3. I am also getting the sense that the Ind_Team feedback condition may be encouraging a team to move quicker through the task as well. However, it looks like the effect of the Ind_Team feedback takes longer to take effect. Even so, the amount of time remaining at the end of the session ended up being about the same after four sessions in the Ind_Team and the Team condition.
+The interaction plots shows that the score in each group increase overtime. It also shows that the scores in each session are similar. This indicates that the intervention may not have had an impact on the score overal at the team level. 
 
 
 #### Individual
@@ -500,36 +472,27 @@ __Reflection:__ I am getting the session that the team condition encouraged team
 y_label_ind <- params$dependent_response_name_WithSpace
 x_label_ind <- "Target"
 title_response_ind <- paste(params$dependent_response_name_WithSpace,"(Individual) Vs. Target")
-value_threshold <- 120
 plot_name <- paste("Bar_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_Ind.png", sep = "")
 setwd(figure_directory)
 
 plot_data_ind <- ind_data %>%
   select(Target, SessionOrder, params$dependent_response_ind, Player_ID) %>%
-  mutate(rank_order = -rank(.data[[params$dependent_response_ind]])) %>%
-  mutate(above_value_threshold = .data[[params$dependent_response_ind]] > value_threshold)
-
-names <- ifelse(plot_data_ind[,"above_value_threshold"], as.character( plot_data_ind[["Player_ID"]]), "")
+  mutate(rank_order = -rank(.data[[params$dependent_response_ind]])) 
 
 ggplot(data = plot_data_ind, 
        aes(x = factor(SessionOrder), 
                   y = .data[[params$dependent_response_ind]], 
-                  fill = Player_ID, group = rank_order,
-                  label = names )) +
+                  fill = Player_ID, group = rank_order )) +
   geom_bar(stat = "identity", position = "dodge") + 
   facet_grid(. ~ Target) + 
   guides(fill = FALSE) +
-  coord_flip()+
-  xlim("4", "3", "2") +
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Player_ID") +
   ggsave(filename = plot_name)
 
 ggplot(data = plot_data_ind, 
        aes(x = factor(SessionOrder), 
            y = .data[[params$dependent_response_ind]], 
-           fill = Player_ID, group = rank_order,
-           label = names )) +
-  geom_text_repel(stat = "identity", position = position_jitterdodge(), force = 5) +
+           fill = Player_ID, group = rank_order)) +
   geom_point(position = position_jitterdodge()) +
   facet_grid(. ~ Target) + 
   guides(fill = FALSE) +
@@ -545,21 +508,10 @@ sumDataCount <- plot_data_ind %>%
 sumDataCount %>%
   kable() %>%
   kable_styling()
-
-sumCountFastParticipants <- plot_data_ind %>%
-  filter(above_value_threshold) %>%
-  group_by(Target, SessionOrder) %>%
-  summarise(N_fast = length(.data[[params$dependent_response_ind]])) 
-
-sumCountFastParticipants %>%
-  kable() %>%
-  kable_styling()
-
 ```
 
-Visually, it looks like some participants moved quickly through the task (i.e., possible outliers). It seems like there are more "fast" participants in session for in the Team condition. 
+Neither the bar plot or the point plot indicate an unexpected a pattern.
 
-__Reflection:__ It looks like pariticipants were moving slower in the Ind condition when compared to the Ind_Team and Team condition. I'm getting the sense that for some reason the individuals were moving fast in the Team condition. Or, participants were getting faster quicker in the Team condition.
 
 
 ```{r}
@@ -583,12 +535,11 @@ ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = SessionOrder, 
   geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
   labs(y = y_label_ind, x = x_label_ind, title = title_response_ind, fill = "Players") + 
   ggsave(filename = plot_name)
-
 ```
 
-There appears to be an interaction between Target and Session Order. Overall, the amount of time at the end of the session increases over time. It looks like there is a considerable increase in the amount of time remaining in the Team condition from Session 2 to session 3. This substantial increase suggests that giving team feedback resulted in individuals moving faster. It looks like something is happening in the Team and Ind_Team condition. In the Ind condition, there is a steady increase in the amount of time remaining. In the Ind_Team condition, there was little to no change in the time remaining between session 2 and 3 but a big change from session 3 to 4. 
+The interaction plot indicates there is no interaction between Target and Session Order. 
 
-__Reflection:__ I am getting the sense that something is happening with the Ind_Team and the Team condition. For some reason, there are these large increases in the time remaining. 
+
 
 ```{r}
 y_label_ind <- params$dependent_response_name_WithSpace
@@ -613,20 +564,12 @@ ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, 
   ggsave(filename = plot_name)
 ```
 
-There seems to be an interaction between the session order and the target variable. 
+The plot indicates the scores do increase over time. It seems as though Team and Ind_Team condition might be significantly different from one another in session 3. 
 
-In the Ind condition, there is a steadying increase in the time remaining at the individual level. 
 
-In the Team condition, there is a large improvement from session 2 to session 3 but little to no improvement from session 3 to session 4. 
+#### Summary / Reflection 
 
-In the Ind_Team condition, there is little to no improvement from session 2 to session 3 but a large improvement from session 3 to session 4. 
-
-__Reflection:__ I get the sense that something interesting is going on with the Ind_Team and Team conditions. The figure suggests that both sessions have a positive influence (i.e., increase the amount of time remaining) on how fast participants move through the session. It seems as though the positive effect of the Team condition happens quicker than the impact of the Ind_Team condition.
-
-#### Summary / Reflection
-
-I am getting the sense that there is something interesting happening with the Ind_Team condition and Team condition. For some reason, the positive effect (i.e., the large increase in the time remaining at the end of the session) in the Team condition happens quicker than the positive effect from the Ind_Team condition. More exploration is needed to understand why this apparent effect is happening. Some statistical analysis is necessary to determine the strength of this effect if it exists. Also, statistical tests are needed to determine if there is an interaction between the Target and SessionOrder variable for the individual and team level.
-
+Overall, there were no interesting patterns that shwoed strong indication there was an interaction between Target and Session order at the individual or team level. This finding suggests that we can ignore the interaction in the models. 
 
 ### Q: Is there an interaction between the Target and Session Order for the _`r params$dependent_response_name_WithSpace`_ that is statistically significant?
 
@@ -652,10 +595,9 @@ $$ y_{ijtp} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} +
 
 Where $y_{ijtp}$ is the response variable (e.g., individual score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^(th)$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^(th)$ session order, $\gamma_{t}$ is the random effect for the $t^(th)$ team, $\theta_{p}$ is the random effect for the $p^(th)$ individual, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijtp}$ is the residual for the model.
 
-
 #### Team
 
-```{r message=FALSE}
+```{r}
 # Data to fit
 data_modified_team <- team_data %>%
   select(TeamScore,
@@ -692,7 +634,6 @@ anova(model.null,
       model.NoInteraction.NoSession) %>%
   kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
   kable_styling()
-
 ```
 
 The following models were significantly different from the null model: model.All,  model.NoInteraction, model.NoInteraction.NoTarget. 
@@ -702,9 +643,6 @@ model.All: Session Order, Target, and the interaction are included in this model
 model.NoInteraction: Session order and target are the fixed effects in this model.
 
 model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
-
-I want to compare the models that are significanntly different from the null model (i.e., the models mentioned above) and compare them with one another. The goal is to see if the extra terms improve the model. 
-
 
 ```{r}
 # Data to fit
@@ -738,22 +676,22 @@ anova(model.NoInteraction,
   kable_styling()
 ```
 
-The results show that the model with the interaction (i.e., Model.All) was not significantly better at describing the data than the other two models (*i.e.,model.NoInteraction.NoTarget and model.NoInteraction*). According to this result, we can remove the interaction effect of the model. It is important to note that some models, compared to model.All, have a small difference in AIC values. However, there is a noticeable difference in BIC values. 
-
-The results also show that the model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. This lack of significance suggests that the model.NoInteraction.NoTarget describes the data best. I notice there is a small difference in the AIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","AIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","AIC"]`) and the BIC (`r anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction","BIC"] - anova(model.NoInteraction, model.NoInteraction.NoTarget)["model.NoInteraction.NoTarget","BIC"]`) criteria values. Due to the small AIC and BIC difference between the two models, I cannot confidently say one model is clearly better than the other model, though the model.NoInteraction.NoTarget is a slightly better model.
-
-I want to calculate the effect size of both models to see if there is a noticeable difference between the effect sizes.
-
+Overal, the results indicate that the model with the interaction, model.All, is not significantly differeny from the other mmodels (i.e., model.NoInteraction and model.NoInteraction.NoTarget). The data suggest the ineraction does not need to be included in the model. The result also indicates that the model.NoInteraction.NoTarget is the best model because none of the added terms (i.e., Target and Target:SessionOrder) significantly improve the model. However, when compaing model.NoInteraction to model.NoInteraction.NoTarget, there was little difference in the AIC and BIC values. I want to compare the models to see if there are any difference in how well they explain the varience in the data. 
 
 ```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
 # Generate models with variable response
-#response_variable <- "timeRemaining_team"
 data_focus_team <- data_modified_team
-model.null <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "null", is.team = TRUE, is.robust =FALSE)
-model.All <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+
 model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
-model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
 
 # Effect size (R^2)
 
@@ -766,16 +704,13 @@ r.squaredGLMM(model.NoInteraction) %>%
    kable_styling(full_width = F)
 ```
 
-There is little difference between the effect sizes for both models. The results show that model.NoInteraction has a slightly better effect size, but the difference is not noticeably different. 
-
-
-__Reflection:__ The models that are significantly different from the null model are model.All, model.NoInteraction, model.NoInteraction.NoTarget. Comparing these three models showed that the model.All was not significantly better than model.NoInteraction or model.NoInteraction.NoTarget. Comparing model.NoInteraction and model.NoInteraction.NoTarget showed no significant difference between the models (i.e., model.NoInteraction did not explain the data better than model.NoInteraction.NoTarget), suggesting that adding the Target variable did not significantly improve the model. However, I noted that the AIC and BIC values were similar. The effect size for both models was examined to determine if one model had a noticeably higher effect size than the other model. There was no noticeable difference in effect size, but the results indicated that model.NoInteraction had a slightly higher effect size. Model.NoInteraction is the model that I am interested in but I cannot I cannot confidently ignore the model of least interest (i.e., model.NoInteraction.NoTarget). Therefore, I will include model.NoInteraction.NoTarget in further analysis.
+I see no noticable difference in the effect size between __model.NoInteraction__ and __model.NoInteraction.NoTarget__. I will include the model.NoInteraction in later analysis.
 
 
 
 #### Individual
 
-```{r, message=FALSE}
+```{r}
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -811,18 +746,15 @@ anova(model.null,
       model.NoInteraction.NoSession) %>%
   kable(caption = "ANOVA: model.null and model.NoInteraction.NoSession") %>%
   kable_styling()
-
 ```
 
-All of the models were significantly different from the null model (i.e., model.All, model.NoInteraction, model.NoInteraction.NoTarget, and model.NoInteraction.NoSession).
+The following models were significantly different from the null model: model.All,  model.NoInteraction, model.NoInteraction.NoTarget. 
 
 model.All: Session Order, Target, and the interaction are included in this model.
 
 model.NoInteraction: Session order and target are the fixed effects in this model.
 
 model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
-
-model.NoInteraction.NoSession: Target is the only fixed effect in this model. 
 
 ```{r}
 # Data to model
@@ -837,7 +769,6 @@ data_focus_ind <- data_modified_ind
 model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
-model.NoInteraction.NoSession <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
 
 anova(model.All,
       model.NoInteraction) %>%
@@ -849,29 +780,15 @@ anova(model.All,
   kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
   kable_styling()
 
-anova(model.All,
-      model.NoInteraction.NoSession) %>%
-  kable(caption = "ANOVA: All and NoInteraction.NoSession") %>%
-  kable_styling()
-
 anova(model.NoInteraction,
       model.NoInteraction.NoTarget) %>%
   kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
   kable_styling()
-
-anova(model.NoInteraction,
-      model.NoInteraction.NoSession) %>%
-  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoSession") %>%
-  kable_styling()
-
-anova(model.NoInteraction.NoTarget,
-      model.NoInteraction.NoSession) %>%
-  kable(caption = "ANOVA: NoInteraction.NoTarget and NoInteraction.NoSession") %>%
-  kable_styling()
 ```
 
-The results show that model.NoInteraction is significantly different from model.NoInteraction.NoTarget and NoInteraction.NoSession. The significant difference means that the model should include the effect of Target and Session Order. The results show that model.All is not significantly from model.NoInteraction. This result tells me that I can confidently remove the interaction effect from the model. I will now calculate the effect size of model.All and model.NoInteraction to examine if there is a noticeable difference between the effect sizes.
+The results show that model.All (the model with the interaction term) does not sigificantly imrpove the model when compared to model.NoInteraction and model.NoInteraction.NoTarget. This suggests that I can ignore the interaction in the model. The results also indicate that model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. 
 
+However, the p value (p = 0.0808538) seems to be trending to significance, suggusting that more data is needed to reach significance. It is important to note that when comparing the AIC and BIC values of the model.NoInteraction and model.NoInteraction.NoTarget, the difference are realtivley small. I will calculate the effect size of each mode to examin how well they explain the varience and see if there are any major differences. 
 
 ```{r}
 # Data to model
@@ -883,7 +800,7 @@ data_modified_ind <- ind_data %>%
          Player_ID)
 
 data_focus_ind <- data_modified_ind
-model.All <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
 model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
 # Effect size (R^2)
@@ -892,23 +809,16 @@ r.squaredGLMM(model.NoInteraction) %>%
   kable(caption = "Table: Effect size for *No Interaction*") %>%
    kable_styling(full_width = F)
 
-r.squaredGLMM(model.All) %>%
-  kable(caption = "Table: Effect size for *All*") %>%
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
+  kable(caption = "Table: Effect size for *No Interaction No Target*") %>%
    kable_styling(full_width = F)
 ```
 
-
-__Reflection:__ Ultimately, the data suggests that the model.NoInteraction is the best model to use. It is significantly different from the mode.Null but model.All (i.e., including the interaction effect) does significantly improve the model.
-
+The results show that both __model.NoInteraction__ and __model.NoInteraction.NoTarget__  describe a similar amount of the varience. I will include the model.NoInteraction in later analysis.
 
 #### Summary / Reflection
 
-At the team level, the models that seem to fit the data best is __model.NoInteraction.NoTarget__ and __model.NoInteraction__. The answer to the original question (is the interaction significant) is that the results suggest the model should not include the interaction effect.
-
-At the individual level, the model that seems to fit the data best is __model.NoInteraction__. The answer to the original question is that the results suggest the model should not include the interaction effect.
-
-My next step is to examine the models and see what I can learn from these models. Are any of the effects in these models significantly different from zero?
-
+Overall, it appears as though the interaction term can be ignored. __model.NoInteraction__ and __model.NoInteraction.NoTarget__ seem to best describe the data at the individual and team level. I will examine both models at the individual and team level reveal any interesting / significant results.
 
 ### Q: Are any of the effects in the models statistically different from zero?
 
@@ -922,7 +832,9 @@ The models may violate some of the assumptions. According to @Field2017, the bes
 
 #### Team
 
-We learned that __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describe the team level data at the team level (see previous analysis). The model __model.NoInteraction__ is the model of interest but I cannot ignore __model.NoInteraction.NoTarget__.
+We learned that __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describe the team level data at the team level (see previous analysis). 
+
+###### Model.NoInteraction
 
 ```{r}
 # Data to fit
@@ -964,8 +876,10 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   ggsave(filename = paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Team.png", sep = ""))
 ```
 
-model.NoInteraction: Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
+The plots indicate that there may be a violation of assumption 3. The tail ends of the QQ plots seem to trial away from the diagonal line. I will need to compare a non-robust model to a robust model to see if there is any major differences in the models. 
 
+
+###### Model.NoInteraction.NoTarget
 
 ```{r}
 # Data to fit
@@ -1008,10 +922,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   ggsave(filename = paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction.NoTarget_Team.png", sep = ""))
 ```
 
-model.NoInteraction.NoTarget: Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
-
-__Reflection:__ It looks both models violated assumptions 2 and 3. In other words,  there may be a constant error violation (i.e., the fitted value plot is not consistent from left to right) and the QQ plot shows an assumption violation. I need to determine if this violation influences the model overall.
-
+The plots indicate that there may be a violation of assumption 3. The tail ends of the QQ plots seem to trial away from the diagonal line. I will need to compare a non-robust model to a robust model to see if there is any major differences in the models. 
 
 ##### Q: Does the violation influence the linear model estimation?
 
@@ -1039,10 +950,10 @@ comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.r
 comparision_results %>%
   kable(caption = "model.NoInteraction") %>%
   kable_styling()
-
 ```
 
-The robust model.NoInteraction model is noticeably different from the non-robust model.NoInteraction. This suggests that the data should be transformed to satisfy the residual assumptions.
+I see no concerable difference between the non-robust and robust model. I will not transform the data. 
+
 
 ###### Model.NoInteraction.NoTarget
 
@@ -1068,109 +979,7 @@ comparision_results %>%
   kable_styling()
 ```
 
-The robust model.NoInteraction.NoTarget model is noticeably different from the non-robust model.NoInteraction.NoTarget This suggests that the data should be transformed to satisfy the residual assumptions.
-
-__Reflection:__ Comparing the normal estimation to the robust models indicates that the data should be transformed because the estimates are noticeably different.
-
-##### Q: Does data transformation satisfy the assumptions of the residuals?
-
-I will use the square root transformation method from Tukey's ladder [@Tukey1977].
-
-###### Model.NoInteraction
-
-```{r}
-# Data to fit
-data_modified_team <- team_data %>%
-  select(TeamScore,
-         params$dependent_response_team,
-         Target, 
-         SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
-
-#response_variable <- "sqrt.value"
-data_focus_team <- data_modified_team
-
-#Plot location
-setwd(figure_directory)
-
-# Generate non-robust models - NoInteraction
-model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
-
-# Histogram of Residuals - model.NoInteraction
-ggplot(model.NoInteraction, aes(x = .resid)) +
-  geom_histogram(bins = 30) + 
-  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
-
-# Fitted values - model.NoInteraction
-ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
-  geom_point() + 
-  geom_hline(yintercept = 0)+
-  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
-
-# QQ plots - model.NoInteraction
-ggplot(model.NoInteraction, aes(sample = .resid)) +
-  stat_qq() +
-  stat_qq_line()+
-  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
-
-```
-
-The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction.
-
-###### Model.NoInteraction.NoTarget
-
-```{r}
-# Data to fit
-data_modified_team <- team_data %>%
-  select(TeamScore,
-         params$dependent_response_team,
-         Target, 
-         SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
-
-response_variable <- "sqrt.value"
-data_focus_team <- data_modified_team
-
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
-
-# Plot location 
-setwd(figure_directory)
-
-# Histogram of Residuals - model.NoInteraction.NoTarget
-ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
-  geom_histogram(bins = 30) + 
-  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction.NoTarget_Team.png", sep = ""))
-
-# Fitted values - model.NoInteraction.NoTarget
-ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
-  geom_point() + 
-  geom_hline(yintercept = 0)+
-  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction.NoTarget_Team.png", sep = ""))
-
-# QQ plots - model.NoInteraction.NoTarget
-ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
-  stat_qq() +
-  stat_qq_line()+
-  labs(title = "Normal Q-Q Plot for NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
-   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction.NoTarget_Team.png", sep = ""))
-```
-
-The diagnostic plots suggest the transformation has resolved the assumption violations for the model.NoInteraction.NoTarget.
-
-__Reflection:__ The plots suggest that the data transformation resolved the residual assumption violations for both models. I will use a step on Tukey's ladder to transform the data.
+I see no concerable difference between the non-robust and robust model. I will not transform the data. 
 
 ##### Q: Are there any effects that are significant?
 
@@ -1185,19 +994,19 @@ data_modified_team <- team_data %>%
          params$dependent_response_team,
          Target, 
          SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+         Team) 
 
 #response_variable <- "sqrt.value"
 data_focus_team <- data_modified_team
 
 # Generate robust and non-robust models - NoInteraction
-model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 
 summary(model.NoInteraction)
 ```
 
-The estimations are in reference to the Ind level for the Target variable and session 2 for the session order variable. The results suggest that session 3 and 4 have a significant effect. I expected this effect. The results also indicate that the impact of the Team and Ind_Team levels do not have an effect that is greater than zero, in reference to the Ind level.
+The results show no significant effection from Team and Ind_Team condition in reference to the Ind condition. The results show that there is a significant effect from session 3 and 4 in reference to session 2. 
+
 
 ```{r}
 # Data to fit
@@ -1206,18 +1015,18 @@ data_modified_team <- team_data %>%
          params$dependent_response_team,
          Target, 
          SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+         Team)
 
 #response_variable <- "sqrt.value"
 data_focus_team <- data_modified_team
 
 # Generate robust and non-robust models - NoInteraction
-model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 
 emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
 ```
-The estimated marginal means show no significant difference among the Target variable. It does look like the different between Ind_Team and Team is approaching significance (p = .168). This approaching significance suggests that more data is needed.
+
+The results show no significant difference among the Target levels. 
 
 ```{r}
 # Data to fit
@@ -1226,21 +1035,21 @@ data_modified_team <- team_data %>%
          params$dependent_response_team,
          Target, 
          SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+         Team)
 
 #response_variable <- "sqrt.value"
 data_focus_team <- data_modified_team
 
 # Generate robust and non-robust models - NoInteraction
-model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
 
 emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
 ```
 
-The estimated marginal means show a significant difference between all of the sessions. This significance suggests that the amount of time remaining at the end of the session increased over time. In other words, the teams were getting faster over time.
+The results show a significant difference among the session orders. In other words, the scores increase over time.
 
-__Reflection:__ The *model.NoInteraction:* model shows no significant effect from the Target levels, but it does show a significant effect from the session order. Specifically, all of the session orders were significantly different from one another. The significance among the session orders means that the amount of time remaining at the end of each session increased over time. 
+
+
 
 ###### Model.NoInteraction.NoTarget
 
@@ -1251,19 +1060,18 @@ data_modified_team <- team_data %>%
          params$dependent_response_team,
          Target, 
          SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+         Team)
 
 #response_variable <- "sqrt.value"
 data_focus_team <- data_modified_team
 
 # Generate robust and non-robust models - NoInteraction_NoTarget
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 
 summary(model.NoInteraction.NoTarget)
 ```
 
-The results show that that session 3 and 4 are significantly different from session 2.
+The results showed a signifcant effect from session 3 and session 4 in reference to session 2. 
 
 ```{r}
 # Data to fit
@@ -1272,31 +1080,28 @@ data_modified_team <- team_data %>%
          params$dependent_response_team,
          Target, 
          SessionOrder, 
-         Team) %>%
-  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+         Team)
 
 #response_variable <- "sqrt.value"
 data_focus_team <- data_modified_team
 
 # Generate robust and non-robust models - NoInteraction_NoTarget
-model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
 
 emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
 ```
 
-The results show a significant difference between each session. 
-
-__Reflection:__ As expected, the results show a significant difference among the session order. In other words, the amount of time remaining at the end of each session increased over time. 
+The results showed a significant difference among all of the sessions. In other words, the scores increased over time. 
 
 ##### Summary / Reflection
 
-I had to transform the data to resolve assumption issues. I used one of the steps in the Tukey ladder @Tukey1977. I took the square root of all the values in the time remaining value for the teams.
-
-Overall, the results show no significant effect from the Target variable, but it does show that the session order has a significant impact. This impact means that the amount of time remaining at the end of each session increased over time. I expected the effects of Session Order. There are no statistically significant results that I can discuss about Target.
+Overall, there were no unexpectred signoficant results at the team level. The lack of interesting results may be a result of so few teams. 
 
 #### Individual
 
-We learned that __model.NoInteraction__ best describe the individual level data(see previous analysis).
+We learned that __model.NoInteraction__ and __model.NoInteraction.NoTarget__ best describe the individual level data(see previous analysis).
+
+##### model.NoInteraction
 
 ```{r}
 # Data to model
@@ -1338,19 +1143,14 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) +
   ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
-
 ```
 
-model.NoInteraction: Visually, it looks like the model violates assumption 2 and 3 in the fitted-value plot and the QQ plot, respectively. I will need to compare this model to a robust model to examine the influence of the apparent violation. If there is a noticeable difference, I will need to transform the data.
+The results indicate the model satisfies all three assumptions. 
 
-__Reflection:__ Overall, it looks like I need to compare the model to the robust models to see if the violation has any influence on the model estimation.
 
-##### Q: Does the violation influence the model estimation?
-
-I will use the robust estimation for linear mixed models found in the robustlmm package by @Koller2016. I will then compare the robust model to the non-robust model. If the estimated values are noticeably different, then data will need to be transformed. 
+##### model.NoInteraction.NoTarget
 
 ```{r}
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
@@ -1359,102 +1159,45 @@ data_modified_ind <- ind_data %>%
          Team, 
          Player_ID)
 
-# Generate models with variable response
-data_focus_ind <- data_modified_ind
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
-rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
-
-comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
-
-comparision_results %>%
-  kable(caption = "model.NoInteraction") %>%
-  kable_styling()
-```
-
-There is a noticeable difference between the non-robust model and the robust model. This noticeable difference indicates that the data should be transformed to attempt to satisfy the assumptions.
-
-__Reflection:__ I need to transform the data because there is a very noticeable difference between the robust model and the non-robust model.
-
-##### Q: Does data transformation satisfy the assumptions of the residuals?
-
-I will use the square root transformation method from Tukey's ladder [@Tukey1977]. 
-
-```{r}
-# Data to model
-data_modified_ind <- ind_data %>%
-  select(params$dependent_response_ind,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
-
 # Plot location
 setwd(figure_directory)
 
-#response_variable <- "sqrt.value"
-data_focus_ind <- data_modified_ind
-
 # Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
-# Histogram of Residuals - model.NoInteraction
-ggplot(model.NoInteraction, aes(x = .resid)) +
+data_focus_ind <- data_modified_ind
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
-  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
-  theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
 
-
-# Fitted values - model.NoInteraction
-ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0)+
-  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
 
 
-# QQ plots - model.NoInteraction
-ggplot(model.NoInteraction, aes(sample = .resid)) +
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq() +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
-
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
 ```
 
-There still appears to be a normality violation in the QQ plot. So, I need to compare the robust and non-robust models to make sure I do not need to worry about this violation.
-
-```{r}
-# Data to model
-data_modified_ind <- ind_data %>%
-  select(params$dependent_response_ind,
-         Target, 
-         SessionOrder, 
-         Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
-
-#response_variable <- "sqrt.value"
-data_focus_ind <- data_modified_ind
-
-# Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
-rmodel.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
-
-compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE) %>%
-  kable() %>%
-  kable_styling()
-```
-
-Comparing the robust and non-robust model does not reveal any concerning difference in estimated value.
-
-__Reflection:__ After the transformation, there still appeared to be a violation in the QQ plot but comparing the robust model to the non-robust model showed no concerning differences.
+The results indicate the model satisfies all three assumptions. 
 
 ##### Q: Are there any effects that are significant?
 
+###### model.NoInteraction
+
 ```{r}
 # Data to model
 data_modified_ind <- ind_data %>%
@@ -1462,19 +1205,18 @@ data_modified_ind <- ind_data %>%
          Target, 
          SessionOrder, 
          Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+         Player_ID)
 
 #response_variable <- "sqrt.value"
 data_focus_ind <- data_modified_ind
 
 # Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
 summary(model.NoInteraction)
 ```
 
-The results showed a significant effect from session 3 and 4 when compared to session 2. This significant effect is expected. The results showed no significant impact from Target levels when compared to the Ind level. However, it is important to note that the effect from the Team Target level is approaching significance (p = .0779). This suggests that more data is needed to reach significance. 
+The results indicate no significant effect from Team and Ind_Team condition in reference to Ind condition. The results indicate a significant effect from session order 3 and 4 in references to session 2. 
 
 ```{r}
 # Data to model
@@ -1483,45 +1225,89 @@ data_modified_ind <- ind_data %>%
          Target, 
          SessionOrder, 
          Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+         Player_ID)
 
 #response_variable <- "sqrt.value"
 data_focus_ind <- data_modified_ind
 
 # Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
 emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
 ```
-The results show a *significant difference* between the Ind_Team and Team level of feedback. The difference indicates that the amount of time remaining in the Team feedback condition results in higher time remaining (transformed using 1/2 power). 
+
+The results indcate no significant difference among the Target. However, it is important to note that the significant difference between Team and Ind_Team _(p= 0.08)_ is approaching significance. This suggest that significance may be reached if more data was collected. A significant result would mean that the individual scores in the Team condition are higher than the individual scores in the Ind_Team condition.  
 
 ```{r}
-
 # Data to model
 data_modified_ind <- ind_data %>%
   select(params$dependent_response_ind,
          Target, 
          SessionOrder, 
          Team, 
-         Player_ID) %>%
-  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some fo the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+         Player_ID)
 
 #response_variable <- "sqrt.value"
 data_focus_ind <- data_modified_ind
 
 # Generate models with variable response
-model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
 
 emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
 ```
 
-There is a significant difference between each of the sessions. This result means that the time remaining at the end of the session was increasing over time. This increase in time remaining suggests that the teams were moving through the session faster the more times they completed the task (Note: This is when the data is transformed using the 1/2 power).
+The results show a significant difference among the session orders. Specifically, the individual scores increase over time. 
+
+###### model.NoInteractionNoTarget
+
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+#response_variable <- "sqrt.value"
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteractionNoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteractionNoTarget)
+```
+
+The results show a significant effect from session 3 and 4 in reference to session 2. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+#response_variable <- "sqrt.value"
+data_focus_ind <- data_modified_ind
+
+# Generate models with variable response
+model.NoInteractionNoTarget <- model_data_Target_Session(df = data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results show a significant difference among the session orders. Specifically, the individual scores increase over time. 
 
 ##### Summary / Reflection
 
-There was a __significant difference__ between the Ind_Team and Team level feedback condition in __model.NoInteraction__. The significant difference indicates that the amount of time remaining at the end of the session in the Team feedback condition is higher than the amount of time remaining in the Ind_Team condition. 
+Overall, there were no significant result to report at the individual level. However, in model.NoInteraction, the difference between Team and Ind_Team was approaching significance _(p= 0.08)_. Assuming the difference would eventually reach significance, the result indicates that the individual scores in the Team condition are higher on average than the scores in the Ind_Team condition 
 
-According to the data, giving groups feedback that contains team performance metrics will encourage them to move through the task faster. The amount of time remaining at the end of the session does not tell me if the groups in the Team condition are accurate (i.e., able to collected correct items quicker) as they are completing the task. A plausible conclusion could be that the groups in the Team condition are merely moving through the session quicker than those in the Ind_Team condition. 
+
+
+
+
 
 # References
