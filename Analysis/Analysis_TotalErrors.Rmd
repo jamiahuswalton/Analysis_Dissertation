@@ -477,9 +477,7 @@ ggplot(data = plot_data_ind,
 ggplot(data = plot_data_ind, 
        aes(x = factor(SessionOrder), 
            y = .data[[params$dependent_response_ind]], 
-           fill = Player_ID, group = rank_order,
-           label = names )) +
-  geom_text_repel(stat = "identity", position = position_jitterdodge(), force = 5) +
+           fill = Player_ID, group = rank_order)) +
   geom_point(position = position_jitterdodge()) +
   facet_grid(. ~ Target) + 
   guides(fill = FALSE) +
@@ -666,6 +664,14 @@ Overall, the results indicate that model.All is no significantly better than mod
 The results also indicate that there is no significant difference between model.NoInteraction or model.NoInteraction.NoTarget. In other words, the extra Target term does not improve the model. However, the AIC and BIC value are close in number (less than 10 difference), which is not a great indication that model.NoInteraction.NoTarget is better that much better than model.NoInteraction. I will look at the effect sizes to examine the differences. 
 
 ```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         Target, 
+         SessionOrder, 
+         Team)
+
 # Generate models with variable response
 #response_variable <- "timeRemaining_team"
 data_focus_team <- data_modified_team
