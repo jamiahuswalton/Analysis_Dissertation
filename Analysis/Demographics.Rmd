@@ -1,0 +1,143 @@
+---
+title: "Participant Demographic"
+author: "Jamiahus Walton"
+date: "5/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
+# Examples of how to use the ggrepel package
+# Link: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html#examples
+
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+library(robustlmm)
+library(ggrepel)
+library(knitr)
+library(kableExtra)
+
+
+#Folder locations and File Names ----
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+survey_folder_name <- "Survey"
+folder_location_survey <- paste(main_work_directory_name, survey_folder_name, sep = "")
+
+# Read Survey Data ----
+setwd(folder_location_survey)
+
+demographic_filename <- "Data_Demographics_Pre-Survey.csv"
+demographic_table <- read.csv(demographic_filename)
+
+# What is the N for Inds ----
+N_ind <- length(demographic_table$Rand)
+
+
+```
+
+# Purpose
+
+The purpose of this document is to explore the demographics of the participants
+
+# Total Participant Count
+
+There were `r N_ind` participants (`r N_ind / 3 ` teams).
+
+# Gender
+
+```{r}
+coulumn.name <- "Gender_Male_Female_Other_PreferNotToAnswer"
+
+Gender_table <- demographic_table %>%
+  select(coulumn.name)%>%
+  group_by(.data[[coulumn.name]]) %>%
+  summarise(Count = length(.data[[coulumn.name]]),
+            Percent = length(.data[[coulumn.name]]) / N_ind * 100)
+
+Gender_table %>%
+  kable() %>%
+  kable_styling()
+```
+
+# Age
+
+```{r}
+coulumn.name <- "Age..18.21..22.30..31.40..41.50..51.60..61...Prefer.not.to.answer."
+
+Gender_table <- demographic_table %>%
+  select(coulumn.name)%>%
+  group_by(.data[[coulumn.name]]) %>%
+  summarise(Count = length(.data[[coulumn.name]]),
+            Percent = length(.data[[coulumn.name]]) / N_ind * 100)
+
+Gender_table %>%
+  kable() %>%
+  kable_styling()
+```
+
+# Academic Standing
+
+```{r}
+coulumn.name <- "What.year.are.you...Freshman..Sophomore..Junior..Senior..I.am.not.an.undergaduate..Prefer.not.to.answer."
+
+Gender_table <- demographic_table %>%
+  select(coulumn.name)%>%
+  group_by(.data[[coulumn.name]]) %>%
+  summarise(Count = length(.data[[coulumn.name]]),
+            Percent = length(.data[[coulumn.name]]) / N_ind * 100)
+
+Gender_table %>%
+  kable() %>%
+  kable_styling()
+```
+
+# Academic major
+
+```{r}
+coulumn.name <- "What.is.your.major.of.study....Selected.Choice..Agricultural..Business..Design..Education...Human.Sciences..Engineering..Liberal.Arts..Sciences..Veterinary.Medicine..Prefer.not.to.Answer."
+
+Gender_table <- demographic_table %>%
+  select(coulumn.name)%>%
+  group_by(.data[[coulumn.name]]) %>%
+  summarise(Count = length(.data[[coulumn.name]]),
+            Percent = length(.data[[coulumn.name]]) / N_ind * 100)
+
+Gender_table %>%
+  kable() %>%
+  kable_styling()
+```
+
+# Highest degree 
+
+```{r}
+coulumn.name <- "What.is.your.highest.degree...High.School..Associate.s..Bachelor.s..Master.s..PhD..Prefer.not.to.answer."
+
+Gender_table <- demographic_table %>%
+  select(coulumn.name)%>%
+  group_by(.data[[coulumn.name]]) %>%
+  summarise(Count = length(.data[[coulumn.name]]),
+            Percent = length(.data[[coulumn.name]]) / N_ind * 100)
+
+Gender_table %>%
+  kable() %>%
+  kable_styling()
+```
+
+
