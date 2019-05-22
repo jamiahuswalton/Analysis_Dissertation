@@ -390,8 +390,7 @@ setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, params$dependent_response_team, Team) %>%
-  mutate(rank_order = -rank(team_data[[params$dependent_response_team]], ties.method = "first")) %>%
-  mutate(above_value_threshold = .data[[params$dependent_response_team]] > value_threshold)
+  mutate(rank_order = -rank(team_data[[params$dependent_response_team]], ties.method = "first"))
 
 ggplot(data = plot_data_team, 
        aes(x = factor(SessionOrder), 
@@ -427,7 +426,8 @@ plot_data_team <- team_data %>%
   select(Target, SessionOrder, params$dependent_response_team) %>%
   group_by(SessionOrder, Target) %>%
   summarise(dependentAverage = mean(.data[[params$dependent_response_team]]), 
-            Stdv =sd(.data[[params$dependent_response_team]]), n = length(.data[[params$dependent_response_team]]), 
+            Stdv =sd(.data[[params$dependent_response_team]]), 
+            n = length(.data[[params$dependent_response_team]]), 
             StEr = sd(.data[[params$dependent_response_team]]) / sqrt(length(.data[[params$dependent_response_team]])))
 
 ggplot(data = plot_data_team, aes(x = Target, y = dependentAverage, color = SessionOrder, shape = SessionOrder)) +
@@ -587,7 +587,7 @@ The next two sections below describe the full model for team and individual leve
 
 $$ y_{ijt} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} +   \epsilon_{ijt}$$ 
 
-Where $y_{ijt}$ is the response variable (e.g., team score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^(th)$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^(th)$ session order, $\gamma_{t}$ is the random effect for the $t^(th)$ team, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijt}$ is the residual for the model. 
+Where $y_{ijt}$ is the response variable (e.g., team score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^{th}$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^{th}$ session order, $\gamma_{t}$ is the random effect for the $t^{th}$ team, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijt}$ is the residual for the model. 
 
 ##### Individual Team Full Model
 
