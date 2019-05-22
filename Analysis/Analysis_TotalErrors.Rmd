@@ -378,8 +378,7 @@ setwd(figure_directory)
 
 plot_data_team <- team_data %>%
   select(Target, SessionOrder, params$dependent_response_team, Team) %>%
-  mutate(rank_order = -rank(team_data[[params$dependent_response_team]], ties.method = "first")) %>%
-  mutate(above_value_threshold = .data[[params$dependent_response_team]] > value_threshold)
+  mutate(rank_order = -rank(team_data[[params$dependent_response_team]], ties.method = "first")) 
 
 ggplot(data = plot_data_team, 
        aes(x = factor(SessionOrder), 
