@@ -325,6 +325,17 @@ session_order_number <- function(teamNum, counter_balance_set_dataframe, conditi
   return(current_session_order)
 }
 
+# Find the counterbalance set order
+set_counter_balance_number <- function(teamNum, counter_balance_set_dataframe){
+  
+  set_index <- teamNum %% length(counter_balance_set_dataframe)
+  if(set_index == 0){
+    #This means that this team used the last set
+    set_index = length(counter_balance_set_dataframe)
+  }
+  return(set_index)
+}
+
 # Total distance traveled by a player ----
 total_distance_traveled_by_player<- function(position_data, experimentalcondition, teamnumber_current, playerNum, col_name_X, col_name_y){
   
@@ -596,6 +607,10 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
   colnames(data_output_final)<- col.names
   
   for(team in team_numbers){
+    
+    # Counter balance set number for the team
+    counter_balance_set_num <- set_counter_balance_number(team, counter_balance_set)
+    
     for(condition in condition_list){
       
       #Count the number of times strategies were used
@@ -776,6 +791,7 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     player, 
                                     current_player_id,
                                     current_session_order,
+                                    counter_balance_set_num,
                                     target_for_feedback,
                                     time_remaining_ind,
                                     time_remaining_team,
@@ -1030,20 +1046,17 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 
 #Test ----
-
-# dependent <- "TeamScore"
-# data.to.use <- team_data
+# teamNum <- 12
+# counter_balance_set_dataframe <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6))
 # 
-# test <- function(df, dependent, model.type){
-#   if(model.type == "null"){
-#     lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
-#   } else if(model.type == "All"){
-#     lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+# set_counter_balance_number <- function(teamNum, counter_balance_set_dataframe){
+#   
+#   set_index <- teamNum %% length(counter_balance_set_dataframe)
+#   if(set_index == 0){
+#     #This means that this team used the last set
+#     set_index = length(counter_balance_set_dataframe)
 #   }
+#   return(set_index)
 # }
 # 
-# # anova(test(team_data, "TeamScore", "null"), test(team_data, "TeamScore", "All"))
-# anova(model_data_Target_Session(team_data, "TeamScore", "null",T), model_data_Target_Session(team_data, "TeamScore", "All",T), model_data_Target_Session(team_data, "TeamScore", "NoInteraction",T))
-# test1 <- model_data_Target_Session(team_data, "TeamScore", "All",T)
-# summary(update(test1, . ~ . -Target:Session))
-# lmer(as.formula(paste(dependent, "~ Target * SessionOrder + (1|Team)")), data.to.use)
+# set_counter_balance_number(18, counter_balance_set_dataframe)
