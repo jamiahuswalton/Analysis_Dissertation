@@ -2,7 +2,9 @@
 title: 'Dissertation Analysis: Scores'
 author: "Jamiahus Walton"
 date: "5/15/2019"
-output: html_document
+output: 
+  html_document: 
+    toc: true
 editor_options:
   chunk_output_type: inline
 csl: apa.csl
@@ -1172,7 +1174,7 @@ ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction.NoTarget_Ind.png", sep =""))
 
 # Fitted values - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
@@ -1180,7 +1182,7 @@ ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction.NoTarget_Ind.png", sep =""))
 
 
 # QQ plots - model.NoInteraction.NoTarget
@@ -1189,7 +1191,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction.NoTarget_Ind.png", sep =""))
 ```
 
 The results indicate the model satisfies all three assumptions. 
