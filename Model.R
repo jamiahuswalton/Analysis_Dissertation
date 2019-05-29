@@ -71,7 +71,8 @@ data_modified_ind <- ind_data %>%
          Target, 
          SessionOrder, 
          Team, 
-         Player_ID)
+         Player_ID) %>%
+  mutate(timeRemaining_ind_Positive = ifelse(.data[["timeRemaining_ind"]] < 0, 0, .data[["timeRemaining_ind"]]))
 
 data_modified_ind_GT <- ind_data %>%
   filter(Dominate.Strategy == "Go Together") %>%
