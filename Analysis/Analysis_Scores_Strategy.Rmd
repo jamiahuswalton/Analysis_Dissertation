@@ -184,7 +184,7 @@ ggplot(data = plot_data_team) +
   ggsave(filename = plot_name)
 ```
 
-[Add review]
+The distribution of the scores using the `r params$Strategy_GA_name_WithSpace` is skewed to the left with a center around 55 or so and the distribution of the score using the  `r params$Strategy_GT_name_WithSpace` is normally distributed with the cetner around 65. 
 
 ```{r cache=FALSE}
 y_label_team <- "Count"
