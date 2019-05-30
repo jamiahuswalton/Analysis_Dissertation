@@ -1045,18 +1045,27 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-#Test ----
-# teamNum <- 12
-# counter_balance_set_dataframe <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6))
+# Test ----
+# clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
 # 
-# set_counter_balance_number <- function(teamNum, counter_balance_set_dataframe){
-#   
-#   set_index <- teamNum %% length(counter_balance_set_dataframe)
-#   if(set_index == 0){
-#     #This means that this team used the last set
-#     set_index = length(counter_balance_set_dataframe)
-#   }
-#   return(set_index)
-# }
+# # Re factor the columns
+# columns_to_refactor <- c("SessionOrder", 
+#                          "Team", 
+#                          "Player_ID", 
+#                          "Condition", 
+#                          "Dominate.Strategy", 
+#                          "Condition", 
+#                          "Target",
+#                          "Confident_team_comm_important_details_quickly")
+# clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
 # 
-# set_counter_balance_number(18, counter_balance_set_dataframe)
+# data_focus <- clean_aggregate_data_stats %>%
+#   select(Target, SessionOrder, Team, Player_ID, IndividualScore, Dominate.Strategy)
+# 
+# my_model_manual <- lmer(data = data_focus, IndividualScore ~ Target + SessionOrder + Dominate.Strategy + SessionOrder:Target + (1|Team) + (1| Player_ID))
+# 
+# my_model_function <- model_data_Target_Session(df = clean_aggregate_data_stats, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust =FALSE)
+# 
+# emmeans(my_model_manual, list(pairwise ~ Target*Dominate.Strategy), adjust = "tukey")
+# 
+# compare(model.null, model.null)
