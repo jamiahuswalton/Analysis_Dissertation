@@ -1,0 +1,411 @@
+---
+title: 'Dissertation Analysis: Time Remaining - Strategy'
+author: "Jamiahus Walton"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: true
+editor_options:
+  chunk_output_type: inline
+csl: apa.csl
+bibliography: bibliography.bib
+params:
+  dependent_response_name_WithSpace: "Time Remaining"
+  dependent_response_name_NoSpace: "TimeRemaining"
+  dependent_response_team: "timeRemaining_team"
+  dependent_response_ind: "timeRemaining_ind"
+  dependent_response_DominateStrategy: "Dominate.Strategy"
+  Strategy_GT_name_NoSpace: "Go.Together"
+  Strategy_GT_name_WithSpace: "Go Together"
+  Strategy_GA_name_NoSpace: "Go.Alone"
+  Strategy_GA_name_WithSpace: "Go Alone"
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
+# Examples of how to use the ggrepel package
+# Link: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html#examples
+
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+library(robustlmm)
+library(ggrepel)
+library(knitr)
+library(kableExtra)
+
+# Functions used in documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+# Factor columns that need it.
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+# Model the data for the team level analysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
+  
+  if(is.team){
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  } else {
+    # Run this code if individual level model
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
+}
+
+#Folder locations ----
+figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID", 
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly")
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+# Q: Is there exciting variation among the _`r params$dependent_response_name_WithSpace`_ metric that will help me understand the influence of the feedback condition?
+
+## Team
+
+```{r cache=FALSE}
+y_label_team <- "Count"
+x_label_team <- params$dependent_response_name_WithSpace
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, 
+         params$dependent_response_DominateStrategy, 
+         Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  facet_grid( . ~ .data[[params$dependent_response_DominateStrategy]]) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+```
+
+The distribution of both groups have a skew to the left.
+
+```{r cache=FALSE}
+y_label_team <- "Count"
+x_label_team <- "Target"
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, 
+         params$dependent_response_DominateStrategy, 
+         Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 25) +
+  facet_grid(.data[[params$dependent_response_DominateStrategy]] ~ Target) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(Target, .data[[params$dependent_response_DominateStrategy]]) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+I see no obvious pattern.
+
+```{r}
+y_label_team <- "Count"
+x_label_team <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, 
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder)
+
+# Generate data by strategy
+GA_plot_data_team <- plot_data_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+GT_plot_data_team <- plot_data_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Plot
+ # GA
+ggplot(data = GA_plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)","(", params$Strategy_GA_name_WithSpace ,")" ), x = x_label_team, y = y_label_team) +
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+    # Information about the N values in each condition
+GA_tableData <- GA_plot_data_team %>%
+  select(params$dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+GA_tableData %>%
+  kable(caption = paste("Data for ", params$Strategy_GA_name_WithSpace)) %>%
+  kable_styling()
+
+ # GT
+ggplot(data = GT_plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)","(", params$Strategy_GT_name_WithSpace ,")" ), x = x_label_team, y = y_label_team) +
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+
+    # Information about the N values in each condition
+GT_tableData <- GT_plot_data_team %>%
+  select(params$dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+GT_tableData %>%
+  kable(caption = paste("Data for ", params$Strategy_GT_name_WithSpace)) %>%
+  kable_styling()
+```
+
+In the `r params$Strategy_GT_name_WithSpace` group, session 4, it looks like there is are a number of teams that have a lt of time remaining. However, I see no obvious pattern.
+
+## Individual
+
+```{r cache=FALSE}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, params$dependent_response_DominateStrategy, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 40) +
+  facet_grid(. ~ .data[[params$dependent_response_DominateStrategy]]) + 
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+```
+
+Both groups sees to have a distribution that is skewed to the left. The `r params$Strategy_GA_name_WithSpace` group seem to have a large number of outliers but the `r params$Strategy_GT_name_WithSpace` group is more concentrated. 
+
+```{r cache=FALSE}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, params$dependent_response_DominateStrategy, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(.data[[params$dependent_response_DominateStrategy]] ~ Target) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- ind_data %>%
+  group_by(Target, .data[[params$dependent_response_DominateStrategy]]) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+The distributions when grouped by target and strategy is similar to the overall distribution. 
+
+```{r}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, 
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder)
+
+# Generate data by strategy
+GA_plot_data_ind <- plot_data_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+GT_plot_data_ind <- plot_data_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# plot
+  # GA
+ggplot(data = GA_plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(SessionOrder ~ Target) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)","(", params$Strategy_GA_name_WithSpace ,")" ), x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep = ""))
+
+    # Information about the N values in each condition
+GA_tableData <- GA_plot_data_ind %>%
+  select(params$dependent_response_ind, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+GA_tableData %>%
+  kable(caption =  paste("Data for ", params$Strategy_GA_name_WithSpace)) %>%
+  kable_styling()
+
+  # GT
+ggplot(data = GT_plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(SessionOrder ~ Target) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)","(", params$Strategy_GT_name_WithSpace ,")" ), x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GT_name_NoSpace, "_Ind.png", sep = ""))
+
+# Information about the N values in each condition
+GT_tableData <- GT_plot_data_ind %>%
+  select(params$dependent_response_ind, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+GT_tableData %>%
+  kable(caption = paste("Data for ", params$Strategy_GT_name_WithSpace)) %>%
+  kable_styling()
+```
+
+In the `r params$Strategy_GA_name_WithSpace` group, the bulk of time remaining seems only move slightly, if at all, to the right. Where as the distribution of time reamining in the `r params$Strategy_GT_name_WithSpace`seems to flatten over time.
+
+## Summary
+
+Overall, there were no obvious patterns at the team level. At the individual level, when grouped by Target, session order, and `r params$Strategy_GT_name_WithSpace`, the distributions faltten over time, as oppsed to staying the same. The distribution at the individiual level, grouped by target, session order, and `r params$Strategy_GA_name_WithSpace`, seems to change only a little but not much. 
+
+I am getting the sense that strategy may have a significant effect on the time remaining, even if it is small. However, there may not be enough teams to detect the effect. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# References
