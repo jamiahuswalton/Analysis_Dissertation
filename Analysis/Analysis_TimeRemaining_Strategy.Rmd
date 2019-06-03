@@ -1578,6 +1578,505 @@ At the team level, I will need to transform the data for __model.NoInteraction__
 
 At the individual level, I will need to transform the data for __model.NoInteraction__ and __model.NoInteractionNoTarget__ when teams use the Go Alone strategy. I will also need to transform the data for __model.All__ and __model.NoInteraction__ when teams use the Go Together strategy.
 
+# Q: Does data transformation satisfy the assumptions of the residuals?
+
+## Team
+
+### Model.NoInteraction
+
+#### GA
+
+```{r}
+#Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
+
+```
+
+There still seems to be a violation with assumption 3. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### GT
+
+__Dont need to transform data.__
+
+### Model.NoInteraction.NoTarget
+
+#### GA
+
+```{r}
+#Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate non-robust models - NoInteractionNoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Team.png", sep = ""))
+
+```
+
+It looks like there may still be a violation with assumption 2 and 3.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - model.NoInteraction.NoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### GT
+
+__Dont need to transform data.__
+
+## Individual
+
+### GA
+
+#### Model.NoInteraction
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### Model.NoInteraction.NoTarget
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Ind.png", sep =""))
+
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+### GT
+
+#### Model.All
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.All
+ggplot(model.All, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.All"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_Ind.png", sep =""))
+
+
+# Fitted values - model.All
+ggplot(model.All, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.All"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_Ind.png", sep =""))
+
+
+# QQ plots - model.All
+ggplot(model.All, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.All", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 2 and 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+rmodel.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.All, rmodel.All, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.All") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### Model.NoInteraction
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+## Summary
+
+Overall, transforming the data reduced the influnce of the violations. There were instances where the transformation seemed to not address the assumptions but comparing the classic model to the robust model showed no concernable difference. 
 
 
 
