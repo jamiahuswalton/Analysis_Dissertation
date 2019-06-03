@@ -2078,8 +2078,574 @@ I see no concernable difference when I compared the classic model to the robust 
 
 Overall, transforming the data reduced the influnce of the violations. There were instances where the transformation seemed to not address the assumptions but comparing the classic model to the robust model showed no concernable difference. 
 
+# Q: Are there any effects that are significant?
 
+## Team
 
+### Model.NoInteraction
+
+#### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show no significant effect from Target variables. The results show a significant effect from session 3 and 4.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results showed no signifcant difference among the Target levels.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results showed a significant difference between session 2 and 4, and between session 3 and 4. The difference beteen session 2 and 3 is marginally significant, indiciating that more data is needed to reach significance. Overall, this means that the time remaining increased over time. 
+
+#### GT
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show no significant effect from the Target variable. The results show a significant effect from session 4 and a marginally significant effect from session 3 (p = 0.0541).
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results show no significant difference among the Target levels
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results only show a significant difference between sesson 2 and 4. Indicating the time remaining at the team level significantly increased when compared from start to finish. 
+
+### Model.NoInteraction.NoTarget
+
+#### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results show a significant effect from session 3 and 4, in reference to session 2. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results show a significant difference between session 2 and 4, and between session 3 and 4. There was a marginal significance between session 2 and 3 (p = 0.0591).
+
+#### GT
+
+DONT TRANSFORM
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results show a significant effect from session 3 and 4, inreference to session 2. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results only show a significant difference between session 2 and 4. 
+
+## Individual
+
+### GA
+
+#### Model.NoInteraction
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show a significant effection from the Ind_Team condition in reference to the Ind condition. However, the result is close to 0.05, I think it will not be significant after the Tukey adjustment. 
+
+The results show a significant effect from session 3 and 4 in reference to session 2. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+As expected, the significance between Ind and Ind_Team went away, but there is a __significant difference__ between Ind_Team and Team. The results indicates that the time remaining (square root) is larger for individuals when the team uses the Go Alone strategy.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results showed a significant difference between each session, indicating that the time remaining increased over time. 
+
+#### Model.NoInteraction.NoTarget
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results indicate a significant effect from session 3 and 4, inreference to session.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey") 
+```
+
+The results indiciate a significant difference between each session, indiciating that the `r params$dependent_response_name_WithSpace` increased over time. 
+
+### GT
+
+#### Model.All
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+summary(model.All)
+```
+
+In reference to Ind, sessison 2, and Ind_Session2, the results only a show a significant effection from session 3 and 4 (in reference to session 2), and Team_Session4 (in reference to Ind_Session2).
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ Target), adjust = "tukey") 
+```
+
+The results show no significant difference among the Target level. __However, it is important to note that this result may be misleading, due to the presence of the interaction term__.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ SessionOrder), adjust = "tukey") 
+```
+
+Unsurprisingly, the results show a significant difference between each session. __However, it is important to note that this result may be misleading, due to the presence of the interaction term__.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ Target | SessionOrder), adjust = "tukey")
+```
+The result show that __significant difference__ when Target is a condition of Session Order. Specifically, in session 4, the Team condition is significantly different from Ind and Ind_Team. The results indicate that the `r params$dependent_response_name_WithSpace` at the individual level, in the Team condition, in session 4, is larger than the `r params$dependent_response_name_WithSpace` in the Ind and Ind_Team condition. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ SessionOrder | Target), adjust = "tukey")
+```
+
+Unsurprisingly, the results indicate a significant difference between session 2 and 3, and between session 3 and 4 for each condition. HOwever, it is intersting to note that only in the Team condition is session 3 and 4 signficiantly different. 
+
+#### Model.NoInteraction
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show no significant effect from the Target variable in reference to Ind level. The results show a significant effect from session 3 and 4 in reference to session 2.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results show no significant effect among the feedback conditions.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey") 
+```
+
+The results show a significant difference between each session order, indicating `r params$dependent_response_name_WithSpace` increased over time. 
+
+## Summary
+
+At the individual level, when teams use the Go Alone method, model.NoInteracton indicates a __significant difference__ between Ind_Team and Team. Specicially, `r params$dependent_response_name_WithSpace` (square root) is significantly higher when given Team feedback in the condition, compared to Ind_Team feedback.   
+
+At the individual level, wehn teams use the Go Together method, in session 4, model.All indicates a __significant difference__ between Ind_Team and Team, and a difference between Ind and Team condition, indicating that the Team condition produced the higher individual `r params$dependent_response_name_WithSpace` (Square root). 
+
+Overall, the results indicate that the Team condition significantly increased the `r params$dependent_response_name_WithSpace` (sqaure root) at the individual level when the team uses Go Together strategy. There were no sinificant results in at the team level but there were signifcant results at the team level.
+
+The results at the individual level, when teams use the Go Alone method, indicate that  `r params$dependent_response_name_WithSpace` (square root) is __significantly__ higher when given Team feedback when compared to giving Ind_Team feedback.  
+
+The results at the individual level, when teams use the Go Together method, is session 4, indicate that in the beginning, the feedback condition did not matter until the teams had some experience. Once a team has experience, the results suggest that giving them Team feedback will increse the `r params$dependent_response_name_WithSpace`. 
 
 
 
