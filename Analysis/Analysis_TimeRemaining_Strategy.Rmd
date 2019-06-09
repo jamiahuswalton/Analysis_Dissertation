@@ -1612,7 +1612,7 @@ ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
 
 # Fitted values - model.NoInteraction
 ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
@@ -1620,7 +1620,7 @@ ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
+  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
 
 # QQ plots - model.NoInteraction
 ggplot(model.NoInteraction, aes(sample = .resid)) +
@@ -1628,7 +1628,7 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Team.png", sep = ""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
 
 ```
 
@@ -1696,7 +1696,7 @@ ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Team.png", sep = ""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace,"_Team.png", sep = ""))
 
 # Fitted values - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
@@ -1704,7 +1704,7 @@ ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Team.png", sep = ""))
+  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace,"_Team.png", sep = ""))
 
 # QQ plots - model.NoInteraction.NoTarget
 ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
@@ -1712,7 +1712,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
    theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Team.png", sep = ""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace,"_Team.png", sep = ""))
 
 ```
 
@@ -1783,7 +1783,7 @@ ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
 
 
 # Fitted values - model.NoInteraction
@@ -1792,8 +1792,7 @@ ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
-
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
 
 # QQ plots - model.NoInteraction
 ggplot(model.NoInteraction, aes(sample = .resid)) +
@@ -1801,7 +1800,7 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
 
 ```
 
@@ -1863,7 +1862,8 @@ ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Ind.png", sep =""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
 
 
 # Fitted values - model.NoInteraction.NoTarget
@@ -1872,7 +1872,7 @@ ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Ind.png", sep =""))
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
 
 
 # QQ plots - model.NoInteraction.NoTarget
@@ -1881,7 +1881,7 @@ ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_Ind.png", sep =""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
 
 ```
 
@@ -1944,7 +1944,7 @@ ggplot(model.All, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.All"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_Ind.png", sep =""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
 
 
 # Fitted values - model.All
@@ -1953,7 +1953,7 @@ ggplot(model.All, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.All"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_Ind.png", sep =""))
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
 
 
 # QQ plots - model.All
@@ -1962,7 +1962,7 @@ ggplot(model.All, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for model.All", x = "Theoretical", y = "Sample") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_Ind.png", sep =""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
 
 ```
 
@@ -2023,7 +2023,7 @@ ggplot(model.NoInteraction, aes(x = .resid)) +
   geom_histogram(bins = 30) + 
   labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
   theme(plot.title = element_text(hjust = 0.5)) + 
-  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
 
 
 # Fitted values - model.NoInteraction
@@ -2032,7 +2032,7 @@ ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)+
   labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
 
 
 # QQ plots - model.NoInteraction
@@ -2041,7 +2041,7 @@ ggplot(model.NoInteraction, aes(sample = .resid)) +
   stat_qq_line()+
   labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_Ind.png", sep =""))
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
 
 ```
 
