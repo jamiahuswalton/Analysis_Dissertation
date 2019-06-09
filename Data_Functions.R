@@ -406,7 +406,7 @@ total_correct_items_collected_in_session_by_individual <- function(inventory_dat
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error.----
+# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Item.----
 # Duration is retruned if error count is 0.
 collection_rate_correct_items_ind <- function(data_position, data_inventory, teamnum, playernumber, condition){
   # This is the item collection rate for an individual
@@ -466,7 +466,7 @@ total_correct_items_collected_in_session_by_team <- function(data_inventory, tea
   return(length(inventory_data_filtered[,"itemid"]))
 }
 
-# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Error. ----
+# Function to calculate the Collection Rate for correct items (i.e., duration / total items collected): Sec / Item. ----
 # Duration is retruned if error count is 0.
 collection_rate_correct_items_team <- function(data_position, data_inventory, teamnum, condition){
   # This is the item collection rate for a team
