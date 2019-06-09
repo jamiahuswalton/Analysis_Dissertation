@@ -9,10 +9,11 @@ csl: apa.csl
 bibliography: bibliography.bib
 params:
   # Team
-  score_team: "TeamScore"
+  dependent_team: "TeamScore"
+  dependent_team_name_WithSpace: "Team Score"
   
   #Individual
-  score_ind: "IndividualScore"
+  dependent_ind: "IndividualScore"
 ---
 
 ```{r setup, include=FALSE}
@@ -159,41 +160,38 @@ ind_data <- clean_aggregate_data_stats
 
 # Purpose
 
-The purpose of this document is to determine if there is an effect from the counter balance order. 
+The purpose of this document is to examine the effect from the counter balance order. 
 
 # Scores
 
 ## Team
 
-Looking at the overall data. 
-
 ```{r}
 data_focus_team <- team_data %>%
-  select(SessionOrder, Counterbalance_set, Team, params$score_team) %>%
-  filter(SessionOrder ==4)
+  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
+  mutate(position_order = rank(.data[[params$dependent_team]], ties.method = "first"))
 
-ggplot(data_focus_team, aes(x = SessionOrder, y = .data[[params$score_team]], fill = Team)) +
+ggplot(data_focus_team, aes(x = SessionOrder, y = .data[[params$dependent_team]], fill = Team, group = position_order)) +
   geom_bar(stat = "identity", position = "dodge") +
   facet_grid( . ~ Counterbalance_set) +
   guides(fill = FALSE) +
-  labs(title = paste(params$score_team, " vs. session order, grouped by counterbalance set"))
-
-data_focus_team
+  labs(title = paste(params$dependent_team, " vs. session order, grouped by counterbalance set"), x = "Session Order", y = params$dependent_team_name_WithSpace)
 ```
 
+The figure above shows the team scores in different counter balance sets across session 2, 3, and 4. Generally, it looks like team score improves over time in each counter balance session. Counter balance set 5 looks overall lower than the over sets. 
 
 ```{r}
 data_focus_team <- team_data %>%
-  select(SessionOrder, Counterbalance_set, Team, params$score_team) %>%
+  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
   # filter(SessionOrder ==4) %>%
   group_by(SessionOrder, Counterbalance_set) %>%
-  summarise(average = mean(.data[[params$score_team]]),
-            n = length(.data[[params$score_team]]),
-            StEr = sd(.data[[params$score_team]]) / sqrt(length(.data[[params$score_team]])))
+  summarise(average = mean(.data[[params$dependent_team]]),
+            n = length(.data[[params$dependent_team]]),
+            StEr = sd(.data[[params$dependent_team]]) / sqrt(length(.data[[params$dependent_team]])))
 
 ggplot(data_focus_team, aes(x = SessionOrder, y = average)) +
   geom_point() +
-  labs(title = paste("Averages", params$score_team, " vs. session order, grouped by counterbalance set")) +
+  labs(title = paste("Averages", params$dependent_team, " vs. session order, grouped by counterbalance set")) +
   geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
   facet_grid(. ~ Counterbalance_set)
 
@@ -205,29 +203,29 @@ data_focus_team
 
 ```{r}
 data_focus_ind <- ind_data %>%
-  select(SessionOrder, Counterbalance_set, Player_ID, Team, params$score_ind) #%>%
+  select(SessionOrder, Counterbalance_set, Player_ID, Team, params$dependent_ind) #%>%
   # filter(SessionOrder == 4) 
 
-ggplot(data_focus_ind, aes(x = SessionOrder, y = .data[[params$score_ind]], fill = Player_ID)) +
+ggplot(data_focus_ind, aes(x = SessionOrder, y = .data[[params$dependent_ind]], fill = Player_ID)) +
   geom_bar(stat = "identity", position = "dodge") +
   facet_grid( . ~ Counterbalance_set) +
   guides(fill = FALSE) +
-  labs(title = paste(params$score_ind, " vs. session order, grouped by counterbalance set"))
+  labs(title = paste(params$dependent_ind, " vs. session order, grouped by counterbalance set"))
 ```
 
 
 ```{r}
 data_focus_ind <- ind_data %>%
-  select(SessionOrder, Counterbalance_set, Player_ID, params$score_ind) %>%
+  select(SessionOrder, Counterbalance_set, Player_ID, params$dependent_ind) %>%
   filter(SessionOrder == 4) %>%
   group_by(SessionOrder, Counterbalance_set) %>%
-  summarise(average = mean(.data[[params$score_ind]]),
-            n = length(.data[[params$score_ind]]),
-            StEr = sd(.data[[params$score_ind]]) / sqrt(length(.data[[params$score_ind]])))
+  summarise(average = mean(.data[[params$dependent_ind]]),
+            n = length(.data[[params$dependent_ind]]),
+            StEr = sd(.data[[params$dependent_ind]]) / sqrt(length(.data[[params$dependent_ind]])))
 
 ggplot(data_focus_ind, aes(x = SessionOrder, y = average)) +
   geom_point() +
-  labs(title = paste("Averages", params$score_ind, " vs. session order, grouped by counterbalance set")) +
+  labs(title = paste("Averages", params$dependent_ind, " vs. session order, grouped by counterbalance set")) +
   geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
   facet_grid(. ~ Counterbalance_set)
 
