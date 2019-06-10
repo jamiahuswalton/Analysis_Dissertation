@@ -2645,11 +2645,94 @@ At the individual level, when teams use the Go Alone method, model.NoInteracton 
 
 At the individual level, wehn teams use the Go Together method, in session 4, model.All indicates a __significant difference__ between Ind_Team and Team, and a difference between Ind and Team condition, indicating that the Team condition produced the higher individual `r params$dependent_response_name_WithSpace` (Square root). 
 
-Overall, the results indicate that the Team condition significantly increased the `r params$dependent_response_name_WithSpace` (sqaure root) at the individual level when the team uses Go Together strategy. There were no sinificant results in at the team level but there were signifcant results at the team level.
+Overall, the results indicate that the Team condition significantly increased the `r params$dependent_response_name_WithSpace` (sqaure root) at the individual level when the team uses Go Together strategy. There were no sinificant results in at the team level but there were signifcant results at the individual level.
 
 The results at the individual level, when teams use the Go Alone method, indicate that  `r params$dependent_response_name_WithSpace` (square root) is __significantly__ higher when given Team feedback when compared to giving Ind_Team feedback.  
 
 The results at the individual level, when teams use the Go Together method, is session 4, indicate that in the beginning, the feedback condition did not matter until the teams had some experience. Once a team has experience, the results suggest that giving them Team feedback will increse the `r params$dependent_response_name_WithSpace`. 
+
+# Q: Is there an *interaction* between the Target and Session Order for the _`r params$dependent_response_name_WithSpace`_ at the individual level when Teams us the Go Together strategy?
+
+## Individual
+
+The previous results showed significance at the individual level. 
+
+When teams used the Go Alone method, Individual time remaining was significantly greater when teams were in the Team condition as opposed to the Ind_Team condition. This was deteremined using model.NoInteraction
+
+When teams used the GO Together method, and were in session 4, individual time remaining was significantly more in the Team condition when compared to Ind or Ind_Team condition. This was determined using model.All
+
+-- Short hand summary
+Individual - Go Alone - Team > Ind_Team - model.NoInteraction - Square Root value
+Individual - Go Together - Session 4 - Team > Ind_Team and Team > Ind - model.All - Square root value
+
+### Go Alone interaction plot
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, 
+         SessionOrder, 
+         params$dependent_response_ind,
+         params$dependent_response_DominateStrategy) %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) %>%
+  group_by(Target) %>%
+  summarise(Average = mean(.data[["sqrt.value"]]), 
+            Stdv =sd(.data[["sqrt.value"]]), 
+            n = length(.data[["sqrt.value"]]), 
+            StEr = sd(.data[["sqrt.value"]]) / sqrt(length(.data[["sqrt.value"]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Target, shape=Target, label = .data[["n"]])) +
+  geom_point(size = 3) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = "Target", title = paste(params$dependent_response_name_WithSpace, "(Individual) Vs. Target (", params$Strategy_GA_name_WithSpace, ")")) +
+  ggsave(filename = paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_ByTarget_Avereaged_Over_SessionOrder", params$Strategy_GA_name_NoSpace, "_Ind.png", sep = ""))
+
+plot_data_ind %>% 
+  kable(caption = paste(params$Strategy_GA_name_WithSpace, "Data")) %>%
+  kable_styling()
+```
+
+According to model.NoInteraction, there is a significant difference between Ind_Team and Team condition. 
+
+### Go Together interaction plot
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, 
+         SessionOrder, 
+         params$dependent_response_ind,
+         params$dependent_response_DominateStrategy) %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[["sqrt.value"]]), 
+            Stdv =sd(.data[["sqrt.value"]]), 
+            n = length(.data[["sqrt.value"]]), 
+            StEr = sd(.data[["sqrt.value"]]) / sqrt(length(.data[["sqrt.value"]])))
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target, label = .data[["n"]])) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = "Target", title = paste(params$dependent_response_name_WithSpace, "(Individual) Vs. Target (", params$Strategy_GT_name_WithSpace, ")")) +
+  ggsave(filename = paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_BySessionOrder_ByTarget", params$Strategy_GT_name_NoSpace, "_Ind.png", sep = ""))
+
+plot_data_ind %>% 
+  kable(caption = paste(params$Strategy_GT_name_WithSpace, "Data")) %>%
+  kable_styling()
+```
+
+The results show a significant difference in the 4th session. Indicating that the time remaining at the individual level when in the Team condition is significantly higher than both the Ind and Ind_Team condtion. 
+
+
+
+
 
 
 
