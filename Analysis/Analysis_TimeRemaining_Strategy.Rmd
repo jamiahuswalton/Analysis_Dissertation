@@ -162,6 +162,10 @@ ind_data <- clean_aggregate_data_stats
 
 ```
 
+# Motivation
+
+In previous analysis, there was a significant difference between Ind_Team and Team level feedback condition. The motivation behind this analysis is to discover if the impact/influence of the feedback conditions had any noticeable influence on performance depending on the strategy used by the teams. 
+
 # Q: Is there exciting variation among the _`r params$dependent_response_name_WithSpace`_ metric that will help me understand the influence of the feedback condition?
 
 ## Team
