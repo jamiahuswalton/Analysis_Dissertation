@@ -15,7 +15,7 @@ clean_error_log_data <- remove_a_team_from_raw_data(error_log_data, team_to_remo
 # The different conditions that all team participated in
 condition_list<- c("A", "B", "C", "D")
 
-# The order the teams conducted the session 
+# The order the teams conducted the session (A = None, B = Ind, C = Team, D = Ind_Team)
 set_1 <- c("A", "B", "C", "D")
 set_2 <- c("A", "C", "B", "D")
 set_3 <- c("A", "D", "C", "B")
