@@ -1,5 +1,5 @@
 ---
-title: 'Dissertation Analysis: Examining Counterbalance Effects'
+title: 'Dissertation Analysis: Time Remaining - Examining Counterbalance Effects'
 author: "Jamiahus Walton"
 date: "`r Sys.Date()`"
 output: html_document
