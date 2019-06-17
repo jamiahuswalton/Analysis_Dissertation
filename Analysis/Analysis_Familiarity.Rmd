@@ -1,0 +1,301 @@
+---
+title: 'Dissertation Analysis: Familiarity'
+author: "Jamiahus Walton"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: true
+editor_options:
+  chunk_output_type: inline
+csl: apa.csl
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
+# Examples of how to use the ggrepel package
+# Link: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html#examples
+
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+library(robustlmm)
+library(ggrepel)
+library(knitr)
+library(kableExtra)
+
+# Functions used in documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+# Factor columns that need it.
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+# Model the data for the team level analysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
+  
+  if(is.team){
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  } else {
+    # Run this code if individual level model
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
+}
+
+#Folder locations ----
+figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+familiarity_filename<- "familiarity.csv"
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Read familiarity data
+my_familiarity_data<- read.csv(file = paste(folder_location_database,"\\",familiarity_filename, sep=""))
+
+# Demographics titles
+demo_names <- c("Rand",	
+                "Gender_Male_Female_Other_PreferNotToAnswer",
+                "age_range",
+                "highest_degree",
+                "student_status",
+                "academic_major",
+                "academic_major_other",
+                "is_vision_20_20",
+                "can_communicate_with_team",
+                "can_hold_my_team_back",
+                "can_team_slow_me_down",
+                "can_teams_perform_better_than_ind",
+                "can_feedback_useful_for_teamwork",
+                "can_i_learn_better_in_team",
+                "can_navigate_VE",
+                "video_game_play_frequency",
+                "work_in_team_frequency")
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID", 
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly",
+                         demo_names)
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+# Motivation
+
+The motivation behind this analysis is to see how familiarity played a role in team performance. 
+
+# Q: What is the familiarity breakdown when data is split by strategy?
+
+## Team
+
+```{r}
+N_familiar<- my_familiarity_data[["Familiar"]]
+N_Strangers<- my_familiarity_data[["Strangers"]]
+N_Partially<- my_familiarity_data[["Partially"]]
+
+my_familiarity_data%>%
+  select(Familiarity)%>%
+  group_by(Familiarity)%>%
+  summarise(count = length(.data[["Familiarity"]]),
+            percent = length(.data[["Familiarity"]]) / length(my_familiarity_data[["Familiarity"]]) * 100)
+```
+
+Overall, there were 11 familiar teams, 20 partially familiar teams, and 15 teams that were strangers 
+
+
+```{r}
+plot_data_team <- team_data%>%
+  select(familiarity, 
+         Dominate.Strategy,
+         Target) 
+
+ggplot(plot_data_team, aes(x = factor(Dominate.Strategy))) + 
+  geom_bar()+
+  labs(title= "Strategy count, grouped by team familiarity", x = "Strategy")+
+  facet_grid(. ~ familiarity)
+
+plot_data_team %>%
+  group_by(familiarity) %>%
+  summarise(N = length(.data[["familiarity"]])) %>%
+  kable()%>%
+  kable_styling()
+```
+
+The figure above suggest that teams that were strangers favored Go Alone.
+
+###Summary
+
+It looks like the teams that were strangers tended to use Go Alone.
+
+# Q: Does team familiarity influence the distribution of dependent variables?
+
+## Team
+
+```{r cache=FALSE}
+y_label_team <- "Count"
+x_label_team <- "Time Remaining"
+title_response_team <- paste("Distribution of", "Time Remaining", "(Team)")
+plot_name <- paste("Histogram_", "TimeRemaining", "_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select("timeRemaining_team", 
+         familiarity,
+         Dominate.Strategy, 
+         Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = "timeRemaining_team"), bins = 30) +
+  facet_grid( . ~ Dominate.Strategy) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = "timeRemaining_team"), bins = 30) +
+  facet_grid( familiarity ~ Dominate.Strategy) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+```
+
+I do not see an obvious pattern. The data when grouped by familiarity is similar to the overall distribution of data. 
+
+## Individual
+
+```{r cache=FALSE}
+y_label_ind <- "Count"
+x_label_ind <- "Time Remaining"
+title_response_ind <- paste("Distribution of", "Time Remaining", "(Ind)")
+plot_name <- paste("Histogram_", "TimeRemaining", "_ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select("timeRemaining_ind", 
+         familiarity,
+         Dominate.Strategy, 
+         Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = "timeRemaining_ind"), bins = 30) +
+  facet_grid( . ~ Dominate.Strategy) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = "timeRemaining_ind"), bins = 30) +
+  facet_grid( familiarity ~ Dominate.Strategy) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+```
+
+
+# NEED TO COMPLETE THIS ANALYSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
