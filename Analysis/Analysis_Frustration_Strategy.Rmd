@@ -738,6 +738,356 @@ Overall, I will need to compare the robust model to the classic model for model.
 
 # Q: Does the violation influence the linear model estimation?
 
+## Team
+
+### GA
+
+[No analysis was given]
+
+### GT 
+
+[No analysis was given]
+
+## Individual
+
+### GA
+
+#### model.All
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+rmodel.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.All, rmodel.All, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.All") %>%
+  kable_styling()
+```
+
+I see no concerable difference. I will not transform. 
+
+#### model.NoInteraction.NoTarget
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see no concernable difference. I will not transform the data. 
+
+### GT
+
+#### model.NoInteraction
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference. I will not transform the data 
+
+## Summary
+
+Overall, none of the violations seem to have a noticable influence on the model when comepared to the robust model. I will not transform the data. 
+
+# Q: Are there any effects that are significant?
+
+## Team
+
+### GA
+
+[No analysis was given]
+
+### GT
+
+[No analysis was given]
+
+## Individual
+
+### GA
+
+#### model.All
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+summary(model.All)
+```
+
+__Note:__ It is important to note that the model __failed to converge__. This means that the model was not able to be fitted. Any analysis from this model should not carry a lot of weight. 
+
+The results show a __significant effect__ from Ind_Team in reference to Ind and the results show a __margnially significant__ effect from the Team conditio in reference to Ind condition. There is a significant effect from session 3 in reference to session 2 but there is no marginally significant effect from session 4 in reference to session 2. 
+
+Inturpriting the main effects is made difficult when including the interaction effect.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The result show no significant difference among the Target levels.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The is a significant difference between session 2 and 4, indicating that frustration is higher in session 4. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ Target | SessionOrder), adjust = "tukey")
+```
+
+The result show no significant differences. 
+
+__Note:__ Model failed to converge. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ SessionOrder | Target), adjust = "tukey")
+```
+
+__Note:__ Model failed to converge. 
+
+#### model.NoInteraction.NoTarget
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+The restuls show a significant effect from session 4 in reference to session 2.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+Results showed no significant difference among the session orders. The results showed a __margnially significant__ difference between session 2 and 4.
+
+### GT
+
+#### model.NoInteraction
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show a significant effect from Team and Ind_Team in reference to Ind condition. The results also show a significant effect from from session 4. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results show a __significant difference__ between Ind and Ind_Team, and between Ind and Team. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results show a significant difference between session 2 and 4. 
+
+## Summary
+
+Overall, at the individual level the results show a significant difference in self reported frustration when teams used Go Together. There was a __significant difference__ between Ind and Ind_Team, and between Ind and Team. Specifically, the results suggested that when teams used Go Together, frustration was significantly reduced when teams were in the Team or Ind_Team condition, when compared to the Ind condition. There was a bigger reduction in frustration in the Team condition. 
+
+The results suggest that the Team and Ind_Team condition condition maay have reduced frustration.
+
+
 
 
 
