@@ -88,6 +88,7 @@ go_together_name <- "Go Together"
 go_alone_name <- "Go Alone"
 mix_name <- "Mix"
 col_names<- c("Team", 
+              "familiarity",
               "Condition", 
               "Player",
               "Player_ID",
@@ -128,7 +129,7 @@ col_names<- c("Team",
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
-my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, demographic_table,
+my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, demographic_table, familiarity_data,
                                              player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names,
                                              Rand_num_key, demo_names)
 

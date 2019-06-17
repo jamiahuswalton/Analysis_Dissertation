@@ -30,6 +30,7 @@ folder_location_survey <- paste(main_work_directory_name, survey_folder_name, se
 positiondatafilename<- "position_for_players.csv"
 inventory_data_filename<- "inventory_activity.csv"
 error_log_filename<- "error_log.csv"
+familiarity_filename<- "familiarity.csv"
 
 # ---- Surevy files 
 post_session_filename <- "Data_Post-Session.csv"
