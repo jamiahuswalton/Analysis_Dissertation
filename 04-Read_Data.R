@@ -6,6 +6,7 @@ setwd(folder_location_database)
 positionTable <- read.csv(positiondatafilename)
 inventory_table<- read.csv(inventory_data_filename)
 error_log_data<- read.csv(error_log_filename)
+familiarity_data<- read.csv(familiarity_filename)
 
 # ---- Read in data from sruvey folder
 

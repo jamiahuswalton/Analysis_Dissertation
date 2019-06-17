@@ -49,6 +49,24 @@ PostSession_names <- c("NoticeFeedback",
                        "Confident_team_accurately_assess_handling_information",
                        "Confident_team_quickly_assess_handling_information",
                        "Confident_team_accurately_transfer_information")
+demo_names <- c("Rand",	
+                "Gender_Male_Female_Other_PreferNotToAnswer",
+                "age_range",
+                "highest_degree",
+                "student_status",
+                "academic_major",
+                "academic_major_other",
+                "is_vision_20_20",
+                "can_communicate_with_team",
+                "can_hold_my_team_back",
+                "can_team_slow_me_down",
+                "can_teams_perform_better_than_ind",
+                "can_feedback_useful_for_teamwork",
+                "can_i_learn_better_in_team",
+                "can_navigate_VE",
+                "video_game_play_frequency",
+                "work_in_team_frequency",
+                "team_types")
 
 # Data frame that contains the session order set. The session in the first row was the first condition, second row was the seconds condition...
 counter_balance_set <- data.frame(cbind(set_1, set_2, set_3, set_4, set_5, set_6)) # Put the session orders into a data frame
@@ -70,6 +88,7 @@ go_together_name <- "Go Together"
 go_alone_name <- "Go Alone"
 mix_name <- "Mix"
 col_names<- c("Team", 
+              "familiarity",
               "Condition", 
               "Player",
               "Player_ID",
@@ -105,12 +124,14 @@ col_names<- c("Team",
               mix_name,
               "Dominate Strategy",
               TLX_Scale_Names,
-              PostSession_names)
+              PostSession_names,
+              demo_names)
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
-my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, 
-                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names)
+my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, demographic_table, familiarity_data,
+                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names,
+                                             Rand_num_key, demo_names)
 
 # Save aggregate data to csv file
 setwd(folder_location_database)

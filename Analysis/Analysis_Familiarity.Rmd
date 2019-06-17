@@ -1,22 +1,17 @@
 ---
-title: 'Dissertation Analysis: Examining Counterbalance Effects'
+title: 'Dissertation Analysis: Familiarity'
 author: "Jamiahus Walton"
-date: "5/20/2019"
-output: html_document
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: true
 editor_options:
   chunk_output_type: inline
 csl: apa.csl
 bibliography: bibliography.bib
-params:
-  # Team
-  dependent_team: "TeamScore"
-  dependent_team_name_WithSpace: "Team Score"
-  
-  #Individual
-  dependent_ind: "IndividualScore"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 # Tips for formatting in RMarkdown
@@ -125,22 +120,45 @@ database_folder_name <- "Database"
 file_name_output <- "team_player_aggragate_stats.csv"
 folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
 aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+familiarity_filename<- "familiarity.csv"
 
 # Read aggregaate data ----
 my_aggregate_data <- read.csv(file =  aggregate_folder_location)
 
 clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
 
+# Read familiarity data
+my_familiarity_data<- read.csv(file = paste(folder_location_database,"\\",familiarity_filename, sep=""))
+
+# Demographics titles
+demo_names <- c("Rand",	
+                "Gender_Male_Female_Other_PreferNotToAnswer",
+                "age_range",
+                "highest_degree",
+                "student_status",
+                "academic_major",
+                "academic_major_other",
+                "is_vision_20_20",
+                "can_communicate_with_team",
+                "can_hold_my_team_back",
+                "can_team_slow_me_down",
+                "can_teams_perform_better_than_ind",
+                "can_feedback_useful_for_teamwork",
+                "can_i_learn_better_in_team",
+                "can_navigate_VE",
+                "video_game_play_frequency",
+                "work_in_team_frequency")
+
 # Re factor the columns
 columns_to_refactor <- c("SessionOrder", 
                          "Team", 
-                         "Player_ID",
-                         "Counterbalance_set",
+                         "Player_ID", 
                          "Condition", 
                          "Dominate.Strategy", 
                          "Condition", 
                          "Target",
-                         "Confident_team_comm_important_details_quickly")
+                         "Confident_team_comm_important_details_quickly",
+                         demo_names)
 clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
 
 # What is the N for Teams ----
@@ -158,77 +176,126 @@ ind_data <- clean_aggregate_data_stats
 
 ```
 
-# Purpose
+# Motivation
 
-The purpose of this document is to examine the effect from the counter balance order. 
+The motivation behind this analysis is to see how familiarity played a role in team performance. 
 
-# Scores
+# Q: What is the familiarity breakdown when data is split by strategy?
 
 ## Team
 
 ```{r}
-data_focus_team <- team_data %>%
-  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
-  mutate(position_order = rank(.data[[params$dependent_team]], ties.method = "first"))
+N_familiar<- my_familiarity_data[["Familiar"]]
+N_Strangers<- my_familiarity_data[["Strangers"]]
+N_Partially<- my_familiarity_data[["Partially"]]
 
-ggplot(data_focus_team, aes(x = SessionOrder, y = .data[[params$dependent_team]], fill = Team, group = position_order)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_grid( . ~ Counterbalance_set) +
-  guides(fill = FALSE) +
-  labs(title = paste(params$dependent_team, " vs. session order, grouped by counterbalance set"), x = "Session Order", y = params$dependent_team_name_WithSpace)
+my_familiarity_data%>%
+  select(Familiarity)%>%
+  group_by(Familiarity)%>%
+  summarise(count = length(.data[["Familiarity"]]),
+            percent = length(.data[["Familiarity"]]) / length(my_familiarity_data[["Familiarity"]]) * 100)
 ```
 
-The figure above shows the team scores in different counter balance sets across session 2, 3, and 4. Generally, it looks like team score improves over time in each counter balance session. Counter balance set 5 looks overall lower than the over sets. 
+Overall, there were 11 familiar teams, 20 partially familiar teams, and 15 teams that were strangers 
+
 
 ```{r}
-data_focus_team <- team_data %>%
-  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
-  # filter(SessionOrder ==4) %>%
-  group_by(SessionOrder, Counterbalance_set) %>%
-  summarise(average = mean(.data[[params$dependent_team]]),
-            n = length(.data[[params$dependent_team]]),
-            StEr = sd(.data[[params$dependent_team]]) / sqrt(length(.data[[params$dependent_team]])))
+plot_data_team <- team_data%>%
+  select(familiarity, 
+         Dominate.Strategy,
+         Target) 
 
-ggplot(data_focus_team, aes(x = SessionOrder, y = average)) +
-  geom_point() +
-  labs(title = paste("Averages", params$dependent_team, " vs. session order, grouped by counterbalance set")) +
-  geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
-  facet_grid(. ~ Counterbalance_set)
+ggplot(plot_data_team, aes(x = factor(Dominate.Strategy))) + 
+  geom_bar()+
+  labs(title= "Strategy count, grouped by team familiarity", x = "Strategy")+
+  facet_grid(. ~ familiarity)
 
-data_focus_team
+plot_data_team %>%
+  group_by(familiarity) %>%
+  summarise(N = length(.data[["familiarity"]])) %>%
+  kable()%>%
+  kable_styling()
 ```
 
+The figure above suggest that teams that were strangers favored Go Alone.
+
+###Summary
+
+It looks like the teams that were strangers tended to use Go Alone.
+
+# Q: Does team familiarity influence the distribution of dependent variables?
+
+## Team
+
+```{r cache=FALSE}
+y_label_team <- "Count"
+x_label_team <- "Time Remaining"
+title_response_team <- paste("Distribution of", "Time Remaining", "(Team)")
+plot_name <- paste("Histogram_", "TimeRemaining", "_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select("timeRemaining_team", 
+         familiarity,
+         Dominate.Strategy, 
+         Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = "timeRemaining_team"), bins = 30) +
+  facet_grid( . ~ Dominate.Strategy) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = "timeRemaining_team"), bins = 30) +
+  facet_grid( familiarity ~ Dominate.Strategy) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+```
+
+I do not see an obvious pattern. The data when grouped by familiarity is similar to the overall distribution of data. 
 
 ## Individual
 
-```{r}
-data_focus_ind <- ind_data %>%
-  select(SessionOrder, Counterbalance_set, Player_ID, Team, params$dependent_ind) #%>%
-  # filter(SessionOrder == 4) 
+```{r cache=FALSE}
+y_label_ind <- "Count"
+x_label_ind <- "Time Remaining"
+title_response_ind <- paste("Distribution of", "Time Remaining", "(Ind)")
+plot_name <- paste("Histogram_", "TimeRemaining", "_ind.png", sep = "")
+setwd(figure_directory)
 
-ggplot(data_focus_ind, aes(x = SessionOrder, y = .data[[params$dependent_ind]], fill = Player_ID)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_grid( . ~ Counterbalance_set) +
-  guides(fill = FALSE) +
-  labs(title = paste(params$dependent_ind, " vs. session order, grouped by counterbalance set"))
+plot_data_ind <- ind_data %>%
+  select("timeRemaining_ind", 
+         familiarity,
+         Dominate.Strategy, 
+         Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = "timeRemaining_ind"), bins = 30) +
+  facet_grid( . ~ Dominate.Strategy) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = "timeRemaining_ind"), bins = 30) +
+  facet_grid( familiarity ~ Dominate.Strategy) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
 ```
 
 
-```{r}
-data_focus_ind <- ind_data %>%
-  select(SessionOrder, Counterbalance_set, Player_ID, params$dependent_ind) %>%
-  filter(SessionOrder == 4) %>%
-  group_by(SessionOrder, Counterbalance_set) %>%
-  summarise(average = mean(.data[[params$dependent_ind]]),
-            n = length(.data[[params$dependent_ind]]),
-            StEr = sd(.data[[params$dependent_ind]]) / sqrt(length(.data[[params$dependent_ind]])))
+# NEED TO COMPLETE THIS ANALYSIS
 
-ggplot(data_focus_ind, aes(x = SessionOrder, y = average)) +
-  geom_point() +
-  labs(title = paste("Averages", params$dependent_ind, " vs. session order, grouped by counterbalance set")) +
-  geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
-  facet_grid(. ~ Counterbalance_set)
 
-data_focus_ind
-```
+
+
+
+
+
+
+
+
+
+
+
 

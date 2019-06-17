@@ -294,6 +294,43 @@ scale_value_NASA_TLX <- function (TLX_table, teamNum, playerNum, condition, scal
   }
 }
 
+# Return familiary value for team
+familiarity_value<- function(data_familiar, team_num, team_column_name){
+  team_data <- data_familiar %>%
+    filter(.data[[team_column_name]]== team_num)
+  
+  num_of_entries<- length(team_data[[team_column_name]])
+  
+  if(num_of_entries == 1){
+    
+    return(team_data[["Familiarity"]])
+  }
+}
+
+# Retrive demographic value
+demographic_value_get <- function(demographic_data, key_rand_playerID_data, player_Id_value, demographic_value){
+  rand_num <- key_rand_playerID_data %>%
+    filter(ID == player_Id_value)
+  
+  if(length(rand_num[[1]]) == 1){
+    # There should only be one value.
+    player_demo_data <- demographic_data %>%
+      filter(Rand == rand_num$Random_num)
+    
+    if(length(rand_num[[1]]) == 1){
+      return(player_demo_data[[demographic_value]])
+    } else{
+      # This means there is more than one value. That is a problem. 
+      message <- paste("There are multiple deomgraphic entries for the player with the ID", player_Id_value, ".")
+      stop(message)
+    }
+  } else{
+    # This means there is more than one value. That is a problem for demographic data. 
+    message <- paste("The player with the ID", player_Id_value, "does not have a rand number value.")
+    stop(message)
+  }
+}
+
 # Get post-session value
 post_session_survey_value<- function(data_post_session, team, player, condition, survey_value){
   player_data<- data_post_session %>%
@@ -597,8 +634,9 @@ is_post_session_data_correct <- function(post_session_data, team_number_column_n
 }
 
 # Generate aggragate data (final team score, final individual score, ) ----
-generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, 
-                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX, names_PostSession){
+generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, clean_demo_data, clean_familiarity_data,
+                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX, names_PostSession,
+                                    key_rand_player_data, names_demographic ){
   # Final data output
   number_of_columns<- length(col.names)
   data_output_final<- matrix(0, nrow = 0, ncol = number_of_columns)
@@ -610,6 +648,9 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
     
     # Counter balance set number for the team
     counter_balance_set_num <- set_counter_balance_number(team, counter_balance_set)
+    
+    # Familiarity value for team
+    familiarity_of_team<- as.character(familiarity_value(clean_familiarity_data,team, "ï..Team")) # Note sure why the column name is "ï..Team" in stead of "Team". 
     
     for(condition in condition_list){
       
@@ -754,6 +795,14 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         # Find player id
         current_player_id <- generate_player_id(player,team)
         
+        # Demographic survey data
+        demo_values<- vector()
+        for(name in names_demographic){
+          # Need to make the the values a character because there are different types of values.
+          value<- as.character(demographic_value_get(clean_demo_data, key_rand_player_data, current_player_id, name))
+          demo_values<- append(demo_values, value)
+        }
+        
         #---------------------------------------------------------------
         #Find the session order
         current_session_order <- session_order_number(team, counter_balance_set, condition)
@@ -786,7 +835,8 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
         
         #This should be the same as the col_names variable above.
         data_output_final<- rbind(data_output_final, 
-                                  c(team, 
+                                  c(team,
+                                    familiarity_of_team,
                                     condition, 
                                     player, 
                                     current_player_id,
@@ -822,7 +872,8 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     current_mix,
                                     dominate_strategy_used,
                                     TLX_values, 
-                                    Post_Session_Values))
+                                    Post_Session_Values,
+                                    demo_values))
       }
     }
     
@@ -1046,26 +1097,51 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 
 # Test ----
-# clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+# post_session_survey_value<- function(data_post_session, team, player, condition, survey_value){
+#   player_data<- data_post_session %>%
+#     filter(Condition == condition, Team == team, Player == player)
 # 
-# # Re factor the columns
-# columns_to_refactor <- c("SessionOrder", 
-#                          "Team", 
-#                          "Player_ID", 
-#                          "Condition", 
-#                          "Dominate.Strategy", 
-#                          "Condition", 
-#                          "Target",
-#                          "Confident_team_comm_important_details_quickly")
-# clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+#   if(length(player_data[[1]]) != 1){
+#     message <- paste("Could not find post session survey data for player", player, "in team", team, "for condition", condition)
+#     stop(message)
+#   }
 # 
-# data_focus <- clean_aggregate_data_stats %>%
-#   select(Target, SessionOrder, Team, Player_ID, IndividualScore, Dominate.Strategy)
+#   return(player_data[[survey_value]])
+# }
 # 
-# my_model_manual <- lmer(data = data_focus, IndividualScore ~ Target + SessionOrder + Dominate.Strategy + SessionOrder:Target + (1|Team) + (1| Player_ID))
 # 
-# my_model_function <- model_data_Target_Session(df = clean_aggregate_data_stats, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust =FALSE)
+# # The goal of this logic is to generate the responses from demographics
 # 
-# emmeans(my_model_manual, list(pairwise ~ Target*Dominate.Strategy), adjust = "tukey")
+# data_familiar<- familiarity_data
 # 
-# compare(model.null, model.null)
+# team_num<- 10
+# team_column_name<- "ï..Team"
+# 
+# team_data <- data_familiar %>%
+#   filter(.data[[team_column_name]]== team_num)
+# 
+# num_of_entries<- length(team_data[[team_column_name]])
+# 
+# if(num_of_entries == 1){
+#   
+#   return(team_data[["Familiarity"]])
+# }
+# 
+# 
+# familiarity_value<- function(data_familiar, team_num, team_column_name){
+#   team_data <- data_familiar %>%
+#     filter(.data[[team_column_name]]== team_num)
+#   
+#   num_of_entries<- length(team_data[[team_column_name]])
+#   
+#   if(num_of_entries == 1){
+#     
+#     return(team_data[["Familiarity"]])
+#   }
+# }
+# familiarity_value(familiarity_data, 13, "ï..Team")
+# 
+# 
+
+
+
