@@ -207,19 +207,23 @@ for (name in demo_names) {
     select(.data[[dependent]], Dominate.Strategy, Target, IndividualScore) 
   
   print(
-    ggplot(data = plot_data_ind) + 
-    geom_histogram(aes(x = .data[[dependent]]), stat = "count") +
-    facet_grid(Dominate.Strategy ~ .) +
-    labs(title = dependent, x = "Dependent", y = y_label_ind) +
-    scale_x_discrete(labels = abbreviate)
+    suppressWarnings( # This warning supressing is needed for because there is a bug that prevents an HTML document to be generated. 
+      ggplot(data = plot_data_ind) +
+      geom_histogram(aes(x = .data[[dependent]]), stat = "count") +
+      facet_grid(Dominate.Strategy ~ .) +
+      labs(title = dependent, x = "Dependent", y = y_label_ind) +
+      scale_x_discrete(labels = abbreviate)
+    )
   )
   
   print(
-    ggplot(data = plot_data_ind) + 
-    geom_histogram(aes(x = .data[[dependent]]), stat = "count") +
-    facet_grid(Dominate.Strategy ~ Target) +
-    labs(title = dependent, x = "Dependent", y = y_label_ind) +
-    scale_x_discrete(labels = abbreviate)
+    suppressWarnings( # This warning supressing is needed for because there is a bug that prevents an HTML document to be generated. 
+      ggplot(data = plot_data_ind) +
+      geom_histogram(aes(x = .data[[dependent]]), stat = "count") +
+      facet_grid(Dominate.Strategy ~ Target) +
+      labs(title = dependent, x = "Dependent", y = y_label_ind) +
+      scale_x_discrete(labels = abbreviate)
+    )
   )
 }
 
@@ -251,11 +255,12 @@ for (name in TLX_Scale_Names) {
          Dominate.Strategy, 
          Target, 
          SessionOrder)
+  plot<- ggplot(data = plot_data_ind) +
+    geom_histogram(aes(x = .data[[dependent]]), bins = 30) +
+    facet_grid(Dominate.Strategy ~ Target)
   
   print(
-    ggplot(data = plot_data_ind) +
-    geom_histogram(aes(x = .data[[dependent]])) +
-    facet_grid(Dominate.Strategy ~ Target)
+    plot
   )
 }
 ```
@@ -398,7 +403,7 @@ emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey")
 
 No statistical differences. 
 
-### Summary
+## Summary
 
 Overall, it looks like there is a significant difference with respect to frustrations when teams used the Go Together strategy. Specifically, there was a __significant different__ between Ind and Team, and Ind and Ind_Team conditons. The differences indictated that frustation is higher in the Ind condition when compared to the Team or the Ind_Team condition. There seems to be a stronger difference between Ind and Team, when compared to the difference between Ind and Ind_Team. 
 
