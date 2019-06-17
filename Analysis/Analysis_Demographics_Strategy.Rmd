@@ -1,0 +1,423 @@
+---
+title: 'Dissertation Analysis: Demographics and Strategy'
+author: "Jamiahus Walton"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: true
+editor_options:
+  chunk_output_type: inline
+csl: apa.csl
+bibliography: bibliography.bib
+  
+---
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
+# Examples of how to use the ggrepel package
+# Link: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html#examples
+
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+library(robustlmm)
+library(ggrepel)
+library(knitr)
+library(kableExtra)
+
+# Functions used in documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+# Factor columns that need it.
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+# Model the data for the team level analysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
+  
+  if(is.team){
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  } else {
+    # Run this code if individual level model
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
+}
+
+#Folder locations ----
+figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Demographics titles
+demo_names <- c("Rand",	
+                "Gender_Male_Female_Other_PreferNotToAnswer",
+                "age_range",
+                "highest_degree",
+                "student_status",
+                "academic_major",
+                "academic_major_other",
+                "is_vision_20_20",
+                "can_communicate_with_team",
+                "can_hold_my_team_back",
+                "can_team_slow_me_down",
+                "can_teams_perform_better_than_ind",
+                "can_feedback_useful_for_teamwork",
+                "can_i_learn_better_in_team",
+                "can_navigate_VE",
+                "video_game_play_frequency",
+                "work_in_team_frequency")
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID", 
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly",
+                         demo_names)
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+# Motivation
+
+The motivation behind this analyis is to explore behavior (e.g., distance traveled) and characteristics (e.g., demographics or strategies). I want to explore the survey data and see if any of it can help explain the variance in the data.
+
+# Q: Are there similar demographic characterisitcs for teams that use a certain strategy
+
+## Individual
+
+__Note:__ 1 = Strongly Agree, 7 = Strgonly Disagree
+
+```{r cache=FALSE}
+demo_names <- c("Gender_Male_Female_Other_PreferNotToAnswer",
+                "age_range",
+                "highest_degree",
+                "student_status",
+                "academic_major",
+                "can_communicate_with_team",
+                "can_hold_my_team_back",
+                "can_team_slow_me_down",
+                "can_teams_perform_better_than_ind",
+                "can_feedback_useful_for_teamwork",
+                "can_i_learn_better_in_team",
+                "can_navigate_VE",
+                "video_game_play_frequency",
+                "work_in_team_frequency")
+
+for (name in demo_names) {
+  dependent<- name
+
+  y_label_ind <- "Count"
+  
+  plot_data_ind <- ind_data %>%
+    select(.data[[dependent]], Dominate.Strategy, Target, IndividualScore) 
+  
+  print(
+    suppressWarnings( # This warning supressing is needed for because there is a bug that prevents an HTML document to be generated. 
+      ggplot(data = plot_data_ind) +
+      geom_histogram(aes(x = .data[[dependent]]), stat = "count") +
+      facet_grid(Dominate.Strategy ~ .) +
+      labs(title = dependent, x = "Dependent", y = y_label_ind) +
+      scale_x_discrete(labels = abbreviate)
+    )
+  )
+  
+  print(
+    suppressWarnings( # This warning supressing is needed for because there is a bug that prevents an HTML document to be generated. 
+      ggplot(data = plot_data_ind) +
+      geom_histogram(aes(x = .data[[dependent]]), stat = "count") +
+      facet_grid(Dominate.Strategy ~ Target) +
+      labs(title = dependent, x = "Dependent", y = y_label_ind) +
+      scale_x_discrete(labels = abbreviate)
+    )
+  )
+}
+
+
+
+```
+
+Overall, I do not see any obvious characterisitcs that show a partern for teams using the differnet strategies.
+
+There is possible patter for the dependent variable __"can_team_slow_me_down"__. The questions asked was the statement was "Team members slow me down". The participants selected a value from a range of "Strongly Agree (1)" to Strongly Disagree (7). It looks like the center of the distribution of answers for teams that used the Go Alone strategy is around 5 (neither agree nor disagree). 
+
+# Q: Are there interesting distributions for self-reported cognitive workload?
+
+## Individual
+
+### Graph for all TLX metrics
+
+```{r}
+TLX_Scale_Names <- c("Mental.Demand", "Physical.Demand", "Temporal.Demand", "Performance", "Effort", "Frustration" )
+dependent<- "Temporal.Demand"
+
+for (name in TLX_Scale_Names) {
+  dependent<- name
+  
+  y_label_ind <- "Count"
+  
+  plot_data_ind <- ind_data %>%
+  select(TLX_Scale_Names, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder)
+  plot<- ggplot(data = plot_data_ind) +
+    geom_histogram(aes(x = .data[[dependent]]), bins = 30) +
+    facet_grid(Dominate.Strategy ~ Target)
+  
+  print(
+    plot
+  )
+}
+```
+
+It looks like there may be a patter in the following workload channels: _Performance, Frustraton, and Effort_. 
+
+I want to fit a model on the data split by strategy. I want to see if a model with no interaction (i.e., only using the session order and target variable) can explain the varience. 
+
+### Performance
+
+#### Go Alone
+```{r}
+dependent<- "Performance"
+
+plot_data_ind <- ind_data %>%
+  select(dependent, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder,
+         Team,
+         Player_ID)
+
+plot_data_GA <-plot_data_ind %>% filter(Dominate.Strategy == "Go Alone")
+
+model.NoInteraction<- model_data_Target_Session(df = plot_data_GA, dependent =  dependent, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey") 
+```
+
+Statistically, it looks like there is no significant difference between the Target levels in self performance rating for teams that used Go Alone. 
+
+#### Go Together
+
+```{r}
+dependent<- "Performance"
+
+plot_data_ind <- ind_data %>%
+  select(dependent, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder,
+         Team,
+         Player_ID)
+
+plot_data_GA <-plot_data_ind %>% filter(Dominate.Strategy == "Go Together")
+
+model.NoInteraction<- model_data_Target_Session(df = plot_data_GA, dependent =  dependent, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey") 
+```
+
+There is no statisitcally significant difference between the conditions. HOwever, it is important to note that there is a __margnially significant result__ between Team and Ind condtions. The difference indicates that participants felt they did better in the Team condition when compared to the Ind condition. 
+
+__Warning/Note__: The model failed to converge
+
+
+### Frustraton
+
+#### Go Alone
+
+```{r}
+dependent<- "Frustration"
+
+plot_data_ind <- ind_data %>%
+  select(dependent, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder,
+         Team,
+         Player_ID)
+
+plot_data_GA <-plot_data_ind %>% filter(Dominate.Strategy == "Go Alone")
+
+model.NoInteraction<- model_data_Target_Session(df = plot_data_GA, dependent =  dependent, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey") 
+```
+
+No statisitcally significant difference among the conditions
+
+#### Go Together
+
+```{r}
+dependent<- "Frustration"
+
+plot_data_ind <- ind_data %>%
+  select(dependent, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder,
+         Team,
+         Player_ID)
+
+plot_data_GA <-plot_data_ind %>% filter(Dominate.Strategy == "Go Together")
+
+model.NoInteraction<- model_data_Target_Session(df = plot_data_GA, dependent =  dependent, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey") 
+```
+
+There is a __significant different__ between Ind and Team, and Ind and Ind_Team conditons. The difference indictate frustation is higher in the Ind condition when compared to the Team or the Ind_Team condition. 
+
+### Effort
+
+#### Go Alone
+
+```{r}
+dependent<- "Effort"
+
+plot_data_ind <- ind_data %>%
+  select(dependent, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder,
+         Team,
+         Player_ID)
+
+plot_data_GA <-plot_data_ind %>% filter(Dominate.Strategy == "Go Alone")
+
+model.NoInteraction<- model_data_Target_Session(df = plot_data_GA, dependent =  dependent, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey") 
+```
+
+No statistical differences. 
+
+#### Go Together
+
+```{r}
+dependent<- "Effort"
+
+plot_data_ind <- ind_data %>%
+  select(dependent, 
+         Dominate.Strategy, 
+         Target, 
+         SessionOrder,
+         Team,
+         Player_ID)
+
+plot_data_GA <-plot_data_ind %>% filter(Dominate.Strategy == "Go Together")
+
+model.NoInteraction<- model_data_Target_Session(df = plot_data_GA, dependent =  dependent, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+emmeans(model.NoInteraction, list(pairwise ~ Target),adjust = "tukey") 
+```
+
+No statistical differences. 
+
+## Summary
+
+Overall, it looks like there is a significant difference with respect to frustrations when teams used the Go Together strategy. Specifically, there was a __significant different__ between Ind and Team, and Ind and Ind_Team conditons. The differences indictated that frustation is higher in the Ind condition when compared to the Team or the Ind_Team condition. There seems to be a stronger difference between Ind and Team, when compared to the difference between Ind and Ind_Team. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

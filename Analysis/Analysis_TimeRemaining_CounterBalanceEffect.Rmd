@@ -1,0 +1,377 @@
+---
+title: 'Dissertation Analysis: Time Remaining - Examining Counterbalance Effects'
+author: "Jamiahus Walton"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options:
+  chunk_output_type: inline
+csl: apa.csl
+bibliography: bibliography.bib
+params:
+  # Dependent Variable
+  dependent_name_WithSpace: "Time Remaining"
+  dependent_name_NoSpace: "TimeRemaining"
+  
+  # Team
+  dependent_team: "timeRemaining_team"
+  
+  #Individual
+  dependent_ind: "timeRemaining_ind"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
+# Examples of how to use the ggrepel package
+# Link: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html#examples
+
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+library(robustlmm)
+library(ggrepel)
+library(knitr)
+library(kableExtra)
+
+# Functions used in documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+# Factor columns that need it.
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+# Model the data for the team level analysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
+  
+  if(is.team){
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  } else {
+    # Run this code if individual level model
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
+}
+
+#Folder locations ----
+figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID",
+                         "Counterbalance_set",
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly")
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+# Purpose
+
+The purpose of this document is to examine the effect from the counter balance order. 
+
+# Counterbalance Sets
+
+The six counterbalance sets are shown in the table below. The key to the sets below are as follows: A = None, B = Ind, C = Team, D = Ind_Team.
+
+```{r}
+set_1 <- c("A", "B", "C", "D")
+set_2 <- c("A", "C", "B", "D")
+set_3 <- c("A", "D", "C", "B")
+set_4 <- c("A", "B", "D", "C")
+set_5 <- c("A", "C", "D", "B")
+set_6 <- c("A", "D", "B", "C")
+
+cbind(set_1, set_2, set_3, set_4, set_5, set_6) %>%
+  kable(caption = "A = None, B = Ind, C = Team, D = Ind_Team") %>% 
+  kable_styling()
+```
+
+
+
+
+# Overview of  `r params$dependent_name_WithSpace` 
+
+## Team
+
+```{r}
+setwd(figure_directory)
+
+data_focus_team <- team_data %>%
+  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
+  mutate(position_order = rank(.data[[params$dependent_team]], ties.method = "first"))
+
+ggplot(data_focus_team, aes(x = SessionOrder, y = .data[[params$dependent_team]], fill = Team, group = position_order)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_grid( . ~ Counterbalance_set) +
+  guides(fill = FALSE) +
+  labs(title = paste(params$dependent_name_WithSpace, " vs. session order, grouped by counterbalance set"), x = "Session Order", y = params$dependent_team_name_WithSpace) +
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_BySessionOrder_Group_CounterBalanceSet_Team.png", sep = ""))
+```
+
+At first glance, there seem to be teams that performed better than other teams. Specifically is sets 1, 2, and 3, there appear to be teams that are high performing teams (i.e., they moved quickly through the sessions). In set 4, there seem to be teams that improved a lot by the 4th session. The 3rd and 4th session appear to be the sets that have the overall lowest time remaining. 
+
+```{r}
+setwd(figure_directory)
+
+data_focus_team <- team_data %>%
+  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
+  mutate(position_order = rank(.data[[params$dependent_team]], ties.method = "first"))
+
+ggplot(data_focus_team, aes(x = Counterbalance_set, y = .data[[params$dependent_team]], fill = Team, group = position_order)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_grid( . ~ SessionOrder) +
+  guides(fill = FALSE) +
+  labs(title = paste(params$dependent_name_WithSpace, " vs. counterbalance set, grouped by  session order"), x = "Counter Balance Set", y = params$dependent_name_WithSpace)+
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_ByCounterBalanceSet_Group_SessionOrder_Team.png", sep = ""))
+```
+
+At first glance, it seems as though the variance in the time remaining at the team level increases when the participants, as the participants gained more experience.
+
+```{r}
+setwd(figure_directory)
+
+data_focus_team <- team_data %>%
+  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
+  # filter(SessionOrder ==4) %>%
+  group_by(SessionOrder, Counterbalance_set) %>%
+  summarise(average = mean(.data[[params$dependent_team]]),
+            n = length(.data[[params$dependent_team]]),
+            StEr = sd(.data[[params$dependent_team]]) / sqrt(length(.data[[params$dependent_team]])))
+
+ggplot(data_focus_team, aes(x = SessionOrder, y = average)) +
+  geom_point() +
+  labs(title = paste("Averages", params$dependent_name_WithSpace, " vs. session order, grouped by counterbalance set")) +
+  geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
+  facet_grid(. ~ Counterbalance_set) + 
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_Average_BySessionOrder_Group_CounterBalanceSet_Team.png", sep = ""))
+
+data_focus_team
+```
+
+Overall, the time remaining increased over time as expected. There seems to be a noticed increase from session 3 to session 4 in counterbalance set 4. I attribute this to the apparent variance in the teams. 
+
+```{r}
+setwd(figure_directory)
+
+data_focus_team <- team_data %>%
+  select(SessionOrder, Counterbalance_set, Team, params$dependent_team) %>%
+  # filter(SessionOrder ==4) %>%
+  group_by(SessionOrder, Counterbalance_set) %>%
+  summarise(average = mean(.data[[params$dependent_team]]),
+            n = length(.data[[params$dependent_team]]),
+            StEr = sd(.data[[params$dependent_team]]) / sqrt(length(.data[[params$dependent_team]])))
+
+ggplot(data_focus_team, aes(x = Counterbalance_set, y = average)) +
+  geom_point() +
+  labs(title = paste("Averages", params$dependent_team, " vs. session order, grouped by counterbalance set")) +
+  geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
+  facet_grid(. ~ SessionOrder) +
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_Average_ByCounterBalanceSet_Group_SessionOrder_Team.png", sep = ""))
+
+data_focus_team
+```
+
+Generally, the time remaining at the end of the session increases over time (as expected). There is a lot of overlapping in the errors bars. As expected from the distribution, sets 5 and 6 are generally the lowest, but I would attribute that to the variance in teams. 
+
+### Summary
+
+Overall, there seems to be a large variance in the amount of time remaining. Some teams had a lot of time remaining, and some times had little time remaining at the end of the session. Generally, teams increased the amount of time remaining at the team level (as expected). Overall, the results do not suggest any unexpected influence due to the counterbalance sets. 
+
+## Individual
+
+```{r}
+setwd(figure_directory)
+
+data_focus_ind <- ind_data %>%
+  select(SessionOrder, Counterbalance_set, Player_ID, Team, params$dependent_ind) #%>%
+  # filter(SessionOrder == 4) 
+
+ggplot(data_focus_ind, aes(x = SessionOrder, y = .data[[params$dependent_ind]], fill = Player_ID)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_grid( . ~ Counterbalance_set) +
+  guides(fill = FALSE) +
+  labs(title = paste(params$dependent_ind, " vs. session order, grouped by counterbalance set"), y = params$dependent_name_WithSpace)+
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_BySessionOrder_Group_CounterBalanceSet_Ind.png", sep = ""))
+```
+
+Initially, there seems to be individuals that completed the task qucikly in counter balance set 1, 2, and 3. There individual in set 3 seem to be the highest, the individuals in set 1 seem to be the second highest, and the individuals in set 2 seem to be the third highest. 
+
+```{r}
+setwd(figure_directory)
+
+data_focus_ind <- ind_data %>%
+  select(SessionOrder, Counterbalance_set, Player_ID, Team, params$dependent_ind) #%>%
+  # filter(SessionOrder == 4) 
+
+ggplot(data_focus_ind, aes(x = Counterbalance_set, y = .data[[params$dependent_ind]], fill = Player_ID)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_grid( . ~ SessionOrder) +
+  guides(fill = FALSE) +
+  labs(title = paste(params$dependent_name_WithSpace, " vs. session order, grouped by counterbalance set"), y= params$dependent_name_WithSpace) +
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_ByCounterBalanceSet_Group_SessionOrder_Ind.png", sep = ""))
+```
+
+Similar to the team distribution, the varience seems to increase when teams have more experience. 
+
+```{r}
+setwd(figure_directory)
+
+data_focus_ind <- ind_data %>%
+  select(SessionOrder, Counterbalance_set, Player_ID, params$dependent_ind) %>%
+  group_by(SessionOrder, Counterbalance_set) %>%
+  summarise(average = mean(.data[[params$dependent_ind]]),
+            n = length(.data[[params$dependent_ind]]),
+            StEr = sd(.data[[params$dependent_ind]]) / sqrt(length(.data[[params$dependent_ind]])))
+
+ggplot(data_focus_ind, aes(x = SessionOrder, y = average)) +
+  geom_point() +
+  labs(title = paste("Averages", params$dependent_name_WithSpace, " vs. session order, grouped by counterbalance set"), y= params$dependent_name_WithSpace) +
+  geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
+  facet_grid(. ~ Counterbalance_set) +
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_Average_BySessionOrder_Group_CounterBalanceSet_Ind.png", sep = ""))
+
+data_focus_ind
+```
+
+Similar to team, there seems to be a big improvement from session 3 to 4 but I would contribute that to the varience of teams. 
+
+```{r}
+setwd(figure_directory)
+
+data_focus_ind <- ind_data %>%
+  select(SessionOrder, Counterbalance_set, Player_ID, params$dependent_ind) %>%
+  group_by(SessionOrder, Counterbalance_set) %>%
+  summarise(average = mean(.data[[params$dependent_ind]]),
+            n = length(.data[[params$dependent_ind]]),
+            StEr = sd(.data[[params$dependent_ind]]) / sqrt(length(.data[[params$dependent_ind]])))
+
+ggplot(data_focus_ind, aes(x = Counterbalance_set, y = average)) +
+  geom_point() +
+  labs(title = paste("Averages", params$dependent_name_WithSpace, " vs. session order, grouped by counterbalance set"), y= params$dependent_name_WithSpace) +
+  geom_errorbar(aes(ymin = average - StEr, ymax = average + StEr)) +
+  facet_grid(. ~ SessionOrder) +
+  ggsave(filename = paste("CounterBalance_", params$dependent_name_WithSpace, "_Average_BySessionOrder_Group_CounterBalanceSet_Ind.png", sep = ""))
+
+data_focus_ind
+```
+
+Based on the averages, there seems to be some difference in the counter balance sets. I woulc contribute that to the varience in individuals.
+
+
+### Summary
+
+Overall, there does seem to be a large varience at the individual level but I am not too concered because there counter balance set average seem to be explained but the large varience in individual performance. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

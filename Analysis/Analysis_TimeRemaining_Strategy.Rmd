@@ -1,0 +1,2755 @@
+---
+title: 'Dissertation Analysis: Time Remaining - Strategy'
+author: "Jamiahus Walton"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: true
+editor_options:
+  chunk_output_type: inline
+csl: apa.csl
+bibliography: bibliography.bib
+params:
+  dependent_response_name_WithSpace: "Time Remaining"
+  dependent_response_name_NoSpace: "TimeRemaining"
+  dependent_response_team: "timeRemaining_team"
+  dependent_response_ind: "timeRemaining_ind"
+  dependent_response_DominateStrategy: "Dominate.Strategy"
+  Strategy_GT_name_NoSpace: "Go.Together"
+  Strategy_GT_name_WithSpace: "Go Together"
+  Strategy_GA_name_NoSpace: "Go.Alone"
+  Strategy_GA_name_WithSpace: "Go Alone"
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Tips for formatting in RMarkdown
+# Link: https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/rmarkdown.html
+
+# Equations
+# Link: https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+
+# Create awesome HTML table with knitr::kableand kableExtra
+# LinkL https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+
+# Examples of how to use the ggrepel package
+# Link: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html#examples
+
+# Packages for data analysis
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(svMisc)
+library(MuMIn)
+library(modelr)
+library(sjstats)
+library(robustlmm)
+library(ggrepel)
+library(knitr)
+library(kableExtra)
+
+# Functions used in documents ----
+remove_measures_with_given_value <- function(data_set, col_name, value){
+  rows_to_move <- which(as.vector(data_set[,col_name]) == value) 
+  
+  return(data_set[-rows_to_move,])
+}
+
+# Factor columns that need it.
+re_factor_columns <- function(userData, columnNames){
+  factorData <- userData
+  for(column in columnNames){
+    print(column)
+    factorData[,column] <- factor(factorData[,column])
+  }
+  return(factorData)
+}
+
+# Model the data for the team level analysis ----
+model_data_Target_Session <- function(df, dependent, model.type, is.team, is.robust){
+  
+  if(is.team){
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  } else {
+    # Run this code if individual level model
+    if(model.type == "null" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && !is.robust){
+      lmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession"){
+      lmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "null" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ 1 + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "All" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target * SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoTarget" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ SessionOrder + (1|Team) + (1| Player_ID)")))
+    } else if(model.type == "NoInteraction_NoSession" && is.robust){
+      rlmer(data = df, as.formula(paste(dependent,"~ Target + (1|Team) + (1| Player_ID)")))
+    } else{
+      stop("Model.type not supported")
+    }
+  }
+}
+
+#Folder locations ----
+figure_directory <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Figures"
+main_work_directory_name <- "C:\\Users\\jamia\\Box\\TMET2\\DATA TMET2\\Data_And_Calcuations\\Raw Data\\"
+
+database_folder_name <- "Database"
+file_name_output <- "team_player_aggragate_stats.csv"
+folder_location_database <- paste(main_work_directory_name, database_folder_name, sep = "")
+aggregate_folder_location <- paste(folder_location_database,"\\", file_name_output, sep = "") #This will combine the final file name and the desiered folder location
+
+# Read aggregaate data ----
+my_aggregate_data <- read.csv(file =  aggregate_folder_location)
+
+clean_aggregate_data_stats <- remove_measures_with_given_value(data_set =  my_aggregate_data, col_name = "Condition", value = "A") # without none condition
+
+# Re factor the columns
+columns_to_refactor <- c("SessionOrder", 
+                         "Team", 
+                         "Player_ID", 
+                         "Condition", 
+                         "Dominate.Strategy", 
+                         "Condition", 
+                         "Target",
+                         "Confident_team_comm_important_details_quickly")
+clean_aggregate_data_stats <- re_factor_columns(clean_aggregate_data_stats, columns_to_refactor)
+
+# What is the N for Teams ----
+N_teams <- length(levels(factor(clean_aggregate_data_stats$Team)))
+
+# What is the N for Inds ----
+N_ind <- length(levels(factor(clean_aggregate_data_stats$Player_ID) ))
+
+# Team data set ----
+team_data <- clean_aggregate_data_stats %>%
+  filter(Player == 1)
+
+# Individual data set ----
+ind_data <- clean_aggregate_data_stats
+
+```
+
+# Motivation
+
+In previous analysis, there was a significant difference between Ind_Team and Team level feedback condition. The motivation behind this analysis is to discover if the impact/influence of the feedback conditions had any noticeable influence on performance depending on the strategy used by the teams. 
+
+# Q: Is there exciting variation among the _`r params$dependent_response_name_WithSpace`_ metric that will help me understand the influence of the feedback condition?
+
+## Team
+
+```{r cache=FALSE}
+y_label_team <- "Count"
+x_label_team <- params$dependent_response_name_WithSpace
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, 
+         params$dependent_response_DominateStrategy, 
+         Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  facet_grid( . ~ .data[[params$dependent_response_DominateStrategy]]) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+```
+
+The distribution of both groups have a skew to the left.
+
+```{r cache=FALSE}
+y_label_team <- "Count"
+x_label_team <- "Target"
+title_response_team <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_Team.png", sep = "")
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, 
+         params$dependent_response_DominateStrategy, 
+         Target)
+
+ggplot(data = plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 25) +
+  facet_grid(.data[[params$dependent_response_DominateStrategy]] ~ Target) +
+  labs(title = title_response_team, x = x_label_team, y = y_label_team) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(Target, .data[[params$dependent_response_DominateStrategy]]) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+I see no obvious pattern.
+
+```{r}
+y_label_team <- "Count"
+x_label_team <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_team <- team_data %>%
+  select(params$dependent_response_team, 
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder)
+
+# Generate data by strategy
+GA_plot_data_team <- plot_data_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+GT_plot_data_team <- plot_data_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Plot
+ # GA
+ggplot(data = GA_plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)","(", params$Strategy_GA_name_WithSpace ,")" ), x = x_label_team, y = y_label_team) +
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+    # Information about the N values in each condition
+GA_tableData <- GA_plot_data_team %>%
+  select(params$dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+GA_tableData %>%
+  kable(caption = paste("Data for ", params$Strategy_GA_name_WithSpace)) %>%
+  kable_styling()
+
+ # GT
+ggplot(data = GT_plot_data_team) + 
+  geom_histogram(aes_string(x = params$dependent_response_team), bins = 30) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Team)","(", params$Strategy_GT_name_WithSpace ,")" ), x = x_label_team, y = y_label_team) +
+  facet_grid( SessionOrder ~ Target) + 
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+
+    # Information about the N values in each condition
+GT_tableData <- GT_plot_data_team %>%
+  select(params$dependent_response_team, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+GT_tableData %>%
+  kable(caption = paste("Data for ", params$Strategy_GT_name_WithSpace)) %>%
+  kable_styling()
+```
+
+In the `r params$Strategy_GT_name_WithSpace` group, session 4, it looks like there is are a number of teams that have a lt of time remaining. However, I see no obvious pattern.
+
+## Individual
+
+```{r cache=FALSE}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, params$dependent_response_DominateStrategy, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 40) +
+  facet_grid(. ~ .data[[params$dependent_response_DominateStrategy]]) + 
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+```
+
+Both groups sees to have a distribution that is skewed to the left. The `r params$Strategy_GA_name_WithSpace` group seem to have a large number of outliers but the `r params$Strategy_GT_name_WithSpace` group is more concentrated. 
+
+```{r cache=FALSE}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+title_response_ind <- paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)")
+plot_name <- paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_Ind.png", sep = "")
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, params$dependent_response_DominateStrategy, Target)
+
+ggplot(data = plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(.data[[params$dependent_response_DominateStrategy]] ~ Target) +
+  labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- ind_data %>%
+  group_by(Target, .data[[params$dependent_response_DominateStrategy]]) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
+```
+
+The distributions when grouped by target and strategy is similar to the overall distribution. 
+
+```{r}
+y_label_ind <- "Count"
+x_label_ind <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(params$dependent_response_ind, 
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder)
+
+# Generate data by strategy
+GA_plot_data_ind <- plot_data_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+GT_plot_data_ind <- plot_data_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# plot
+  # GA
+ggplot(data = GA_plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(SessionOrder ~ Target) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)","(", params$Strategy_GA_name_WithSpace ,")" ), x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep = ""))
+
+    # Information about the N values in each condition
+GA_tableData <- GA_plot_data_ind %>%
+  select(params$dependent_response_ind, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+GA_tableData %>%
+  kable(caption =  paste("Data for ", params$Strategy_GA_name_WithSpace)) %>%
+  kable_styling()
+
+  # GT
+ggplot(data = GT_plot_data_ind) + 
+  geom_histogram(aes_string(x = params$dependent_response_ind), bins = 30) +
+  facet_grid(SessionOrder ~ Target) +
+  labs(title = paste("Distribution of", params$dependent_response_name_WithSpace, "(Individual)","(", params$Strategy_GT_name_WithSpace ,")" ), x = x_label_ind, y = y_label_ind) +
+  ggsave(filename = paste("Histogram_", params$dependent_response_name_NoSpace, "_ByTarget_BySessionOrder_", params$Strategy_GT_name_NoSpace, "_Ind.png", sep = ""))
+
+# Information about the N values in each condition
+GT_tableData <- GT_plot_data_ind %>%
+  select(params$dependent_response_ind, Target, SessionOrder) %>%
+  group_by(Target, SessionOrder) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+GT_tableData %>%
+  kable(caption = paste("Data for ", params$Strategy_GT_name_WithSpace)) %>%
+  kable_styling()
+```
+
+In the `r params$Strategy_GA_name_WithSpace` group, the bulk of time remaining seems only move slightly, if at all, to the right. Where as the distribution of time reamining in the `r params$Strategy_GT_name_WithSpace`seems to flatten over time.
+
+## Summary
+
+Overall, there were no obvious patterns at the team level. At the individual level, when grouped by Target, session order, and `r params$Strategy_GT_name_WithSpace`, the distributions faltten over time, as oppsed to staying the same. The distribution at the individiual level, grouped by target, session order, and `r params$Strategy_GA_name_WithSpace`, seems to change only a little but not much. 
+
+I am getting the sense that strategy may have a significant effect on the time remaining, even if it is small. However, there may not be enough teams to detect the effect. 
+
+# Q: Is there an interaction between the Target and Session Order for the _`r params$dependent_response_name_WithSpace`_ that is statistically significant?
+
+I am interested in determining if a linear mixed effect model should include the interaction effect between the Target and Session Order variable.
+
+There are a few steps I will take. First, I will fit the multiple models using the data provided. Second, I will compare those models to the null model. Third, I will pick the models that are worth exploring further (e.g., models that are significantly different from the null model). Fourth, I will evaluate the effect size ($R^2$) of the fixed effect and random effect variables using a method by [@Nakagawa2013, @Johnson2014]. Lastly, I will analyze the assumptions for the residuals. 
+
+A note on the effect size ($R^2$). This method generates two types of ($R^2$) values called marginal ($R_{m}^2$) and conditional ($R_{c}^2$) effect size. The $R_{m}^2$ calculates how much of the variance is described by the fixed effect variables (feedback condition and session order) while the $R_{c}^2$ calculates how much of the variance is described by both the fixed and random effect variables.
+
+## Full Models Used for Team and Individual
+
+The next two sections below describe the full model for team and individual level analysis. Five models were fitted and then compared. One model was the null model, one model was the full model, and the last three are a subset of the full model.
+
+### Team Full Model
+
+$$ y_{ijt} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} +   \epsilon_{ijt}$$ 
+
+Where $y_{ijt}$ is the response variable (e.g., team score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^{th}$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^{th}$ session order, $\gamma_{t}$ is the random effect for the $t^{th}$ team, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijt}$ is the residual for the model. 
+
+### Individual Team Full Model
+
+$$ y_{ijtp} = \mu + \alpha_{i} + \beta_{j} + \alpha_{i} \beta_{j} + \gamma_{t} + \theta_{p} + \epsilon_{ijtp}$$ 
+
+Where $y_{ijtp}$ is the response variable (e.g., individual score), $\mu$ is the baseline (or intercept), $\alpha_{i}$ is the fixed effect for the $i^(th)$ feedback target category, $\beta_{j}$ is the fixed effect for the $j^(th)$ session order, $\gamma_{t}$ is the random effect for the $t^(th)$ team, $\theta_{p}$ is the random effect for the $p^(th)$ individual, $ \alpha_{i} \beta_{j}$ is the fixed effect of the interaction between Target and Session Order, and $\epsilon_{ijtp}$ is the residual for the model.
+
+## Team
+
+### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.null <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "null", is.team = TRUE, is.robust =FALSE)
+model.All <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
+
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: Null and All") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: Null and No.Interaction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Target") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
+  kable_styling()
+```
+
+The following models were significantly different from the null model: model.All,  model.NoInteraction, model.NoInteraction.NoTarget. 
+
+model.All: Session Order, Target, and the interaction are included in this model.
+
+model.NoInteraction: Session order and target are the fixed effects in this model.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Compare all of the models
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: model.All and model.NoInteraction") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.All and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.NoInteraction and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+Overall, model.All is not signifcantly different from model.NoInteraction.NoTarget or model.NoInteraction, indicating that the interaction effect can be ignored. The model model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. However, the AIC and the BIC values are very similar. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Effect size (R^2)
+
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+```
+
+I see no noticeable difference. The rule of thumb is to use the simplest model to represent the data. However, in this analysis I will examine __model.NoInteraction.NoTarget__ and __model.NoInteraction__ because the AIC and BIC values are close and the effect sizes are close. 
+
+### GT
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.null <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "null", is.team = TRUE, is.robust =FALSE)
+model.All <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoSession", is.team = TRUE, is.robust = FALSE)
+
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: Null and All") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: Null and No.Interaction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Target") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: Null and No.Interaction.No.Session") %>%
+  kable_styling()
+```
+
+The following models were significantly different from the null model: model.All,  model.NoInteraction, model.NoInteraction.NoTarget. 
+
+model.All: Session Order, Target, and the interaction are included in this model.
+
+model.NoInteraction: Session order and target are the fixed effects in this model.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "All", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Compare all of the models
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: model.All and model.NoInteraction") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.All and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.NoInteraction and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+Overall, model.All is not signifcantly different from model.NoInteraction.NoTarget or model.NoInteraction, indicating that the interaction effect can be ignored. The model model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. However, the AIC and the BIC values are very similar. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Effect size (R^2)
+
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
+  kable(caption = "Table: Effect size for *No Interaction and No Target*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+```
+
+I see no noticeable difference. The rule of thumb is to use the simplest model to represent the data. However, in this analysis I will examine __model.NoInteraction.NoTarget__ and __model.NoInteraction__ because the AIC and BIC values are close and the effect sizes are close. 
+
+## Individual 
+
+### GA
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.null <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "null", is.team = FALSE, is.robust = FALSE)
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
+
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: model.null and model.All") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoSession") %>%
+  kable_styling()
+```
+
+The following models were significantly different from the null model: model.All,  model.NoInteraction, model.NoInteraction.NoTarget. 
+
+model.All: Session Order, Target, and the interaction are included in this model.
+
+model.NoInteraction: Session order and target are the fixed effects in this model.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+However, it is important to note that __model.NoInteraction.NoSession__ is marginally significantly (p < 0.1) different from model.null.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: All and No.Interaction") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+Overall, model.All is not signifcantly different from model.NoInteraction.NoTarget or model.NoInteraction, indicating that the interaction effect can be ignored. The model model.NoInteraction is not significantly different from model.NoInteraction.NoTarget. However, the AIC and the BIC values are very similar. 
+
+It is important to note that model.NoInteraction is __marginially significantly__ different from the model.NoInteraction.NoTarget.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Effect size (R^2)
+
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.NoInteraction.NoTarget) %>%
+  kable(caption = "Table: Effect size for *No Interaction No Target*") %>%
+   kable_styling(full_width = F)
+```
+
+I see no noticeable difference. The rule of thumb is to use the simplest model to represent the data. However, in this analysis I will examine __model.NoInteraction.NoTarget__ and __model.NoInteraction__ because the AIC and BIC values are close and the effect sizes are close. 
+
+### GT
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.null <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "null", is.team = FALSE, is.robust = FALSE)
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
+
+# There is an option to compare all the models with the anova(). However, the function does not compare all models to model.null
+anova(model.null,
+      model.All) %>%
+  kable(caption = "ANOVA: model.null and model.All") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.null,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: model.null and model.NoInteraction.NoSession") %>%
+  kable_styling()
+```
+
+All of the models were significantly different from the null model: model.All,  model.NoInteraction, model.NoInteraction.NoTarget. 
+
+model.All: Session Order, Target, and the interaction are included in this model.
+
+model.NoInteraction: Session order and target are the fixed effects in this model.
+
+model.NoInteraction.NoTarget: Session order is the only fixed effect in this model.
+
+model.NoInteraction.NoSession: Target is the only fixed effect in this model. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction.NoSession <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoSession", is.team = FALSE, is.robust = FALSE)
+
+anova(model.All,
+      model.NoInteraction) %>%
+  kable(caption = "ANOVA: All and No.Interaction") %>%
+  kable_styling()
+
+anova(model.All,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: All and NoInteraction.NoTarget") %>%
+  kable_styling()
+anova(model.All,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: All and model.NoInteraction.NoSession") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoTarget) %>%
+  kable(caption = "ANOVA: No.Interaction and NoInteraction.NoTarget") %>%
+  kable_styling()
+
+anova(model.NoInteraction,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: No.Interaction and model.NoInteraction.NoSession") %>%
+  kable_styling()
+
+anova(model.NoInteraction.NoTarget,
+      model.NoInteraction.NoSession) %>%
+  kable(caption = "ANOVA: model.NoInteraction.NoTarget and model.NoInteraction.NoSession") %>%
+  kable_styling()
+```
+
+Overall, the model.All was significantly different from each of its submodels, idicating that the interaction term is significant and should be included in the model for individual time reamining when teams are using the `r params$Strategy_GT_name_WithSpace` strategy. However, the AIC and BIC values are similar to those in model.NoInteraction.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Effect size (R^2)
+
+r.squaredGLMM(model.All) %>%
+  kable(caption = "Table: Effect size for *model.All*") %>%
+   kable_styling(full_width = F)
+
+r.squaredGLMM(model.NoInteraction) %>%
+  kable(caption = "Table: Effect size for *No Interaction*") %>%
+   kable_styling(full_width = F)
+```
+
+Overall, the effect size of the entire model $(R^{2}_{c})$ for model.All is about 3% higher than the model.NoInteraction. As well, the effect size for the fixed effects ($(R^{2}_{m})$) for model.All is about 9% higher than the model.NoInteraction. Indicating that the model.All is a slightly better model to use when modeling the time remaining at the individual level when teams are using the go `r params$Strategy_GT_name_WithSpace` strategy. 
+
+Overall, it looks like model.ALL does a significantly better job at describing the data. However, I think it is a good idea to analyse the model.NoInteraction as well. I will analyses the __model.All__ and the __model.NoInteraction__.
+
+## Summary
+
+Overall, __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best describes the data at the team level for both strategies. 
+
+At the individual level, __model.NoInteraction.NoTarget__ and __model.NoInteraction__ best described the data when using a `r params$Strategy_GA_name_WithSpace` strategy. The results show that __model.All__ seemed to best describes the data when teams used the `r params$Strategy_GT_name_WithSpace` strategies. However, I will analyze __model.NoInteraction__ as well.
+
+# Q: Do the models satisfy the assumptions?
+
+The purpose of this question is to see what we can learn from these models. Before I examine the model by generating diagnostic plots for the models. The assumptions are as follows [@Galwey2014]:
+
+1. The residuals should have an approximately normal distribution (i.e., a bell curve) when plotted on a histogram.
+2. A fitted-value plot should show an almost constant width when viewed from left to right.
+3. The points on a normal plot should lie on an almost straight line from the bottom left to the top right.
+
+The models may violate some of the assumptions. According to @Field2017, the best way to examine the influence of assumption violations is to compare a robust model to a standard model. When models violate assumptions, I will compare a robust model to a classic model. If there is a noticeable difference between the two models (i.e., if the estimated coefficient are noticeably different) then I will use a step on the power ladder to transform (@Tukey1977), or re-express, the data to address the assumption violation.
+
+## Team
+
+### Model.NoInteraction
+
+#### GA
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+```
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+#### GT
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+```
+
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+### Model.NoInteraction.NoTarget
+
+#### GA
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+```
+
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+#### GT
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(filename = paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace, "_Team.png", sep = ""))
+```
+
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+## Individual 
+
+### GA
+
+#### Model.NoInteraction
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep =""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep =""))
+```
+
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+#### Model.NoInteraction.NoTarget
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep =""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace, "_Ind.png", sep =""))
+```
+
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+### GT
+
+#### model.All
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - 
+ggplot(model.All, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.All"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_All_", params$Strategy_GT_name_NoSpace , "Ind.png", sep =""))
+
+# Fitted values - model.All
+ggplot(model.All, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.All"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_All_", params$Strategy_GT_name_NoSpace , "Ind.png", sep =""))
+
+
+# QQ plots - model.All
+ggplot(model.All, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.All", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_All_", params$Strategy_GT_name_NoSpace , "Ind.png", sep =""))
+```
+
+It looks like assumption 2 and 3 are violated. Need to analysis the influence of the violation. 
+
+#### model.NoInteraction
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace , "Ind.png", sep =""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace , "Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_NoInteraction_", params$Strategy_GT_name_NoSpace , "Ind.png", sep =""))
+```
+
+It looks like all assumptions are violated. Need to analysis the influence of the violation. 
+
+## Summary
+
+Overall, it looks like every model violates the assumptions and I need to compare them to the robust model to see if I need to transform the model.
+
+# Q: Does the violation influence the linear model estimation?
+
+## Team
+
+### Model.NoInteraction
+
+#### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+There is a concerable difference betwee the classic model and the robust model. I will transform the data.
+
+#### GT
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I do not see a concerning difference. I will not transform the data.
+
+### Model.NoInteraction.NoTarget
+
+#### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see a concerable difference. I will transform the data. 
+
+#### GT
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see no concerable difference. I will not transform the data.
+
+## Individual
+
+### GA
+
+#### Model.NoInteraction
+
+```{r}
+#response_variable <- "II_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I do see a concernable difference. I will transform the data. 
+
+#### Model.NoInteraction.NoTarget
+
+```{r}
+#response_variable <- "II_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see a concerable difference, I will transform the data. 
+
+### GT
+
+#### model.All
+
+```{r}
+#response_variable <- "II_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = FALSE)
+rmodel.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "All", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.All, rmodel.All, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "rmodel.All") %>%
+  kable_styling()
+```
+
+I see a concerable difference. I will transform the data.
+
+#### Model.NoInteraction
+
+```{r}
+#response_variable <- "II_ind"
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID)
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  params$dependent_response_ind, model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see a concerable difference. I will transform the data. 
+
+## Summary
+
+I will need to transform some of the data. 
+
+At the team level, I will need to transform the data for __model.NoInteraction__ and __model.NoInteraction.NoTarget__ when teams use the Go Alone strategy.
+
+At the individual level, I will need to transform the data for __model.NoInteraction__ and __model.NoInteractionNoTarget__ when teams use the Go Alone strategy. I will also need to transform the data for __model.All__ and __model.NoInteraction__ when teams use the Go Together strategy.
+
+# Q: Does data transformation satisfy the assumptions of the residuals?
+
+## Team
+
+### Model.NoInteraction
+
+#### GA
+
+```{r}
+#Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace, "_Team.png", sep = ""))
+
+```
+
+There still seems to be a violation with assumption 3. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### GT
+
+__Dont need to transform data.__
+
+### Model.NoInteraction.NoTarget
+
+#### GA
+
+```{r}
+#Plot location
+setwd(figure_directory)
+
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate non-robust models - NoInteractionNoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace,"_Team.png", sep = ""))
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FitteValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace,"_Team.png", sep = ""))
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace,"_Team.png", sep = ""))
+
+```
+
+It looks like there may still be a violation with assumption 2 and 3.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - model.NoInteraction.NoTarget
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### GT
+
+__Dont need to transform data.__
+
+## Individual
+
+### GA
+
+#### Model.NoInteraction
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for NoInteraction", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### Model.NoInteraction.NoTarget
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction.NoTarget"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
+
+
+# Fitted values - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction.NoTarget"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction.NoTarget
+ggplot(model.NoInteraction.NoTarget, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction.NoTarget", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteractionNoTarget_", params$Strategy_GA_name_NoSpace ,"_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction.NoTarget, rmodel.NoInteraction.NoTarget, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction.NoTarget") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+### GT
+
+#### Model.All
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.All
+ggplot(model.All, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.All"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
+
+
+# Fitted values - model.All
+ggplot(model.All, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.All"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
+
+
+# QQ plots - model.All
+ggplot(model.All, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.All", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_All_", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 2 and 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+rmodel.All <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.All, rmodel.All, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.All") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+#### Model.NoInteraction
+
+```{r}
+# Plot location
+setwd(figure_directory)
+
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+# Histogram of Residuals - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .resid)) +
+  geom_histogram(bins = 30) + 
+  labs(title = paste("Histogram of Residuals for model.NoInteraction"), x = "", y = "") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ggsave(paste("Histogram_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
+
+
+# Fitted values - model.NoInteraction
+ggplot(model.NoInteraction, aes(x = .fitted, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0)+
+  labs(title = paste("Fitted-Value Plot for model.NoInteraction"), x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("FittedValue_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
+
+
+# QQ plots - model.NoInteraction
+ggplot(model.NoInteraction, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()+
+  labs(title = "Normal Q-Q Plot for model.NoInteraction", x = "Theoretical", y = "Sample") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggsave(paste("QQ_Residuals_", params$dependent_response_name_NoSpace, "_sqrt_NoInteraction", params$Strategy_GT_name_NoSpace,"_Ind.png", sep =""))
+
+```
+
+It looks like there may still be a violation with assumption 3.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+rmodel.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = TRUE)
+
+comparision_results <- compare(model.NoInteraction, rmodel.NoInteraction, show.rho.functions = FALSE)
+
+comparision_results %>%
+  kable(caption = "model.NoInteraction") %>%
+  kable_styling()
+```
+
+I see no concernable difference when I compared the classic model to the robust model.
+
+## Summary
+
+Overall, transforming the data reduced the influnce of the violations. There were instances where the transformation seemed to not address the assumptions but comparing the classic model to the robust model showed no concernable difference. 
+
+# Q: Are there any effects that are significant?
+
+## Team
+
+### Model.NoInteraction
+
+#### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show no significant effect from Target variables. The results show a significant effect from session 3 and 4.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results showed no signifcant difference among the Target levels.
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results showed a significant difference between session 2 and 4, and between session 3 and 4. The difference beteen session 2 and 3 is marginally significant, indiciating that more data is needed to reach significance. Overall, this means that the time remaining increased over time. 
+
+#### GT
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show no significant effect from the Target variable. The results show a significant effect from session 4 and a marginally significant effect from session 3 (p = 0.0541).
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results show no significant difference among the Target levels
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results only show a significant difference between sesson 2 and 4. Indicating the time remaining at the team level significantly increased when compared from start to finish. 
+
+### Model.NoInteraction.NoTarget
+
+#### GA
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results show a significant effect from session 3 and 4, in reference to session 2. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team) %>%
+  mutate(sqrt.value = sqrt(.data[[params$dependent_response_team]]))
+
+# Generate models with variable response
+GA_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_team, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results show a significant difference between session 2 and 4, and between session 3 and 4. There was a marginal significance between session 2 and 3 (p = 0.0591).
+
+#### GT
+
+DONT TRANSFORM
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results show a significant effect from session 3 and 4, inreference to session 2. 
+
+```{r}
+# Data to fit
+data_modified_team <- team_data %>%
+  select(TeamScore,
+         params$dependent_response_team,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team)
+
+# Generate models with variable response
+GT_data_focus_team <- data_modified_team %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate robust and non-robust models - NoInteraction
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GT_data_focus_team, dependent =  params$dependent_response_team, model.type =  "NoInteraction_NoTarget", is.team = TRUE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results only show a significant difference between session 2 and 4. 
+
+## Individual
+
+### GA
+
+#### Model.NoInteraction
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show a significant effection from the Ind_Team condition in reference to the Ind condition. However, the result is close to 0.05, I think it will not be significant after the Tukey adjustment. 
+
+The results show a significant effect from session 3 and 4 in reference to session 2. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+As expected, the significance between Ind and Ind_Team went away, but there is a __significant difference__ between Ind_Team and Team. The results indicates that the time remaining (square root) is larger for individuals when the team uses the Go Alone strategy.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey")
+```
+
+The results showed a significant difference between each session, indicating that the time remaining increased over time. 
+
+#### Model.NoInteraction.NoTarget
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction.NoTarget)
+```
+
+The results indicate a significant effect from session 3 and 4, inreference to session.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GA_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction.NoTarget <- model_data_Target_Session(df = GA_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction_NoTarget", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction.NoTarget, list(pairwise ~ SessionOrder), adjust = "tukey") 
+```
+
+The results indiciate a significant difference between each session, indiciating that the `r params$dependent_response_name_WithSpace` increased over time. 
+
+### GT
+
+#### Model.All
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+summary(model.All)
+```
+
+In reference to Ind, sessison 2, and Ind_Session2, the results only a show a significant effection from session 3 and 4 (in reference to session 2), and Team_Session4 (in reference to Ind_Session2).
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ Target), adjust = "tukey") 
+```
+
+The results show no significant difference among the Target level. __However, it is important to note that this result may be misleading, due to the presence of the interaction term__.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ SessionOrder), adjust = "tukey") 
+```
+
+Unsurprisingly, the results show a significant difference between each session. __However, it is important to note that this result may be misleading, due to the presence of the interaction term__.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ Target | SessionOrder), adjust = "tukey")
+```
+The result show that __significant difference__ when Target is a condition of Session Order. Specifically, in session 4, the Team condition is significantly different from Ind and Ind_Team. The results indicate that the `r params$dependent_response_name_WithSpace` at the individual level, in the Team condition, in session 4, is larger than the `r params$dependent_response_name_WithSpace` in the Ind and Ind_Team condition. 
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.All <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "All", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.All, list(pairwise ~ SessionOrder | Target), adjust = "tukey")
+```
+
+Unsurprisingly, the results indicate a significant difference between session 2 and 3, and between session 3 and 4 for each condition. HOwever, it is intersting to note that only in the Team condition is session 3 and 4 signficiantly different. 
+
+#### Model.NoInteraction
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+summary(model.NoInteraction)
+```
+
+The results show no significant effect from the Target variable in reference to Ind level. The results show a significant effect from session 3 and 4 in reference to session 2.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ Target), adjust = "tukey")
+```
+
+The results show no significant effect among the feedback conditions.
+
+```{r}
+# Data to model
+data_modified_ind <- ind_data %>%
+  select(params$dependent_response_ind,
+         params$dependent_response_DominateStrategy,
+         Target, 
+         SessionOrder, 
+         Team, 
+         Player_ID) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) # Some of the time remaining vaules are negative when the should be zero. I want to make sure those values are zero
+
+# Generate models with variable response
+GT_data_focus_ind <- data_modified_ind %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace)
+
+# Generate models with variable response
+model.NoInteraction <- model_data_Target_Session(df = GT_data_focus_ind, dependent =  "sqrt.value", model.type =  "NoInteraction", is.team = FALSE, is.robust = FALSE)
+
+emmeans(model.NoInteraction, list(pairwise ~ SessionOrder), adjust = "tukey") 
+```
+
+The results show a significant difference between each session order, indicating `r params$dependent_response_name_WithSpace` increased over time. 
+
+## Summary
+
+At the individual level, when teams use the Go Alone method, model.NoInteracton indicates a __significant difference__ between Ind_Team and Team. Specicially, `r params$dependent_response_name_WithSpace` (square root) is significantly higher when given Team feedback in the condition, compared to Ind_Team feedback.   
+
+At the individual level, wehn teams use the Go Together method, in session 4, model.All indicates a __significant difference__ between Ind_Team and Team, and a difference between Ind and Team condition, indicating that the Team condition produced the higher individual `r params$dependent_response_name_WithSpace` (Square root). 
+
+Overall, the results indicate that the Team condition significantly increased the `r params$dependent_response_name_WithSpace` (sqaure root) at the individual level when the team uses Go Together strategy. There were no sinificant results in at the team level but there were signifcant results at the individual level.
+
+The results at the individual level, when teams use the Go Alone method, indicate that  `r params$dependent_response_name_WithSpace` (square root) is __significantly__ higher when given Team feedback when compared to giving Ind_Team feedback.  
+
+The results at the individual level, when teams use the Go Together method, is session 4, indicate that in the beginning, the feedback condition did not matter until the teams had some experience. Once a team has experience, the results suggest that giving them Team feedback will increse the `r params$dependent_response_name_WithSpace`. 
+
+# Q: Is there an *interaction* between the Target and Session Order for the _`r params$dependent_response_name_WithSpace`_ at the individual level when Teams us the Go Together strategy?
+
+## Individual
+
+The previous results showed significance at the individual level. 
+
+When teams used the Go Alone method, Individual time remaining was significantly greater when teams were in the Team condition as opposed to the Ind_Team condition. This was deteremined using model.NoInteraction
+
+When teams used the GO Together method, and were in session 4, individual time remaining was significantly more in the Team condition when compared to Ind or Ind_Team condition. This was determined using model.All
+
+-- Short hand summary
+Individual - Go Alone - Team > Ind_Team - model.NoInteraction - Square Root value
+Individual - Go Together - Session 4 - Team > Ind_Team and Team > Ind - model.All - Square root value
+
+### Go Alone interaction plot
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, 
+         SessionOrder, 
+         params$dependent_response_ind,
+         params$dependent_response_DominateStrategy) %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GA_name_WithSpace) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) %>%
+  group_by(Target) %>%
+  summarise(Average = mean(.data[["sqrt.value"]]), 
+            Stdv =sd(.data[["sqrt.value"]]), 
+            n = length(.data[["sqrt.value"]]), 
+            StEr = sd(.data[["sqrt.value"]]) / sqrt(length(.data[["sqrt.value"]])))
+
+ggplot(data = plot_data_ind, aes(x = Target, y = Average, color = Target, shape=Target, label = .data[["n"]])) +
+  geom_point(size = 3) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = "Target", title = paste(params$dependent_response_name_WithSpace, "(Individual) Vs. Target (", params$Strategy_GA_name_WithSpace, ")")) +
+  ggsave(filename = paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_ByTarget_Avereaged_Over_SessionOrder", params$Strategy_GA_name_NoSpace, "_Ind.png", sep = ""))
+
+plot_data_ind %>% 
+  kable(caption = paste(params$Strategy_GA_name_WithSpace, "Data")) %>%
+  kable_styling()
+```
+
+According to model.NoInteraction, there is a significant difference between Ind_Team and Team condition. 
+
+### Go Together interaction plot
+
+```{r}
+y_label_ind <- params$dependent_response_name_WithSpace
+setwd(figure_directory)
+
+plot_data_ind <- ind_data %>%
+  select(Target, 
+         SessionOrder, 
+         params$dependent_response_ind,
+         params$dependent_response_DominateStrategy) %>%
+  filter(.data[[params$dependent_response_DominateStrategy]] == params$Strategy_GT_name_WithSpace) %>%
+  mutate(sqrt.value = sqrt(ifelse(.data[[params$dependent_response_ind]] < 0, 0, .data[[params$dependent_response_ind]]))) %>%
+  group_by(SessionOrder, Target) %>%
+  summarise(Average = mean(.data[["sqrt.value"]]), 
+            Stdv =sd(.data[["sqrt.value"]]), 
+            n = length(.data[["sqrt.value"]]), 
+            StEr = sd(.data[["sqrt.value"]]) / sqrt(length(.data[["sqrt.value"]])))
+
+ggplot(data = plot_data_ind, aes(x = SessionOrder, y = Average, color = Target, shape=Target, label = .data[["n"]])) +
+  geom_point(size = 3) +
+  geom_line(aes(group=Target, color = Target)) + 
+  geom_errorbar(aes(ymin = Average - StEr, ymax = Average + StEr), width = 0.2) +
+  labs(y = y_label_ind, x = "Target", title = paste(params$dependent_response_name_WithSpace, "(Individual) Vs. Target (", params$Strategy_GT_name_WithSpace, ")")) +
+  ggsave(filename = paste("InteractionPlot_", params$dependent_response_name_NoSpace, "_BySessionOrder_ByTarget", params$Strategy_GT_name_NoSpace, "_Ind.png", sep = ""))
+
+plot_data_ind %>% 
+  kable(caption = paste(params$Strategy_GT_name_WithSpace, "Data")) %>%
+  kable_styling()
+```
+
+The results show a significant difference in the 4th session. Indicating that the time remaining at the individual level when in the Team condition is significantly higher than both the Ind and Ind_Team condtion. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# References

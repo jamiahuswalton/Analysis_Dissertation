@@ -13,15 +13,14 @@ team_aggregate_data_stats <- re_factor_columns(team_aggregate_data_stats, column
 
 
 # Team ------
-fit_rand_teamscore <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = team_aggregate_data_stats)
+modified_Team_Data <- team_aggregate_data_stats %>%
+  filter(Player == 1)
+
+fit_rand_teamscore <- lmer(TeamScore~Target+SessionOrder+(1|Team), data = modified_Team_Data)
 
 # Currnt power
-powerSim(fit_rand_teamscore, nsim = 200, seed = 300)
-
-# test <- extend(fit_rand_teamscore, along = "Team")
-test_100 <- extend(fit_rand_teamscore, along = "Team", n = 100)
-powerSim(test_100, nsim = 100, seed = 300)
-powerCurve(test_100, seed = 300, along = "Team")
+powerSim(fit_rand_teamscore, nsim = 100)
+powerCurve(fit_rand_teamscore, along = "Team", nsim=50)
 
 
 # powerSim(fit_rand_teamscore_pilot)
@@ -29,11 +28,18 @@ powerCurve(test_100, seed = 300, along = "Team")
 model2 <- extend(fit_rand_teamscore_pilot, along = "Team", n = 33)
 powerSim(model2, nsim=50)
 
-# Individual ----
-fit_rand_indScore <- lmer(IndividualScore~Target+SessionOrder+(1|Team)+(1|Player_ID), data = team_aggregate_data_stats)
 
-# Currnt power
-powerSim(fit_rand_indScore, nsim = 1000, seed = 300)
+
+
+# Individual ----
+  # First six teams
+modified_ind_Data <- team_aggregate_data_stats
+
+fit_rand_indScore <- lmer(IndividualScore~Target + SessionOrder+(1|Team)+(1|Player_ID), data = modified_ind_Data)
+
+  # Currnt power
+powerSim(fit_rand_indScore, nsim = 100, seed = 300)
+powerCurve(fit_rand_indScore, along = "Player_ID", nsim = 50)
 
 # test <- extend(fit_rand_indScore, along = "Team")
 test_100 <- extend(fit_rand_indScore, along = "Team", n = 100)
