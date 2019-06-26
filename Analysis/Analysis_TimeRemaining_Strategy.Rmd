@@ -187,6 +187,15 @@ ggplot(data = plot_data_team) +
   facet_grid( . ~ .data[[params$dependent_response_DominateStrategy]]) +
   labs(title = title_response_team, x = x_label_team, y = y_label_team) +
   ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- team_data %>%
+  group_by(.data[[params$dependent_response_DominateStrategy]]) %>%
+  summarise(N = length(.data[[params$dependent_response_team]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
 The distribution of both groups have a skew to the left.
@@ -294,6 +303,15 @@ ggplot(data = plot_data_ind) +
   facet_grid(. ~ .data[[params$dependent_response_DominateStrategy]]) + 
   labs(title = title_response_ind, x = x_label_ind, y = y_label_ind) +
   ggsave(filename = plot_name)
+
+# Information about the N values in each condition
+tableData <- plot_data_ind %>%
+  group_by(.data[[params$dependent_response_DominateStrategy]]) %>%
+  summarise(N = length(.data[[params$dependent_response_ind]]))
+
+tableData %>%
+  kable() %>%
+  kable_styling()
 ```
 
 Both groups sees to have a distribution that is skewed to the left. The `r params$Strategy_GA_name_WithSpace` group seem to have a large number of outliers but the `r params$Strategy_GT_name_WithSpace` group is more concentrated. 
