@@ -344,6 +344,29 @@ post_session_survey_value<- function(data_post_session, team, player, condition,
   return(player_data[[survey_value]])
 }
 
+# Get overall post-session value
+overall_post_session_survey_value<- function(overall_post_data, key_rand_playerID_data, player_Id_value, value_name){
+  rand_num_player<- key_rand_playerID_data %>%
+    filter(player_Id_value == ID)
+  
+  if(length(rand_num_player[["Random_num"]]) == 1){
+    player_rand_value<- rand_num_player[1,"Random_num"]
+  } else{
+    message<- paste("Rand key data table has more than or less than one entery with the ID:", player_Id_value)
+    stop(message)
+  }
+  
+  player_data<- overall_post_data%>%
+    filter(Rand == player_rand_value)
+  
+  if(length(player_data[["Rand"]])== 1){
+    return(player_data[[value_name]])
+  } else{
+    message<- paste("The overal post survey has more than or less than one entry that has a Random number value of", player_rand_value)
+    stop(message) 
+  }
+}
+
 # Find session order ----
 session_order_number <- function(teamNum, counter_balance_set_dataframe, condition){
   set_index <- teamNum %% length(counter_balance_set_dataframe) #If this equal 0 then that means this team used the last set
@@ -634,8 +657,8 @@ is_post_session_data_correct <- function(post_session_data, team_number_column_n
 }
 
 # Generate aggragate data (final team score, final individual score, ) ----
-generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, clean_demo_data, clean_familiarity_data,
-                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX, names_PostSession,
+generate_aggragate_data <- function(team_numbers, condition_list, clean_position_data, clean_error_data, clean_invent_data, clean_demo_data, clean_familiarity_data, clean_overall_post_data,
+                                    player_num_list, strategy_barrier_dis, counter_balance_set, col.names, names_TLX, names_PostSession, names_Overall_Postsession,
                                     key_rand_player_data, names_demographic ){
   # Final data output
   number_of_columns<- length(col.names)
@@ -830,6 +853,13 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
           Post_Session_Values[index] <- value
         }
         
+        # Overall post-session survey values
+        Overall_Post_Session_Values<- vector()
+        for (name in names_Overall_Postsession) {
+          value <- as.character(overall_post_session_survey_value(clean_overall_post_data, key_rand_player_data, current_player_id, name))
+          Overall_Post_Session_Values<- append(Overall_Post_Session_Values, value)
+        }
+        
         # Error Rate for individual
         ind_error_rate <- error_rate_ind(clean_position_data, clean_error_data, team, player, condition)
         
@@ -873,6 +903,7 @@ generate_aggragate_data <- function(team_numbers, condition_list, clean_position
                                     dominate_strategy_used,
                                     TLX_values, 
                                     Post_Session_Values,
+                                    Overall_Post_Session_Values,
                                     demo_values))
       }
     }
@@ -1097,51 +1128,59 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 
 # Test ----
-# post_session_survey_value<- function(data_post_session, team, player, condition, survey_value){
-#   player_data<- data_post_session %>%
-#     filter(Condition == condition, Team == team, Player == player)
+
+# # The goal of this logic is to retrive values from the overall post survey
+# overall_post_data<- overall_post_session_table
+# key_rand_playerID_data<- Rand_num_key
+# player_Id_value<- "P20"
+# value_name<- "did_your_ind_perform_change_over_time_why_whyNot"
 # 
-#   if(length(player_data[[1]]) != 1){
-#     message <- paste("Could not find post session survey data for player", player, "in team", team, "for condition", condition)
+# rand_num_player<- key_rand_playerID_data %>%
+#   filter(player_Id_value == ID)
+# 
+# if(length(rand_num_player[["Random_num"]]) == 1){
+#   player_rand_value<- rand_num_player[1,"Random_num"]
+# } else{
+#   message<- paste("Rand key data table has multiple enteries with the same ID:", player_Id_value)
+#   stop(message)
+# }
+# 
+# player_data<- overall_post_data%>%
+#   filter(Rand == player_rand_value)
+# 
+# if(length(player_data[["Rand"]])== 1){
+#   player_data[[value_name]]
+# } else{
+#   message<- paste("The overal post survey has more than one entry that has a Random number value of", player_rand_value)
+#   stop(message) 
+# }
+# 
+# 
+# overall_post_session_survey_value<- function(overall_post_data, key_rand_playerID_data, player_Id_value, value_name){
+#   rand_num_player<- key_rand_playerID_data %>%
+#     filter(player_Id_value == ID)
+#   
+#   if(length(rand_num_player[["Random_num"]]) == 1){
+#     player_rand_value<- rand_num_player[1,"Random_num"]
+#   } else{
+#     message<- paste("Rand key data table has multiple enteries with the same ID:", player_Id_value)
 #     stop(message)
 #   }
-# 
-#   return(player_data[[survey_value]])
-# }
-# 
-# 
-# # The goal of this logic is to generate the responses from demographics
-# 
-# data_familiar<- familiarity_data
-# 
-# team_num<- 10
-# team_column_name<- "ï..Team"
-# 
-# team_data <- data_familiar %>%
-#   filter(.data[[team_column_name]]== team_num)
-# 
-# num_of_entries<- length(team_data[[team_column_name]])
-# 
-# if(num_of_entries == 1){
 #   
-#   return(team_data[["Familiarity"]])
-# }
-# 
-# 
-# familiarity_value<- function(data_familiar, team_num, team_column_name){
-#   team_data <- data_familiar %>%
-#     filter(.data[[team_column_name]]== team_num)
+#   player_data<- overall_post_data%>%
+#     filter(Rand == player_rand_value)
 #   
-#   num_of_entries<- length(team_data[[team_column_name]])
-#   
-#   if(num_of_entries == 1){
-#     
-#     return(team_data[["Familiarity"]])
+#   if(length(player_data[["Rand"]])== 1){
+#     return(player_data[[value_name]])
+#   } else{
+#     message<- paste("The overal post survey has more than one entry that has a Random number value of", player_rand_value)
+#     stop(message) 
 #   }
 # }
-# familiarity_value(familiarity_data, 13, "ï..Team")
 # 
-# 
+# overall_post_session_survey_value(overall_post_session_table, Rand_num_key, "P20", "did_your_ind_perform_change_over_time_why_whyNot")
+
+
 
 
 

@@ -219,9 +219,31 @@ plot_data_team %>%
 
 The figure above suggest that teams that were strangers favored Go Alone.
 
-###Summary
+```{r}
+plot_data_team <- team_data%>%
+  select(familiarity, 
+         Dominate.Strategy,
+         Target,
+         SessionOrder,
+         Team) 
 
-It looks like the teams that were strangers tended to use Go Alone.
+ggplot(plot_data_team, aes(x = factor(Dominate.Strategy))) + 
+  geom_bar()+
+  labs(title= "Strategy count, grouped by team familiarity and session order", x = "Strategy")+
+  facet_grid(SessionOrder ~ familiarity)
+
+plot_data_team %>%
+  group_by(familiarity, SessionOrder, Dominate.Strategy) %>%
+  summarise(N = length(.data[["familiarity"]])) %>%
+  kable()%>%
+  kable_styling()
+```
+
+Familiar and partially teams seems to have similar strategy distrbution. The Stranger teams seem to favor Go Alone. Most Stranger teams used Go Alone at the first session and then gradually began to switch to the Go Tgether.
+
+###Summary
+__NEED TO INCLUDE SUMMARY FOR NEW FIGURES__
+
 
 # Q: Does team familiarity influence the distribution of dependent variables?
 

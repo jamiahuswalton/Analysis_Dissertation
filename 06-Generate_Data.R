@@ -49,6 +49,23 @@ PostSession_names <- c("NoticeFeedback",
                        "Confident_team_accurately_assess_handling_information",
                        "Confident_team_quickly_assess_handling_information",
                        "Confident_team_accurately_transfer_information")
+
+Overall_PostSession_names<- c(
+  "my_perform_improved_over_time",	
+  "team_perform_improved_over_time",	
+  "could_done_better_with_better_teammates",	
+  "could_have_done_better_if_I_did_better",	
+  "info_about_my_performance_was_better",	
+  "info_about_team_performance_was_better",	
+  "did_your_ind_perform_change_over_time_why_whyNot",	
+  "did_your_team_perform_change_over_time_why_whyNot",	
+  "characteristics_of_a_session_you_enjoyed",	
+  "characteristics_of_a_session_you_no_enjoyed",	
+  "do_you_feel_feedback_was_useful_why_whyNot",	
+  "how_to_change_feedback_to_be_useful",	
+  "do_you_have_any_other_comments"
+)
+
 demo_names <- c("Rand",	
                 "Gender_Male_Female_Other_PreferNotToAnswer",
                 "age_range",
@@ -125,12 +142,13 @@ col_names<- c("Team",
               "Dominate Strategy",
               TLX_Scale_Names,
               PostSession_names,
+              Overall_PostSession_names,
               demo_names)
 
 
 # The data frame that will be used to store the aggragate data (May add this into a function)
-my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, demographic_table, familiarity_data,
-                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names,
+my_aggregate_data <- generate_aggragate_data(team_number_list, condition_list, clean_positionTable, clean_error_log_data, clean_inventory_data, demographic_table, familiarity_data,overall_post_session_table,
+                                             player_number_list, strategy_barrier_dis_my, counter_balance_set, col_names, TLX_Scale_Names, PostSession_names, Overall_PostSession_names,
                                              Rand_num_key, demo_names)
 
 # Save aggregate data to csv file
