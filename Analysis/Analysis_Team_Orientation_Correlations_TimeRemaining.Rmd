@@ -188,7 +188,7 @@ __Note:__ In TLX, a value of 0 for the performance channel is considered perfect
 
 # Is there correlation between a actual performance (i.e., `r params$dependent_response_name_WithSpace`) and self-reported performance (i.e, Performance (reverse) from TLX)?
 
-## Time reamining (Individual) - timeRemaining_ind
+## `r params$dependent_response_name_WithSpace` - `r params$dependent_response_ind`
 
 ### Plots and Stats
 
