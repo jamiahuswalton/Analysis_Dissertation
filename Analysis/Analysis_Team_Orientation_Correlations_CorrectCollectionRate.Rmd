@@ -1,5 +1,5 @@
 ---
-title: 'Dissertation Analysis: Correlations - Time Remaining - Team Orientation'
+title: 'Dissertation Analysis: Correlations - Collection Rate - Team Orientation'
 author: "Jamiahus Walton"
 date: "`r Sys.Date()`"
 output: 
@@ -8,10 +8,10 @@ output:
 editor_options:
   chunk_output_type: inline
 params:
-  dependent_response_name_WithSpace: "Time Remaining"
-  dependent_response_name_NoSpace: "TimeRemaining"
-  dependent_response_team: "timeRemaining_team"
-  dependent_response_ind: "timeRemaining_ind"
+  dependent_response_name_WithSpace: "Collection Rate"
+  dependent_response_name_NoSpace: "CollectionRate"
+  dependent_response_team: "Collection_rate_correct_item_team"
+  dependent_response_ind: "Collection_rate_correct_item_ind"
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}
@@ -182,9 +182,11 @@ TLX_Scale_Names <- c("Mental.Demand", "Physical.Demand", "Temporal.Demand", "Per
 
 # Motivation
 
-The motivation behind this analysis is to discover different correlations between participants actual performance and self-reported performance. Significance was found in previous analysis regarding a sinificant difference in time remaining at the individual level and the goal of this analysis is to attempt to understand why there was significance. 
+The motivation behind this analysis is to discover different correlations between participants actual performance and self-reported performance. Significance was found in previous analysis regarding a sinificant difference in correct collection rate at the individual level and the goal of this analysis is to attempt to understand why there was significance. 
 
 __Note:__ In TLX, a value of 0 for the performance channel is considered perfect and 100 is considered faile. This is because if you felt the you're performance was perfect, then that would mean your task load was lower. For this analysis, performance was reverse coded so that 0 is failure and 100 is perfect. 
+
+__Note:__ A lower collection rate value indicates a high performaing team. Units for the dependent variable are Sec per Item. 
 
 # Is there correlation between a actual performance (i.e., `r params$dependent_response_name_WithSpace`) and self-reported performance (i.e, Performance (reverse) from TLX)?
 
@@ -231,7 +233,7 @@ for (my_target in c("Ind", "Team", "Ind_Team")) {
   }
 ```
 
-Grouping by Target across Session order, there was a __significant__ correlation for Ind and Team condition. Specifically, there was positive correlation between time remaining and self- reported performance (reverse) at the Individual and Team condition. This means that as their self-reported performance (reverse) increase, so did the time remaining. Indicating a correct self-peception of performance.  
+When grouping paired responses for correct collection rate and performance (reverse) by Target, the results show a __significant__ negative correltation for the Team condition. Indicating correct self perception of performance. Results also show a __marginally significant__ negative correlation in the Ind_Team condition. 
 
 ```{r}
 # dependent<- "timeRemaining_ind"
@@ -247,7 +249,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   facet_grid( . ~ SessionOrder)
 ```
 
-No obvious patterns. The varience seems to increase over time. No obvious violation of monotonic relationship.
+No obvious violation of monotonic relationship.
 
 ```{r}
 
@@ -266,7 +268,7 @@ for (my_session in c(2:4)) {
   }
 ```
 
-The results show a __significant__ correlation betweent time remaining and self reported performance (reversed) session 2 and 4. Specifically, as self-reported performance increases, the time remaining increase. This indicates a correct self examination. There is a __marginally significant__ correlation for session 3
+When grouping paired responses for correct collection rate and performance (reverse) by session order, the results show a __significant__ negative correlation for session 4. Indicating a correct perception of performance. The results also showed a __marginally significant__ negative correlation in session 2.
 
 ```{r}
 # dependent<- "timeRemaining_ind"
@@ -283,7 +285,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   facet_grid( Target ~ SessionOrder)
 ```
 
-No obious pattern. The varience may increase over time. No obvious violation of monotonic relationship.
+No obvious violation of monotonic relationship.
 
 ```{r}
 
@@ -309,7 +311,7 @@ for (my_session in c(2:4)) {
 
 There was a __significant__ correltation in the following condition and session combinations:
 Condition = Team , Session = 2
-Condition = Ind , Session = 3
+Condition = Ind_Team , Session = 4
 
 ```{r}
 my_target<- "Team"
@@ -331,8 +333,8 @@ print(test)
 
 #----
 
-my_target<- "Ind"
-my_session<- 3
+my_target<- "Ind_Team"
+my_session<- 4
 
 plot_data_ind <- ind_data %>%
       select(Performance,
@@ -350,7 +352,11 @@ print(test)
   
 ```
 
-The both __significant__ correlations are positive. Indicating that as their self-reported performance increased, so did their time remaining. This is the case for Team in session 2, and for Individual in Session 3. 
+There was a __significant__ correltation in the following condition and session combinations:
+Condition = Team , Session = 2
+Condition = Ind_Team , Session = 4
+
+When grouping paired responses for correct collection rate and performance (reverse) by target and session order, the results showed a __significant__ negative correlation for participants in Team in session 2, and for pariticpants in Ind_Team in session 4, indicating a correct perception. 
 
 ```{r}
 # dependent <- "timeRemaining_ind"
@@ -365,7 +371,8 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   geom_point() + 
   facet_grid(. ~ My_Performance_f)
 ```
-Overally, it looks like most participants rated their performance as Good or average. Few pariticpants said their performance was Very poor. There were a decent number of participants that said their performance was Average or Excellent. No obvious violation of monotonic relationship.
+
+No obvious violation of monotonic relationship.
 
 ```{r}
 for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
@@ -383,8 +390,8 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
   print(test)
 }
 ```
-The results showed a __signficant__ correltation between time remaining and self-reported performance (resverse) for participants who reported their performance as "Good", indicating a positive relationship. This suggest that participants correctly perceived their performance. There was a __marginally significant__ positive correltation for participant who reported their performance as "Excellent". 
 
+When grouping paired responses for correct collection rate and performance (reverse) by self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants that rated their performance as Excellent, indicating a correct perception of performance. The results also showed a __singnificant__ positive correlation for participants that rated their performance as Poor, indiciating an incorrect perception of performance.
 
 ```{r}
 # dependent<- "timeRemaining_ind"
@@ -402,7 +409,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   facet_grid(My_Performance_f ~ Target)
 ```
 
-When grouped by Target, the most obvious correlations appear when participants rated their performance as excellent. There may be some correlations with participants who rated their performance as good. No obvious violation of monotonic relationship.
+No obvious violation of monotonic relationship.
 
 ```{r}
 
@@ -425,9 +432,48 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
   }
 }
 ```
+The following show a __marginally significant__ correlation:
+Condition = Team , Rated_performance = Poor
+Condition = Ind_Team , Rated_performance = Poor
 
-Results showed no significant or marginally significant correltations.
+```{r}
+ind_rating<- "Poor"
+my_target<- "Team"
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               Target) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, Target == my_target)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    print(paste("Correltation: Condition =", my_target, ", Rated_performance =", ind_rating))
+    print(test)
+    
+#----
+ind_rating<- "Poor"
+my_target<- "Ind_Team"
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               Target) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, Target == my_target)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    print(paste("Correltation: Condition =", my_target, ", Rated_performance =", ind_rating))
+    print(test)
 
+```
+The following show a __marginally significant__ correlation:
+Condition = Team , Rated_performance = Poor
+Condition = Ind_Team , Rated_performance = Poor
+
+__Note:__ There are very few participants that rated their performance as poor in the Team and Ind_Team conditions
 
 ```{r}
 # dependent<- "timeRemaining_ind"
@@ -445,7 +491,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   facet_grid(My_Performance_f ~ SessionOrder)
 ```
 
-No obvious pattern, there maybe a correlation for individuals who rated their performance as excellent. No obvious violation of monotonic relationship.
+No obvious violation of monotonic relationship.
 
 ```{r}
 for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
@@ -468,9 +514,12 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
 }
 ```
 
-__Significant__ results in the following:
+There was a __significant__ correlations for the following: 
 Session = 2 , Rated_performance = Excellent
+Session = 2 , Rated_performance = Poor
 
+There was a __marginally significant__ correlations for the following: 
+Session = 3 , Rated_performance = Poor
 
 ```{r}
 ind_rating<- "Excellent"
@@ -491,13 +540,28 @@ plot_data_ind <- ind_data %>%
     }
     print(test)
     
+#----
+ind_rating<- "Poor"
+my_session<- 2
+
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               SessionOrder) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, SessionOrder == my_session)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    if(test$p.value < 0.1){
+      print(paste("Correltation: Session =", my_session, ", Rated_performance =", ind_rating))
+    }
+    print(test)
+    
 ```
 
-__Significant__ results in the following:
-Session = 2 , Rated_performance = Excellent
-
-The results showed a positive correltation between the time remaining and the self-reported perforemance (reverse), indiciating a correct peception. 
-
+When grouping paired responses for correct collection rate and performance (reverse) by session order and self reported performance (e.g., poor vs. excellent), the results showed a __significant__ negative correlations for participants in session 2 that rated themsleves as Excellent, indicating a correct perception. The results showed a __significant__ positive correlation for participants in session 2 that rated themselves as Poor, indicating an incorrect perception of performance. 
 
 ```{r}
 # dependent<- "timeRemaining_ind"
@@ -579,7 +643,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   facet_grid(SessionOrder ~ Target)
 ```
 
-There seems to be no violation of monotonic relationship.
+No obvious violation of monotonic relationship.
 
 ```{r}
 
@@ -611,14 +675,13 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
   }
 }
 ```
-The results show no significant correlations. The following correlations are __margnially significant__:
- 
- Condition = Ind_Team , Session = 3 , Rated individual Performance = Excellent
- Condition = Team , Session = 2 , Rated individual Performance = Good
- 
+Condition = Ind , Session = 3 , Rated individual Performance = Excellent, __significant__
+Condition = Ind_Team , Session = 4 , Rated individual Performance = Excellent, __significant__
+Condition = Ind_Team , Session = 2 , Rated individual Performance = Poor, __marginally significant__
+
 ```{r}
 # dependent<- "timeRemaining_ind"
-current_target<- "Ind_Team"
+current_target<- "Ind"
 current_my_performance<-  "Excellent"
 current_Session<- 3
 
@@ -643,10 +706,9 @@ cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[
 
 #----
 
-# dependent<- "timeRemaining_ind"
-current_target<- "Team"
-current_my_performance<-  "Good"
-current_Session<- 2
+current_target<- "Ind_Team"
+current_my_performance<-  "Excellent"
+current_Session<- 4
 
 plot_data_ind <- ind_data %>%
   select(Performance,
@@ -667,43 +729,26 @@ print(paste("Observations:", N_paris))
 
 cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
 
+
 ```
 
-The __marginally significant__ result suggests a positive correltation for the following conditions:
- 
- Condition = Ind_Team , Session = 3 , Rated individual Performance = Excellent, negative correlation
- Condition = Team , Session = 2 , Rated individual Performance = Good, positive correlation
+When grouping paired responses for correct collection rate and performance (reverse) by Target, session order, and self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants in Individual conditio in session 3 and labeled their performance as excellent, indicating a correct self-perception of performance. The results show a __significant__ negative correlation for participants in Ind_Team condition in session 4 and labaled their performance as Excellent. 
 
-## Summary
+## Summary 
 
-When grouping paired responses for timeraiming and performance (reverse) by Target, there was a __significant__ positive correlation for in the Ind and Team condition. 
-
-When grouping paired responses for timeraiming and performance (reverse) by SessionOrder, there was a __significant__ positive correltation in session 2 and 4. There was also a __marginally significant__ correlation for session 3. 
-
-When grouping paired responses for timeraiming and performance (reverse) by SessionOrder and Target, there was a __significant__ positive correltation for participants in Team in session 2, and for participant in Individual and Session 3.
-
-When grouping paired responses for timeraiming and performance (reverse) by self-reported performance(e.g., good vs. poor), there was a __significant__ positive correlation for participants who labeled their performance as "Good". There was also a __marginally significant__ positive correlation for participants who reported their performance as "Excellent".
-
-When grouping paired responses for timeraiming and performance (reverse) by self-reported performance(e.g., good vs. poor) and session order, there was a __significant__ positive correlation for participants in session 2 that rated their performance as Excellent.
-
-When grouping paired responses for timeraiming and performance (reverse) by self-reported performance(e.g., good vs. poor), Target, and session order, there was a __marginally significant__ netgative correlation for pariticpnats in the Ind_Team condition, in session 3, with a self performance rating of "Excellent". There was a __marginally significant__ positive correlation for pariticpnats in the Team condition, in session 2, with a self performance rating of "Good".
- 
+"When grouping paired responses for correct collection rate and performance (reverse) by Target, the results show a __significant__ negative correltation for the Team condition. Indicating correct self perception of performance. Results also show a __marginally significant__ negative correlation in the Ind_Team condition. "
 
 
+"When grouping paired responses for correct collection rate and performance (reverse) by session order, the results show a __significant__ negative correlation for session 4. Indicating a correct perception of performance. The results also showed a __marginally significant__ negative correlation in session 2."
+
+"When grouping paired responses for correct collection rate and performance (reverse) by target and session order, the results showed a __significant__ negative correlation for participants in Team in session 2, and for pariticpants in Ind_Team in session 4, indicating a correct perception."
+
+"When grouping paired responses for correct collection rate and performance (reverse) by self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants that rated their performance as Excellent, indicating a correct perception of performance. The results also showed a __singnificant__ positive correlation for participants that rated their performance as Poor, indiciating an incorrect perception of performance."
 
 
+"When grouping paired responses for correct collection rate and performance (reverse) by session order and self reported performance (e.g., poor vs. excellent), the results showed a __significant__ negative correlations for participants in session 2 that rated themsleves as Excellent, indicating a correct perception. The results showed a __significant__ positive correlation for participants in session 2 that rated themselves as Poor, indicating an incorrect perception of performance. "
 
-
-
-
-
-
-
-
-
-
-
-
+"When grouping paired responses for correct collection rate and performance (reverse) by Target, session order, and self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants in Individual conditio in session 3 and labeled their performance as excellent, indicating a correct self-perception of performance. The results show a __significant__ negative correlation for participants in Ind_Team condition in session 4 and labaled their performance as Excellent. "
 
 
 
