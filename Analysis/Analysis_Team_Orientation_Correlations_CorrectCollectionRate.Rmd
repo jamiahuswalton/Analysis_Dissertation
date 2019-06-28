@@ -285,29 +285,470 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   facet_grid( Target ~ SessionOrder)
 ```
 
+No obvious violation of monotonic relationship.
+
+```{r}
+
+for (my_session in c(2:4)) {
+  for (my_target in c("Ind", "Team", "Ind_Team")) {
+    plot_data_ind <- ind_data %>%
+      select(Performance,
+             params$dependent_response_ind,
+             SessionOrder,
+             Target) %>%
+      mutate(performance_reverse = 100 - Performance) %>%
+      filter(Target == my_target, SessionOrder == my_session)
+  
+  test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+  if(test$p.value < 0.1){
+    print(paste("Correltation: Condition =", my_target,",", "Session =", my_session))
+  }
+  print(test$p.value)
+  }
+}
+```
+
+There was a __significant__ correltation in the following condition and session combinations:
+Condition = Team , Session = 2
+Condition = Ind_Team , Session = 4
+
+```{r}
+my_target<- "Team"
+my_session<- 2
+
+plot_data_ind <- ind_data %>%
+      select(Performance,
+             params$dependent_response_ind,
+             SessionOrder,
+             Target) %>%
+      mutate(performance_reverse = 100 - Performance) %>%
+      filter(Target == my_target, SessionOrder == my_session)
+
+print(paste("Correltation: Condition =", my_target,",", "Session =", my_session))
+
+test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+
+print(test)
+
+#----
+
+my_target<- "Ind_Team"
+my_session<- 4
+
+plot_data_ind <- ind_data %>%
+      select(Performance,
+             params$dependent_response_ind,
+             SessionOrder,
+             Target) %>%
+      mutate(performance_reverse = 100 - Performance) %>%
+      filter(Target == my_target, SessionOrder == my_session)
+
+print(paste("Correltation: Condition =", my_target,",", "Session =", my_session))
+
+test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+
+print(test)
+  
+```
+
+There was a __significant__ correltation in the following condition and session combinations:
+Condition = Team , Session = 2
+Condition = Ind_Team , Session = 4
+
+When grouping paired responses for correct collection rate and performance (reverse) by target and session order, the results showed a __significant__ negative correlation for participants in Team in session 2, and for pariticpants in Ind_Team in session 4, indicating a correct perception. 
+
+```{r}
+# dependent <- "timeRemaining_ind"
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance) %>%
+  mutate(performance_reverse = 100 - Performance) %>%
+  mutate(My_Performance_f = factor(.data[["My_Performance"]], levels = c("Excellent", "Good", "Average", "Poor", "Very poor"))) # This mutate column was generated to order the facet groups. 
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() + 
+  facet_grid(. ~ My_Performance_f)
+```
+
+No obvious violation of monotonic relationship.
+
+```{r}
+for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
+  plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating)
+  
+  print(paste("Correltation: My_rating =", ind_rating))
+  
+  test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+  print(test)
+}
+```
+
+When grouping paired responses for correct collection rate and performance (reverse) by self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants that rated their performance as Excellent, indicating a correct perception of performance. The results also showed a __singnificant__ positive correlation for participants that rated their performance as Poor, indiciating an incorrect perception of performance.
+
+```{r}
+# dependent<- "timeRemaining_ind"
+
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         Target) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  mutate(My_Performance_f = factor(.data[["My_Performance"]], levels = c("Excellent", "Good", "Average", "Poor", "Very poor"))) # This mutate column was generated to order the facet groups. 
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  facet_grid(My_Performance_f ~ Target)
+```
+
+No obvious violation of monotonic relationship.
+
+```{r}
+
+for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
+  for (my_target in c("Ind", "Team", "Ind_Team")) {
+    plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               Target) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, Target == my_target)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    if(test$p.value < 0.1){
+      print(paste("Correltation: Condition =", my_target, ", Rated_performance =", ind_rating))
+    }
+    print(test$p.value)
+  }
+}
+```
+The following show a __marginally significant__ correlation:
+Condition = Team , Rated_performance = Poor
+Condition = Ind_Team , Rated_performance = Poor
+
+```{r}
+ind_rating<- "Poor"
+my_target<- "Team"
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               Target) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, Target == my_target)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    print(paste("Correltation: Condition =", my_target, ", Rated_performance =", ind_rating))
+    print(test)
+    
+#----
+ind_rating<- "Poor"
+my_target<- "Ind_Team"
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               Target) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, Target == my_target)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    print(paste("Correltation: Condition =", my_target, ", Rated_performance =", ind_rating))
+    print(test)
+
+```
+The following show a __marginally significant__ correlation:
+Condition = Team , Rated_performance = Poor
+Condition = Ind_Team , Rated_performance = Poor
+
+__Note:__ There are very few participants that rated their performance as poor in the Team and Ind_Team conditions
+
+```{r}
+# dependent<- "timeRemaining_ind"
+
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         SessionOrder) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  mutate(My_Performance_f = factor(.data[["My_Performance"]], levels = c("Excellent", "Good", "Average", "Poor", "Very poor"))) # This mutate column was generated to order the facet groups. 
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  facet_grid(My_Performance_f ~ SessionOrder)
+```
+
+No obvious violation of monotonic relationship.
+
+```{r}
+for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
+  for (my_session in c(2:4)) {
+    plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               SessionOrder) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, SessionOrder == my_session)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    if(test$p.value < 0.1){
+      print(paste("Correltation: Session =", my_session, ", Rated_performance =", ind_rating))
+    }
+    print(test$p.value)
+  }
+}
+```
+
+There was a __significant__ correlations for the following: 
+Session = 2 , Rated_performance = Excellent
+Session = 2 , Rated_performance = Poor
+
+There was a __marginally significant__ correlations for the following: 
+Session = 3 , Rated_performance = Poor
+
+```{r}
+ind_rating<- "Excellent"
+my_session<- 2
+
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               SessionOrder) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, SessionOrder == my_session)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    if(test$p.value < 0.1){
+      print(paste("Correltation: Session =", my_session, ", Rated_performance =", ind_rating))
+    }
+    print(test)
+    
+#----
+ind_rating<- "Poor"
+my_session<- 2
+
+plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               My_Performance,
+               SessionOrder) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(My_Performance == ind_rating, SessionOrder == my_session)
+  
+    test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+  
+    if(test$p.value < 0.1){
+      print(paste("Correltation: Session =", my_session, ", Rated_performance =", ind_rating))
+    }
+    print(test)
+    
+```
+
+When grouping paired responses for correct collection rate and performance (reverse) by session order and self reported performance (e.g., poor vs. excellent), the results showed a __significant__ negative correlations for participants in session 2 that rated themsleves as Excellent, indicating a correct perception. The results showed a __significant__ positive correlation for participants in session 2 that rated themselves as Poor, indicating an incorrect perception of performance. 
+
+```{r}
+# dependent<- "timeRemaining_ind"
+y_lab_indep <- params$dependent_response_name_WithSpace
+
+post_session_labled_performance<- "Excellent"
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         SessionOrder, 
+         Target) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  filter(My_Performance == post_session_labled_performance)
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  labs(title = paste(y_lab_indep, "vs Self-Rated Performance (TLX)"), caption = paste("Participants who label their performance as", post_session_labled_performance) , y = y_lab_indep) +
+  facet_grid(SessionOrder ~ Target)
+
+post_session_labled_performance<- "Good"
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         SessionOrder, 
+         Target) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  filter(My_Performance == post_session_labled_performance)
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  labs(title = paste(y_lab_indep, "vs Self-Rated Performance (TLX)"), caption = paste("Participants who label their performance as", post_session_labled_performance) , y = y_lab_indep) +
+  facet_grid(SessionOrder ~ Target)
+
+post_session_labled_performance<- "Average"
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         SessionOrder, 
+         Target) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  filter(My_Performance == post_session_labled_performance)
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  labs(title = paste(y_lab_indep, "vs Self-Rated Performance (TLX)"), caption = paste("Participants who label their performance as", post_session_labled_performance) , y = y_lab_indep) +
+  facet_grid(SessionOrder ~ Target)
+
+post_session_labled_performance<- "Poor"
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         SessionOrder, 
+         Target) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  filter(My_Performance == post_session_labled_performance)
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  labs(title = paste(y_lab_indep, "vs Self-Rated Performance (TLX)"), caption = paste("Participants who label their performance as", post_session_labled_performance) , y = y_lab_indep) +
+  facet_grid(SessionOrder ~ Target)
+
+post_session_labled_performance<- "Very poor"
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         My_Performance,
+         SessionOrder, 
+         Target) %>%
+  mutate(performance_reverse = 100 - Performance)%>%
+  filter(My_Performance == post_session_labled_performance)
+
+ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$dependent_response_ind]])) +
+  geom_point() +
+  labs(title = paste(y_lab_indep, "vs Self-Rated Performance (TLX)"), caption = paste("Participants who label their performance as", post_session_labled_performance) , y = y_lab_indep) +
+  facet_grid(SessionOrder ~ Target)
+```
+
+No obvious violation of monotonic relationship.
+
+```{r}
+
+for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
+  for (my_target in c("Ind", "Team", "Ind_Team")) {
+    for (my_session in c(2:4)) {
+      plot_data_ind <- ind_data %>%
+        select(Performance,
+               params$dependent_response_ind,
+               SessionOrder,
+               Dominate.Strategy,
+               My_Performance,
+               Target,
+               Player_ID) %>%
+        mutate(performance_reverse = 100 - Performance)%>% 
+        filter(Target == my_target, My_Performance == ind_rating, SessionOrder == my_session)
+      
+      if(length(plot_data_ind[[params$dependent_response_ind]]) < 3){
+        message<- paste("There is less than 3 data point for the Condition =", my_target, ", Session =", my_session, ", Rated individual Performance =", ind_rating)
+        print(message)
+      } else {
+        cor_test_results<- cor.test(x = plot_data_ind[["performance_reverse"]], y = plot_data_ind[[params$dependent_response_ind]], method = "spearman")
+        
+        if(cor_test_results$p.value < 0.1)
+          print(paste("Correltation: Condition =", my_target, ", Session =", my_session, ", Rated individual Performance =", ind_rating))
+          print(cor_test_results$p.value)
+      }
+    }
+  }
+}
+```
+Condition = Ind , Session = 3 , Rated individual Performance = Excellent, __significant__
+Condition = Ind_Team , Session = 4 , Rated individual Performance = Excellent, __significant__
+Condition = Ind_Team , Session = 2 , Rated individual Performance = Poor, __marginally significant__
+
+```{r}
+# dependent<- "timeRemaining_ind"
+current_target<- "Ind"
+current_my_performance<-  "Excellent"
+current_Session<- 3
+
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         SessionOrder,
+         Dominate.Strategy,
+         My_Performance,
+         Target,
+         Player_ID) %>%
+  mutate(performance_reverse = 100 - Performance) %>% 
+  filter(Target == current_target, My_Performance == current_my_performance, SessionOrder == current_Session)
+
+N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+
+print(paste("Correltation: Condition =", current_target, ", Session =", current_Session, ", Rated individual Performance =", current_my_performance))
+
+print(paste("Observations:", N_paris))
+
+cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
+
+#----
+
+current_target<- "Ind_Team"
+current_my_performance<-  "Excellent"
+current_Session<- 4
+
+plot_data_ind <- ind_data %>%
+  select(Performance,
+         params$dependent_response_ind,
+         SessionOrder,
+         Dominate.Strategy,
+         My_Performance,
+         Target,
+         Player_ID) %>%
+  mutate(performance_reverse = 100 - Performance) %>% 
+  filter(Target == current_target, My_Performance == current_my_performance, SessionOrder == current_Session)
+
+N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+
+print(paste("Correltation: Condition =", current_target, ", Session =", current_Session, ", Rated individual Performance =", current_my_performance))
+
+print(paste("Observations:", N_paris))
+
+cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
 
 
+```
+
+When grouping paired responses for correct collection rate and performance (reverse) by Target, session order, and self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants in Individual conditio in session 3 and labeled their performance as excellent, indicating a correct self-perception of performance. The results show a __significant__ negative correlation for participants in Ind_Team condition in session 4 and labaled their performance as Excellent. 
+
+## Summary 
+
+"When grouping paired responses for correct collection rate and performance (reverse) by Target, the results show a __significant__ negative correltation for the Team condition. Indicating correct self perception of performance. Results also show a __marginally significant__ negative correlation in the Ind_Team condition. "
 
 
+"When grouping paired responses for correct collection rate and performance (reverse) by session order, the results show a __significant__ negative correlation for session 4. Indicating a correct perception of performance. The results also showed a __marginally significant__ negative correlation in session 2."
+
+"When grouping paired responses for correct collection rate and performance (reverse) by target and session order, the results showed a __significant__ negative correlation for participants in Team in session 2, and for pariticpants in Ind_Team in session 4, indicating a correct perception."
+
+"When grouping paired responses for correct collection rate and performance (reverse) by self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants that rated their performance as Excellent, indicating a correct perception of performance. The results also showed a __singnificant__ positive correlation for participants that rated their performance as Poor, indiciating an incorrect perception of performance."
 
 
+"When grouping paired responses for correct collection rate and performance (reverse) by session order and self reported performance (e.g., poor vs. excellent), the results showed a __significant__ negative correlations for participants in session 2 that rated themsleves as Excellent, indicating a correct perception. The results showed a __significant__ positive correlation for participants in session 2 that rated themselves as Poor, indicating an incorrect perception of performance. "
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"When grouping paired responses for correct collection rate and performance (reverse) by Target, session order, and self reported performance (e.g., poor vs. excellent), the results show a __significant__ negative correlation for participants in Individual conditio in session 3 and labeled their performance as excellent, indicating a correct self-perception of performance. The results show a __significant__ negative correlation for participants in Ind_Team condition in session 4 and labaled their performance as Excellent. "
 
 
 
