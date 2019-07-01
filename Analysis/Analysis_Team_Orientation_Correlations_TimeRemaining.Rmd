@@ -1,5 +1,5 @@
 ---
-title: 'Dissertation Analysis: Correlations - Time Remaining - Team Orientation'
+title: 'Dissertation Analysis: Correlations - Time Remaining (Individual)- Team Orientation'
 author: "Jamiahus Walton"
 date: "`r Sys.Date()`"
 output: 
@@ -225,7 +225,11 @@ for (my_target in c("Ind", "Team", "Ind_Team")) {
   mutate(performance_reverse = 100 - Performance) %>%
   filter(Target == my_target)
   
+  N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+  
   print(paste("Correltation: Condition =", my_target))
+  
+  print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
   
   print(cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman"))
   }
@@ -260,7 +264,11 @@ for (my_session in c(2:4)) {
   mutate(performance_reverse = 100 - Performance) %>%
   filter(SessionOrder == my_session)
   
+  N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+  
   print(paste("Correltation: Session =", my_session))
+  
+  print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
   
   print(cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman"))
   }
@@ -296,11 +304,15 @@ for (my_session in c(2:4)) {
              Target) %>%
       mutate(performance_reverse = 100 - Performance) %>%
       filter(Target == my_target, SessionOrder == my_session)
+    
+    N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
   
   test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
   
   if(test$p.value < 0.1){
     print(paste("Correltation: Condition =", my_target,",", "Session =", my_session))
+    
+    print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
   }
   print(test$p.value)
   }
@@ -323,7 +335,11 @@ plot_data_ind <- ind_data %>%
       mutate(performance_reverse = 100 - Performance) %>%
       filter(Target == my_target, SessionOrder == my_session)
 
+N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+
 print(paste("Correltation: Condition =", my_target,",", "Session =", my_session))
+
+print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
 
 test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
 
@@ -342,7 +358,11 @@ plot_data_ind <- ind_data %>%
       mutate(performance_reverse = 100 - Performance) %>%
       filter(Target == my_target, SessionOrder == my_session)
 
+N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+
 print(paste("Correltation: Condition =", my_target,",", "Session =", my_session))
+
+print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
 
 test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
 
@@ -376,7 +396,11 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
         mutate(performance_reverse = 100 - Performance)%>% 
         filter(My_Performance == ind_rating)
   
+  N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+  
   print(paste("Correltation: My_rating =", ind_rating))
+  
+  print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
   
   test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
   
@@ -415,11 +439,14 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
                Target) %>%
         mutate(performance_reverse = 100 - Performance)%>% 
         filter(My_Performance == ind_rating, Target == my_target)
+    
+    N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
   
     test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
   
     if(test$p.value < 0.1){
       print(paste("Correltation: Condition =", my_target, ", Rated_performance =", ind_rating))
+      print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
     }
     print(test$p.value)
   }
@@ -457,11 +484,14 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
                SessionOrder) %>%
         mutate(performance_reverse = 100 - Performance)%>% 
         filter(My_Performance == ind_rating, SessionOrder == my_session)
+    
+    N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
   
     test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
   
     if(test$p.value < 0.1){
       print(paste("Correltation: Session =", my_session, ", Rated_performance =", ind_rating))
+      print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
     }
     print(test$p.value)
   }
@@ -483,11 +513,14 @@ plot_data_ind <- ind_data %>%
                SessionOrder) %>%
         mutate(performance_reverse = 100 - Performance)%>% 
         filter(My_Performance == ind_rating, SessionOrder == my_session)
+
+N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
   
     test<- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
   
     if(test$p.value < 0.1){
       print(paste("Correltation: Session =", my_session, ", Rated_performance =", ind_rating))
+      print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
     }
     print(test)
     
@@ -597,15 +630,19 @@ for (ind_rating in c("Excellent", "Good", "Average", "Poor", "Very poor")) {
         mutate(performance_reverse = 100 - Performance)%>% 
         filter(Target == my_target, My_Performance == ind_rating, SessionOrder == my_session)
       
+      N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
+      
       if(length(plot_data_ind[[params$dependent_response_ind]]) < 3){
         message<- paste("There is less than 3 data point for the Condition =", my_target, ", Session =", my_session, ", Rated individual Performance =", ind_rating)
         print(message)
       } else {
         cor_test_results<- cor.test(x = plot_data_ind[["performance_reverse"]], y = plot_data_ind[[params$dependent_response_ind]], method = "spearman")
         
-        if(cor_test_results$p.value < 0.1)
+        if(cor_test_results$p.value < 0.1){
           print(paste("Correltation: Condition =", my_target, ", Session =", my_session, ", Rated individual Performance =", ind_rating))
-          print(cor_test_results$p.value)
+          print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
+        }
+        print(cor_test_results$p.value)
       }
     }
   }
@@ -637,7 +674,7 @@ N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
 
 print(paste("Correltation: Condition =", current_target, ", Session =", current_Session, ", Rated individual Performance =", current_my_performance))
 
-print(paste("Observations:", N_paris))
+print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
 
 cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
 
@@ -663,7 +700,7 @@ N_paris<- length(plot_data_ind[[params$dependent_response_ind]])
 
 print(paste("Correltation: Condition =", current_target, ", Session =", current_Session, ", Rated individual Performance =", current_my_performance))
 
-print(paste("Observations:", N_paris))
+print(paste("Pairs:", N_paris, ", Degree of Freedom:", N_paris-2))
 
 cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[["performance_reverse"]], method = "spearman")
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Jamiahus Walton" />
 
-<meta name="date" content="2019-06-28" />
+<meta name="date" content="2019-06-29" />
 
 <title>Dissertation Analysis: Correlations - Collection Rate - Team Orientation</title>
 
@@ -377,7 +377,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Dissertation Analysis: Correlations - Collection Rate - Team Orientation</h1>
 <h4 class="author">Jamiahus Walton</h4>
-<h4 class="date">2019-06-28</h4>
+<h4 class="date">2019-06-29</h4>
 
 </div>
 
@@ -434,11 +434,15 @@ for (my_target in c(&quot;Ind&quot;, &quot;Team&quot;, &quot;Ind_Team&quot;)) {
   mutate(performance_reverse = 100 - Performance) %&gt;%
   filter(Target == my_target)
   
+  N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
+  
   print(paste(&quot;Correltation: Condition =&quot;, my_target))
+  print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
   
   print(cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;))
   }</code></pre>
-<pre><code>## [1] &quot;Correltation: Condition = Ind&quot;</code></pre>
+<pre><code>## [1] &quot;Correltation: Condition = Ind&quot;
+## [1] &quot;Pairs: 117 , Degree of Freedom: 115&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -452,7 +456,8 @@ for (my_target in c(&quot;Ind&quot;, &quot;Team&quot;, &quot;Ind_Team&quot;)) {
 ##        rho 
 ## -0.1486996 
 ## 
-## [1] &quot;Correltation: Condition = Team&quot;</code></pre>
+## [1] &quot;Correltation: Condition = Team&quot;
+## [1] &quot;Pairs: 117 , Degree of Freedom: 115&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -466,7 +471,8 @@ for (my_target in c(&quot;Ind&quot;, &quot;Team&quot;, &quot;Ind_Team&quot;)) {
 ##        rho 
 ## -0.2296683 
 ## 
-## [1] &quot;Correltation: Condition = Ind_Team&quot;</code></pre>
+## [1] &quot;Correltation: Condition = Ind_Team&quot;
+## [1] &quot;Pairs: 117 , Degree of Freedom: 115&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -502,11 +508,15 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
   mutate(performance_reverse = 100 - Performance) %&gt;%
   filter(SessionOrder == my_session)
   
+  N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
+  
   print(paste(&quot;Correltation: Session =&quot;, my_session))
+  print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
   
   print(cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;))
   }</code></pre>
-<pre><code>## [1] &quot;Correltation: Session = 2&quot;</code></pre>
+<pre><code>## [1] &quot;Correltation: Session = 2&quot;
+## [1] &quot;Pairs: 117 , Degree of Freedom: 115&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -520,7 +530,8 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ##        rho 
 ## -0.1620681 
 ## 
-## [1] &quot;Correltation: Session = 3&quot;</code></pre>
+## [1] &quot;Correltation: Session = 3&quot;
+## [1] &quot;Pairs: 117 , Degree of Freedom: 115&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -534,7 +545,8 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ##       rho 
 ## -0.127522 
 ## 
-## [1] &quot;Correltation: Session = 4&quot;</code></pre>
+## [1] &quot;Correltation: Session = 4&quot;
+## [1] &quot;Pairs: 117 , Degree of Freedom: 115&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -571,11 +583,14 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
              Target) %&gt;%
       mutate(performance_reverse = 100 - Performance) %&gt;%
       filter(Target == my_target, SessionOrder == my_session)
+    
+    N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
   test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)
   
   if(test$p.value &lt; 0.1){
     print(paste(&quot;Correltation: Condition =&quot;, my_target,&quot;,&quot;, &quot;Session =&quot;, my_session))
+    print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
   }
   print(test$p.value)
   }
@@ -588,6 +603,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Team , Session = 2&quot;
+## [1] &quot;Pairs: 39 , Degree of Freedom: 37&quot;
 ## [1] 0.02625088</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
@@ -617,6 +633,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind_Team , Session = 4&quot;
+## [1] &quot;Pairs: 42 , Degree of Freedom: 40&quot;
 ## [1] 0.01963512</code></pre>
 <p>There was a <strong>significant</strong> correltation in the following condition and session combinations: Condition = Team , Session = 2 Condition = Ind_Team , Session = 4</p>
 <pre class="r"><code>my_target&lt;- &quot;Team&quot;
@@ -630,8 +647,12 @@ plot_data_ind &lt;- ind_data %&gt;%
       mutate(performance_reverse = 100 - Performance) %&gt;%
       filter(Target == my_target, SessionOrder == my_session)
 
+N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
+
 print(paste(&quot;Correltation: Condition =&quot;, my_target,&quot;,&quot;, &quot;Session =&quot;, my_session))</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Team , Session = 2&quot;</code></pre>
+<pre class="r"><code>print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))</code></pre>
+<pre><code>## [1] &quot;Pairs: 39 , Degree of Freedom: 37&quot;</code></pre>
 <pre class="r"><code>test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
@@ -659,8 +680,12 @@ plot_data_ind &lt;- ind_data %&gt;%
       mutate(performance_reverse = 100 - Performance) %&gt;%
       filter(Target == my_target, SessionOrder == my_session)
 
+N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
+
 print(paste(&quot;Correltation: Condition =&quot;, my_target,&quot;,&quot;, &quot;Session =&quot;, my_session))</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind_Team , Session = 4&quot;</code></pre>
+<pre class="r"><code>print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))</code></pre>
+<pre><code>## [1] &quot;Pairs: 42 , Degree of Freedom: 40&quot;</code></pre>
 <pre class="r"><code>test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
@@ -698,13 +723,17 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating)
   
+  N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
+  
   print(paste(&quot;Correltation: My_rating =&quot;, ind_rating))
+  print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
   
   test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)
   
   print(test)
 }</code></pre>
-<pre><code>## [1] &quot;Correltation: My_rating = Excellent&quot;</code></pre>
+<pre><code>## [1] &quot;Correltation: My_rating = Excellent&quot;
+## [1] &quot;Pairs: 77 , Degree of Freedom: 75&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -718,7 +747,8 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ##        rho 
 ## -0.2700277 
 ## 
-## [1] &quot;Correltation: My_rating = Good&quot;</code></pre>
+## [1] &quot;Correltation: My_rating = Good&quot;
+## [1] &quot;Pairs: 175 , Degree of Freedom: 173&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -732,7 +762,8 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ##         rho 
 ## -0.08325938 
 ## 
-## [1] &quot;Correltation: My_rating = Average&quot;</code></pre>
+## [1] &quot;Correltation: My_rating = Average&quot;
+## [1] &quot;Pairs: 68 , Degree of Freedom: 66&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -746,7 +777,8 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ##        rho 
 ## 0.03791813 
 ## 
-## [1] &quot;Correltation: My_rating = Poor&quot;</code></pre>
+## [1] &quot;Correltation: My_rating = Poor&quot;
+## [1] &quot;Pairs: 23 , Degree of Freedom: 21&quot;</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
@@ -761,6 +793,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## 0.7008177 
 ## 
 ## [1] &quot;Correltation: My_rating = Very poor&quot;
+## [1] &quot;Pairs: 8 , Degree of Freedom: 6&quot;
 ## 
 ##  Spearman&#39;s rank correlation rho
 ## 
@@ -795,11 +828,14 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
                Target) %&gt;%
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating, Target == my_target)
+    
+    N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
     test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)
   
     if(test$p.value &lt; 0.1){
       print(paste(&quot;Correltation: Condition =&quot;, my_target, &quot;, Rated_performance =&quot;, ind_rating))
+      print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
     }
     print(test$p.value)
   }
@@ -845,8 +881,10 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Team , Rated_performance = Poor&quot;
+## [1] &quot;Pairs: 7 , Degree of Freedom: 5&quot;
 ## [1] 0.0578585
 ## [1] &quot;Correltation: Condition = Ind_Team , Rated_performance = Poor&quot;
+## [1] &quot;Pairs: 6 , Degree of Freedom: 4&quot;
 ## [1] 0.05833333
 ## [1] 1
 ## [1] 1
@@ -861,6 +899,8 @@ plot_data_ind &lt;- ind_data %&gt;%
                Target) %&gt;%
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating, Target == my_target)
+
+N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
     test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
@@ -868,6 +908,8 @@ plot_data_ind &lt;- ind_data %&gt;%
 ## value with ties</code></pre>
 <pre class="r"><code>    print(paste(&quot;Correltation: Condition =&quot;, my_target, &quot;, Rated_performance =&quot;, ind_rating))</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Team , Rated_performance = Poor&quot;</code></pre>
+<pre class="r"><code>    print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))</code></pre>
+<pre><code>## [1] &quot;Pairs: 7 , Degree of Freedom: 5&quot;</code></pre>
 <pre class="r"><code>    print(test)</code></pre>
 <pre><code>## 
 ##  Spearman&#39;s rank correlation rho
@@ -888,11 +930,15 @@ plot_data_ind &lt;- ind_data %&gt;%
                Target) %&gt;%
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating, Target == my_target)
+
+N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
     test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)
   
     print(paste(&quot;Correltation: Condition =&quot;, my_target, &quot;, Rated_performance =&quot;, ind_rating))</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind_Team , Rated_performance = Poor&quot;</code></pre>
+<pre class="r"><code>    print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))</code></pre>
+<pre><code>## [1] &quot;Pairs: 6 , Degree of Freedom: 4&quot;</code></pre>
 <pre class="r"><code>    print(test)</code></pre>
 <pre><code>## 
 ##  Spearman&#39;s rank correlation rho
@@ -929,11 +975,14 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
                SessionOrder) %&gt;%
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating, SessionOrder == my_session)
+    
+    N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
     test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)
   
     if(test$p.value &lt; 0.1){
       print(paste(&quot;Correltation: Session =&quot;, my_session, &quot;, Rated_performance =&quot;, ind_rating))
+      print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
     }
     print(test$p.value)
   }
@@ -942,6 +991,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Session = 2 , Rated_performance = Excellent&quot;
+## [1] &quot;Pairs: 14 , Degree of Freedom: 12&quot;
 ## [1] 0.00295921</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
@@ -979,8 +1029,10 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
 ## value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Session = 2 , Rated_performance = Poor&quot;
+## [1] &quot;Pairs: 15 , Degree of Freedom: 13&quot;
 ## [1] 0.01723925
 ## [1] &quot;Correltation: Session = 3 , Rated_performance = Poor&quot;
+## [1] &quot;Pairs: 5 , Degree of Freedom: 3&quot;
 ## [1] 0.08333333
 ## [1] 0.3333333
 ## [1] 1
@@ -998,6 +1050,8 @@ plot_data_ind &lt;- ind_data %&gt;%
                SessionOrder) %&gt;%
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating, SessionOrder == my_session)
+
+N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
     test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
@@ -1005,8 +1059,10 @@ plot_data_ind &lt;- ind_data %&gt;%
 ## value with ties</code></pre>
 <pre class="r"><code>    if(test$p.value &lt; 0.1){
       print(paste(&quot;Correltation: Session =&quot;, my_session, &quot;, Rated_performance =&quot;, ind_rating))
+      print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
     }</code></pre>
-<pre><code>## [1] &quot;Correltation: Session = 2 , Rated_performance = Excellent&quot;</code></pre>
+<pre><code>## [1] &quot;Correltation: Session = 2 , Rated_performance = Excellent&quot;
+## [1] &quot;Pairs: 14 , Degree of Freedom: 12&quot;</code></pre>
 <pre class="r"><code>    print(test)</code></pre>
 <pre><code>## 
 ##  Spearman&#39;s rank correlation rho
@@ -1028,6 +1084,8 @@ plot_data_ind &lt;- ind_data %&gt;%
                SessionOrder) %&gt;%
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(My_Performance == ind_rating, SessionOrder == my_session)
+
+N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
   
     test&lt;- cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
@@ -1035,8 +1093,10 @@ plot_data_ind &lt;- ind_data %&gt;%
 ## value with ties</code></pre>
 <pre class="r"><code>    if(test$p.value &lt; 0.1){
       print(paste(&quot;Correltation: Session =&quot;, my_session, &quot;, Rated_performance =&quot;, ind_rating))
+      print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
     }</code></pre>
-<pre><code>## [1] &quot;Correltation: Session = 2 , Rated_performance = Poor&quot;</code></pre>
+<pre><code>## [1] &quot;Correltation: Session = 2 , Rated_performance = Poor&quot;
+## [1] &quot;Pairs: 15 , Degree of Freedom: 13&quot;</code></pre>
 <pre class="r"><code>    print(test)</code></pre>
 <pre><code>## 
 ##  Spearman&#39;s rank correlation rho
@@ -1141,15 +1201,19 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
         mutate(performance_reverse = 100 - Performance)%&gt;% 
         filter(Target == my_target, My_Performance == ind_rating, SessionOrder == my_session)
       
+      N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
+      
       if(length(plot_data_ind[[params$dependent_response_ind]]) &lt; 3){
         message&lt;- paste(&quot;There is less than 3 data point for the Condition =&quot;, my_target, &quot;, Session =&quot;, my_session, &quot;, Rated individual Performance =&quot;, ind_rating)
         print(message)
       } else {
         cor_test_results&lt;- cor.test(x = plot_data_ind[[&quot;performance_reverse&quot;]], y = plot_data_ind[[params$dependent_response_ind]], method = &quot;spearman&quot;)
         
-        if(cor_test_results$p.value &lt; 0.1)
+        if(cor_test_results$p.value &lt; 0.1){
           print(paste(&quot;Correltation: Condition =&quot;, my_target, &quot;, Session =&quot;, my_session, &quot;, Rated individual Performance =&quot;, ind_rating))
-          print(cor_test_results$p.value)
+          print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))
+        }
+        print(cor_test_results$p.value)
       }
     }
   }
@@ -1158,6 +1222,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 <pre><code>## Warning in cor.test.default(x = plot_data_ind[[&quot;performance_reverse&quot;]], :
 ## Cannot compute exact p-value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind , Session = 3 , Rated individual Performance = Excellent&quot;
+## [1] &quot;Pairs: 10 , Degree of Freedom: 8&quot;
 ## [1] 0.0189839
 ## [1] 0.2357143
 ## [1] 0.1361111</code></pre>
@@ -1174,6 +1239,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 <pre><code>## Warning in cor.test.default(x = plot_data_ind[[&quot;performance_reverse&quot;]], :
 ## Cannot compute exact p-value with ties</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind_Team , Session = 4 , Rated individual Performance = Excellent&quot;
+## [1] &quot;Pairs: 16 , Degree of Freedom: 14&quot;
 ## [1] 0.009910711</code></pre>
 <pre><code>## Warning in cor.test.default(x = plot_data_ind[[&quot;performance_reverse&quot;]], :
 ## Cannot compute exact p-value with ties</code></pre>
@@ -1224,6 +1290,7 @@ ggplot(data = plot_data_ind, aes(x = performance_reverse, y = .data[[params$depe
 ## [1] 0.3333333
 ## [1] &quot;There is less than 3 data point for the Condition = Team , Session = 4 , Rated individual Performance = Poor&quot;
 ## [1] &quot;Correltation: Condition = Ind_Team , Session = 2 , Rated individual Performance = Poor&quot;
+## [1] &quot;Pairs: 5 , Degree of Freedom: 3&quot;
 ## [1] 0.08333333
 ## [1] &quot;There is less than 3 data point for the Condition = Ind_Team , Session = 3 , Rated individual Performance = Poor&quot;
 ## [1] &quot;There is less than 3 data point for the Condition = Ind_Team , Session = 4 , Rated individual Performance = Poor&quot;
@@ -1257,8 +1324,8 @@ N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
 
 print(paste(&quot;Correltation: Condition =&quot;, current_target, &quot;, Session =&quot;, current_Session, &quot;, Rated individual Performance =&quot;, current_my_performance))</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind , Session = 3 , Rated individual Performance = Excellent&quot;</code></pre>
-<pre class="r"><code>print(paste(&quot;Observations:&quot;, N_paris))</code></pre>
-<pre><code>## [1] &quot;Observations: 10&quot;</code></pre>
+<pre class="r"><code>print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))</code></pre>
+<pre><code>## [1] &quot;Pairs: 10 , Degree of Freedom: 8&quot;</code></pre>
 <pre class="r"><code>cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
@@ -1293,8 +1360,8 @@ N_paris&lt;- length(plot_data_ind[[params$dependent_response_ind]])
 
 print(paste(&quot;Correltation: Condition =&quot;, current_target, &quot;, Session =&quot;, current_Session, &quot;, Rated individual Performance =&quot;, current_my_performance))</code></pre>
 <pre><code>## [1] &quot;Correltation: Condition = Ind_Team , Session = 4 , Rated individual Performance = Excellent&quot;</code></pre>
-<pre class="r"><code>print(paste(&quot;Observations:&quot;, N_paris))</code></pre>
-<pre><code>## [1] &quot;Observations: 16&quot;</code></pre>
+<pre class="r"><code>print(paste(&quot;Pairs:&quot;, N_paris, &quot;, Degree of Freedom:&quot;, N_paris-2))</code></pre>
+<pre><code>## [1] &quot;Pairs: 16 , Degree of Freedom: 14&quot;</code></pre>
 <pre class="r"><code>cor.test(y = plot_data_ind[[params$dependent_response_ind]], x = plot_data_ind[[&quot;performance_reverse&quot;]], method = &quot;spearman&quot;)</code></pre>
 <pre><code>## Warning in cor.test.default(y =
 ## plot_data_ind[[params$dependent_response_ind]], : Cannot compute exact p-
